@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hoàng Vũ - Trợ Lý Thí Nghiệm Vật Lý 1</title>
+    <title>Hoàng Vũ Labs - Ultimate Physics Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
@@ -12,15 +12,19 @@
         .tech-font { font-family: 'JetBrains Mono', monospace; }
         .neon-border { box-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
         .input-group label { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.25rem; }
-        .input-dark { background: #1e293b; border: 1px solid #334155; color: white; padding: 4px 8px; border-radius: 4px; width: 100%; font-family: 'JetBrains Mono'; }
-        .input-dark:focus { outline: none; border-color: #38bdf8; }
+        .input-dark { background: #1e293b; border: 1px solid #334155; color: white; padding: 4px 8px; border-radius: 4px; width: 100%; font-family: 'JetBrains Mono'; transition: all 0.2s; }
+        .input-dark:focus { outline: none; border-color: #38bdf8; background: #0f172a; }
+        .input-disabled { background: #334155; color: #94a3b8; cursor: not-allowed; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
         th, td { border: 1px solid #334155; padding: 8px; text-align: center; }
         th { background-color: #1e293b; color: #38bdf8; }
         tr:nth-child(even) { background-color: #0f172a; }
-        tr:hover { background-color: #1e293b; }
         
-        /* Ruler Styling */
+        /* Range Input Styling */
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #38bdf8; cursor: pointer; margin-top: -6px; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #334155; border-radius: 2px; }
+        
         #ruler { cursor: grab; touch-action: none; }
         #ruler:active { cursor: grabbing; }
     </style>
@@ -28,383 +32,529 @@
 <body class="flex flex-col h-screen overflow-hidden">
 
     <!-- Header -->
-    <header class="bg-slate-900 border-b border-slate-700 p-3 flex justify-between items-center shadow-lg shrink-0">
+    <header class="bg-slate-900 border-b border-slate-700 p-3 flex justify-between items-center shadow-lg shrink-0 z-20">
         <div class="flex items-center space-x-3">
-            <div class="p-2 bg-blue-600 rounded-lg neon-border">
-                <i class="fa-solid fa-microscope text-white"></i>
+            <div class="p-2 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg neon-border">
+                <i class="fa-solid fa-atom text-white"></i>
             </div>
             <div>
-                <h1 class="font-bold text-white uppercase tracking-wider text-sm md:text-base">Hoàng Vũ Labs - Xử Lý Số Liệu</h1>
-                <p class="text-[10px] text-blue-400 tech-font">AUTO_CALC_MODE: ON | NÉM NGANG</p>
+                <h1 class="font-bold text-white uppercase tracking-wider text-sm md:text-base">Hoàng Vũ Labs - Ultimate</h1>
+                <p class="text-[10px] text-blue-400 tech-font">MODE: EXTENDED ANGLE (MAX 100°) | V4.6</p>
             </div>
         </div>
-        <div class="text-right hidden sm:block">
-            <p class="text-xs text-slate-400">Trạng thái:</p>
-            <p class="text-xs font-bold text-green-400">Đang hoạt động tốt ⚡</p>
+        <div class="hidden sm:flex items-center space-x-2">
+            <span class="text-xs text-slate-400">Chọn bài thí nghiệm:</span>
+            <select id="labMode" class="bg-slate-800 text-white text-xs p-1 rounded border border-slate-600 focus:outline-none focus:border-blue-500">
+                <option value="1">Bài 1: Ném Ngang (Tìm v0)</option>
+                <option value="2">Bài 2: Ném Xiên (Tự do)</option>
+            </select>
         </div>
     </header>
 
     <div class="flex flex-1 overflow-hidden">
-        <!-- LEFT PANEL: NHẬP SỐ LIỆU THỰC TẾ -->
-        <aside class="w-full md:w-80 bg-slate-800 border-r border-slate-700 flex flex-col overflow-y-auto">
+        <!-- LEFT PANEL: CONTROL CENTER -->
+        <aside class="w-full md:w-80 bg-slate-800 border-r border-slate-700 flex flex-col overflow-y-auto custom-scrollbar z-10">
             
             <div class="p-4 space-y-4">
-                <!-- 1. Cấu hình chung -->
-                <div class="bg-slate-900 p-3 rounded border border-slate-700">
-                    <h3 class="text-yellow-400 font-bold text-sm mb-2"><i class="fa-solid fa-gear"></i> THÔNG SỐ CỐ ĐỊNH</h3>
+                
+                <!-- Section 1: Thông số môi trường -->
+                <div class="bg-slate-900 p-3 rounded border border-slate-700 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-1 opacity-10"><i class="fa-solid fa-earth-asia text-4xl text-white"></i></div>
+                    <h3 class="text-yellow-400 font-bold text-xs uppercase mb-2 tracking-wider">1. Thông số Cố định</h3>
                     <div class="grid grid-cols-2 gap-2">
                         <div class="input-group">
                             <label>Gia tốc g (m/s²)</label>
                             <input type="number" id="inputG" value="9.8" step="0.01" class="input-dark">
                         </div>
                         <div class="input-group">
-                            <label>Đường kính D (mm)</label>
-                            <input type="number" id="inputD" value="20" class="input-dark">
-                        </div>
-                         <div class="input-group col-span-2">
                             <label>Độ cao h (mm)</label>
-                            <input type="number" id="inputH" value="800" class="input-dark">
+                            <input type="number" id="inputH" value="500" class="input-dark">
                         </div>
                     </div>
                 </div>
 
-                <!-- 2. Nhập liệu từng lần đo -->
-                <div class="bg-slate-900 p-3 rounded border border-slate-700">
-                    <h3 class="text-blue-400 font-bold text-sm mb-2"><i class="fa-solid fa-stopwatch"></i> NHẬP KẾT QUẢ ĐO</h3>
+                <!-- Section 2: Chế độ Ném Ngang (Bài 1) -->
+                <div id="panelMode1" class="bg-slate-900 p-3 rounded border border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.1)] transition-all">
+                    <h3 class="text-blue-400 font-bold text-xs uppercase mb-2 flex justify-between">
+                        <span>2. Ném Ngang (Tìm v0)</span>
+                        <i class="fa-solid fa-1"></i>
+                    </h3>
                     
+                    <div class="input-group mb-2">
+                        <label>Đường kính D (mm)</label>
+                        <input type="number" id="inputD" value="20" class="input-dark">
+                    </div>
                     <div class="input-group mb-3">
-                        <label>Thời gian Δt (ms) - Nhìn trên máy đo</label>
-                        <input type="number" id="inputTime" placeholder="Ví dụ: 5.25" class="input-dark text-lg text-yellow-300 font-bold">
+                        <label>Thời gian chắn cổng Δt (ms)</label>
+                        <input type="number" id="inputTime" placeholder="Ví dụ: 5.0" class="input-dark text-yellow-300 font-bold ring-1 ring-yellow-500/50">
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2 mb-3">
-                        <div class="p-2 bg-slate-800 rounded border border-slate-600 text-center">
-                            <p class="text-[10px] text-slate-400">Vận tốc v0 (tính)</p>
-                            <p id="calcV0" class="text-green-400 font-bold tech-font text-sm">--- m/s</p>
-                        </div>
-                        <div class="p-2 bg-slate-800 rounded border border-slate-600 text-center">
-                            <p class="text-[10px] text-slate-400">L_lý_thuyết (tính)</p>
-                            <p id="calcLtt" class="text-green-400 font-bold tech-font text-sm">--- mm</p>
-                        </div>
+                    <div class="p-2 bg-slate-800 rounded border border-slate-600 text-center mb-2">
+                        <p class="text-[10px] text-slate-400">Vận tốc v0 tính được:</p>
+                        <p id="resV0_1" class="text-green-400 font-bold tech-font text-lg">---</p>
+                        <p class="text-[10px] text-slate-500">m/s</p>
                     </div>
-
-                    <button id="btnSimulate" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 rounded text-sm transition shadow-lg mb-2">
-                        <i class="fa-solid fa-play"></i> MÔ PHỎNG & TÍNH TOÁN
-                    </button>
-                    <p class="text-[10px] text-slate-500 italic text-center">*Hệ thống sẽ tự tính v0 và L_tt cho cậu</p>
+                    <p class="text-[10px] text-slate-500 italic">*Nhập Δt rồi bấm KHAI HỎA để thấy bóng!</p>
                 </div>
 
-                <!-- 3. Kết quả đo thực tế -->
-                <div class="bg-slate-900 p-3 rounded border border-slate-700">
-                    <h3 class="text-purple-400 font-bold text-sm mb-2"><i class="fa-solid fa-ruler"></i> KẾT QUẢ THỰC NGHIỆM</h3>
-                    <p class="text-xs text-slate-400 mb-2">Kéo thước trên màn hình đến điểm rơi để lấy L_tn</p>
-                    
-                    <div class="flex justify-between items-center bg-slate-800 p-2 rounded mb-2">
-                        <span class="text-xs">L_tn (Đo bằng thước ảo):</span>
-                        <span id="measureResult" class="text-purple-300 font-bold tech-font">0 mm</span>
+                <!-- Section 3: Chế độ Ném Xiên (Bài 2) -->
+                <div id="panelMode2" class="bg-slate-900 p-3 rounded border border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.1)] opacity-50 pointer-events-none transition-all">
+                    <h3 class="text-purple-400 font-bold text-xs uppercase mb-2 flex justify-between">
+                        <span>2. Ném Xiên (Góc Tùy Chỉnh)</span>
+                        <i class="fa-solid fa-unlock text-xs"></i>
+                    </h3>
+
+                    <div class="input-group mb-2">
+                        <label class="flex justify-between">
+                            <span>Vận tốc đầu v0 (m/s)</span>
+                            <button id="btnAutoV0" class="text-[10px] text-blue-400 hover:text-white underline">Lấy TB từ Bảng 1</button>
+                        </label>
+                        <input type="number" id="inputV0_Manual" value="3.5" step="0.01" class="input-dark text-green-300 font-bold">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="flex justify-between text-xs text-slate-400 mb-1">
+                            <span>Góc ném (α)</span>
+                            <span id="angleDisplay" class="text-white font-bold">45°</span>
+                        </label>
+                        <!-- UNLOCKED SLIDER 0-100 -->
+                        <input type="range" id="inputAngle" min="0" max="100" value="45" step="1" class="cursor-pointer accent-purple-500">
+                        <div class="flex justify-between text-[10px] text-slate-600 px-1">
+                            <span>0°</span><span>50°</span><span>100°</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="space-y-2">
+                    <div class="bg-slate-800 p-2 rounded flex justify-between items-center border border-slate-600">
+                        <span class="text-xs text-slate-300">L_lý_thuyết:</span>
+                        <span id="calcLtt" class="text-green-400 font-bold tech-font">0.0 mm</span>
                     </div>
                     
-                    <button id="btnRecord" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2 rounded text-sm transition shadow-lg">
-                        <i class="fa-solid fa-save"></i> GHI VÀO BẢNG
+                    <button id="btnSimulate" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold py-2 rounded text-sm shadow-lg transform active:scale-95 transition-all">
+                        <i class="fa-solid fa-rocket mr-1"></i> KHAI HỎA (FIRE)
                     </button>
+
+                    <div class="flex gap-2">
+                        <div class="bg-slate-900 border border-slate-700 rounded p-2 flex-1 text-center">
+                            <p class="text-[10px] text-slate-400">Đo được (Thước)</p>
+                            <p id="measureResult" class="text-purple-400 font-bold tech-font text-sm">0 mm</p>
+                        </div>
+                        <button id="btnRecord" class="bg-green-600 hover:bg-green-500 text-white font-bold px-4 rounded text-xs shadow-lg flex flex-col justify-center items-center w-24 transform active:scale-95 transition-all">
+                            <i class="fa-solid fa-save mb-1"></i> GHI SỐ
+                        </button>
+                    </div>
                 </div>
+                
             </div>
         </aside>
 
-        <!-- RIGHT PANEL: MÔ PHỎNG & BẢNG -->
+        <!-- RIGHT PANEL: VISUALIZATION -->
         <main class="flex-1 flex flex-col bg-slate-950 relative">
-            <!-- Canvas Visualizer -->
-            <div class="relative flex-1 overflow-hidden border-b border-slate-700">
+            <!-- Canvas -->
+            <div class="relative flex-1 overflow-hidden border-b border-slate-700 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]">
                 <canvas id="simCanvas" class="w-full h-full block cursor-crosshair"></canvas>
                 
-                <!-- Thước đo ảo -->
-                <div id="ruler" class="absolute bottom-10 left-10 flex flex-col items-center group z-50" style="transform: translateX(0px);">
-                    <div class="w-0 h-0 border-x-8 border-x-transparent border-t-[12px] border-t-red-500 animate-bounce"></div>
-                    <div class="bg-yellow-400 text-black font-bold text-xs px-2 py-1 rounded shadow-lg border border-yellow-600 min-w-[80px] text-center select-none">
-                        <i class="fa-solid fa-ruler-horizontal"></i> <span id="rulerVal">0 mm</span>
+                <!-- Ruler (Đã nâng lên cao) -->
+                <div id="ruler" class="absolute bottom-32 left-10 flex flex-col items-center group z-50" style="transform: translateX(0px);">
+                    <div class="w-0 h-0 border-x-8 border-x-transparent border-t-[12px] border-t-red-500 animate-bounce filter drop-shadow-[0_0_5px_rgba(239,68,68,0.8)]"></div>
+                    <div class="bg-yellow-400 text-black font-bold text-xs px-2 py-1 rounded shadow-lg border-2 border-yellow-600 min-w-[90px] text-center select-none cursor-grab active:cursor-grabbing">
+                        <i class="fa-solid fa-ruler-combined mr-1"></i> <span id="rulerVal">0 mm</span>
                     </div>
-                    <!-- Đường gióng -->
-                    <div class="w-px h-[1000px] bg-red-500/50 absolute top-full left-1/2 -translate-x-1/2 border-l border-dashed border-red-500"></div>
+                    <!-- Dây dọi dài 2000px để vẫn chạm đất -->
+                    <div class="w-px h-[2000px] bg-red-500/60 absolute top-full left-1/2 -translate-x-1/2 border-l border-dashed border-red-500"></div>
                 </div>
 
-                <div class="absolute top-2 right-2 bg-black/60 px-3 py-1 rounded text-xs text-white">
-                    <i class="fa-solid fa-info-circle"></i> View: Mặt cắt ngang
+                <!-- HUD Info -->
+                <div class="absolute top-4 right-4 text-right pointer-events-none">
+                    <div class="text-slate-500 text-xs">TRẠNG THÁI BÓNG</div>
+                    <div class="text-blue-400 font-mono text-xs" id="hudVx">Vx: 0.00 m/s</div>
+                    <div class="text-green-400 font-mono text-xs" id="hudVy">Vy: 0.00 m/s</div>
+                    <div id="ballStatus" class="text-yellow-500 font-bold text-xs mt-1">SẴN SÀNG</div>
                 </div>
             </div>
 
-            <!-- Data Table (Mô phỏng bảng báo cáo) -->
-            <div class="h-64 bg-slate-900 overflow-auto p-4">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 class="text-white font-bold text-sm">BẢNG SỐ LIỆU 1: KHẢO SÁT CHUYỂN ĐỘNG NÉM NGANG</h3>
-                    <button onclick="clearTable()" class="text-xs text-red-400 hover:text-red-300"><i class="fa-solid fa-trash"></i> Xóa bảng</button>
+            <!-- Data Tables Container -->
+            <div class="h-64 bg-slate-900 overflow-hidden flex flex-col">
+                <div class="flex justify-between items-center px-4 py-2 bg-slate-800 sticky top-0 z-10 border-b border-slate-700">
+                    <h3 class="text-white font-bold text-xs uppercase" id="tableTitle">BẢNG SỐ LIỆU 1 (NÉM NGANG)</h3>
+                    <button onclick="clearCurrentTable()" class="text-[10px] text-red-400 hover:text-red-200 uppercase tracking-wider"><i class="fa-solid fa-trash"></i> Xóa bảng này</button>
                 </div>
-                <table id="dataTable">
-                    <thead>
-                        <tr>
-                            <th>Lần đo</th>
-                            <th>Δt (ms)</th>
-                            <th>v0 (m/s)</th>
-                            <th>L_tn (mm)<br><span class="text-[9px] font-normal">(Thực nghiệm)</span></th>
-                            <th>L_tt (mm)<br><span class="text-[9px] font-normal">(Lý thuyết)</span></th>
-                            <th>Độ lệch (%)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        <!-- Rows will be added here -->
-                    </tbody>
-                </table>
+                
+                <div class="flex-1 overflow-auto custom-scrollbar relative">
+                    <!-- Table 1: Ném Ngang -->
+                    <table id="table1" class="w-full">
+                        <thead class="bg-slate-800 text-xs sticky top-0">
+                            <tr>
+                                <th>Lần</th>
+                                <th>Δt (ms)</th>
+                                <th>v0 (m/s)</th>
+                                <th>L_tn (mm)</th>
+                                <th>L_tt (mm)</th>
+                                <th>Sai số (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody1" class="text-xs font-mono"></tbody>
+                    </table>
+
+                    <!-- Table 2: Ném Xiên -->
+                    <table id="table2" class="w-full hidden">
+                        <thead class="bg-slate-800 text-xs sticky top-0">
+                            <tr>
+                                <th>Lần</th>
+                                <th>Góc (α)</th>
+                                <th>v0 (TB)</th>
+                                <th>L_tn (mm)</th>
+                                <th>L_tt (mm)</th>
+                                <th>Sai số (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody2" class="text-xs font-mono"></tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>
 
     <script>
-        // --- LOGIC HOÀNG VŨ AUTOMATION ---
-
-        // Biến toàn cục
+        // --- HOANG VU PHYSICS ENGINE V4.6 (EXTENDED ANGLE) ---
         const canvas = document.getElementById('simCanvas');
         const ctx = canvas.getContext('2d');
-        const SCALE = 0.5; // 1mm thực tế = 0.5px màn hình (để hiển thị được 1-2m)
+        const SCALE = 0.4; 
         
-        // Trạng thái
         let state = {
+            mode: 1, // 1: Ném Ngang, 2: Ném Xiên
             g: 9.8,
-            D: 20, // mm
-            h: 800, // mm
-            dt: 0, // ms
-            v0: 0, // m/s
-            Ltt: 0, // mm
-            Ltn: 0, // mm (đo bằng thước ảo)
-            ball: null
+            h: 500, // mm
+            v0: 0, 
+            angle: 0, 
+            dt: 0,
+            ball: null, // Object: {x, y, vx, vy, t, landed, path: []}
+            Ltt: 0,
+            Ltn: 0
         };
         
-        let measurementCount = 0;
+        let data1 = []; 
+        let counts = { 1: 0, 2: 0 };
+        let animationId; // To control loop
 
-        // Khởi tạo
         function init() {
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
             
-            // Input listeners
-            ['inputG', 'inputD', 'inputH', 'inputTime'].forEach(id => {
-                document.getElementById(id).addEventListener('input', updateCalculations);
+            document.getElementById('labMode').addEventListener('change', (e) => {
+                setMode(parseInt(e.target.value));
+            });
+            
+            // Slider
+            document.getElementById('inputAngle').addEventListener('input', (e) => {
+                document.getElementById('angleDisplay').textContent = e.target.value + '°';
+                calculatePhysics();
+            });
+            
+            ['inputG', 'inputH', 'inputD', 'inputTime', 'inputV0_Manual'].forEach(id => {
+                document.getElementById(id).addEventListener('input', calculatePhysics);
             });
 
-            document.getElementById('btnSimulate').addEventListener('click', runSimulation);
-            document.getElementById('btnRecord').addEventListener('click', recordData);
+            document.getElementById('btnSimulate').addEventListener('click', fire);
+            document.getElementById('btnRecord').addEventListener('click', record);
+            
+            document.getElementById('btnAutoV0').addEventListener('click', () => {
+                if(data1.length === 0) {
+                    alert("Chưa có dữ liệu ở Bảng 1 để tính!");
+                    return;
+                }
+                const sumV0 = data1.reduce((a, b) => a + b, 0);
+                const avgV0 = sumV0 / data1.length;
+                document.getElementById('inputV0_Manual').value = avgV0.toFixed(3);
+                calculatePhysics();
+                alert(`Đã lấy v0 trung bình: ${avgV0.toFixed(3)} m/s từ ${data1.length} lần đo.`);
+            });
 
             setupRuler();
-            drawScene(); // Vẽ trạng thái tĩnh ban đầu
+            setMode(1); 
+            
+            // Start Infinite Loop
+            loop();
         }
 
-        function resizeCanvas() {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-            drawScene();
-        }
+        function setMode(m) {
+            state.mode = m;
+            const p1 = document.getElementById('panelMode1');
+            const p2 = document.getElementById('panelMode2');
+            const t1 = document.getElementById('table1');
+            const t2 = document.getElementById('table2');
+            const title = document.getElementById('tableTitle');
 
-        // --- 1. LOGIC TÍNH TOÁN VẬT LÝ ---
-        function updateCalculations() {
-            // Lấy giá trị từ input
-            state.g = parseFloat(document.getElementById('inputG').value) || 9.8;
-            state.D = parseFloat(document.getElementById('inputD').value) || 20;
-            state.h = parseFloat(document.getElementById('inputH').value) || 0;
-            state.dt = parseFloat(document.getElementById('inputTime').value) || 0;
-
-            if (state.dt > 0) {
-                // Tính v0 = D (mm) / dt (ms) = m/s
-                state.v0 = state.D / state.dt;
-                
-                // Tính L_tt = v0 * sqrt(2h/g)
-                // h phải đổi ra m: state.h / 1000
-                const h_m = state.h / 1000;
-                const t_flight = Math.sqrt((2 * h_m) / state.g);
-                const L_m = state.v0 * t_flight;
-                state.Ltt = L_m * 1000; // Đổi lại ra mm
-                
-                // Hiển thị kết quả tính
-                document.getElementById('calcV0').textContent = state.v0.toFixed(3) + ' m/s';
-                document.getElementById('calcLtt').textContent = state.Ltt.toFixed(1) + ' mm';
+            if(m === 1) {
+                p1.style.opacity = '1'; p1.style.pointerEvents = 'auto';
+                p2.style.opacity = '0.5'; p2.style.pointerEvents = 'none';
+                t1.classList.remove('hidden');
+                t2.classList.add('hidden');
+                title.textContent = "BẢNG SỐ LIỆU 1 (NÉM NGANG)";
+                state.angle = 0;
             } else {
-                document.getElementById('calcV0').textContent = '---';
-                document.getElementById('calcLtt').textContent = '---';
+                p1.style.opacity = '0.5'; p1.style.pointerEvents = 'none';
+                p2.style.opacity = '1'; p2.style.pointerEvents = 'auto';
+                t1.classList.add('hidden');
+                t2.classList.remove('hidden');
+                title.textContent = "BẢNG SỐ LIỆU 2 (NÉM XIÊN)";
+                // Use current slider value
+                state.angle = parseFloat(document.getElementById('inputAngle').value);
+            }
+            calculatePhysics();
+            state.ball = null; 
+            updateStatus("SẴN SÀNG");
+        }
+
+        function calculatePhysics() {
+            state.g = parseFloat(document.getElementById('inputG').value) || 9.8;
+            state.h = parseFloat(document.getElementById('inputH').value) || 0;
+
+            if(state.mode === 1) {
+                const D = parseFloat(document.getElementById('inputD').value) || 20;
+                const dt = parseFloat(document.getElementById('inputTime').value) || 0;
+                
+                if(dt > 0) {
+                    state.v0 = D / dt; 
+                    state.dt = dt;
+                    document.getElementById('resV0_1').textContent = state.v0.toFixed(3);
+                } else {
+                    state.v0 = 0;
+                }
+                state.angle = 0;
+            } else {
+                state.v0 = parseFloat(document.getElementById('inputV0_Manual').value) || 0;
+                state.angle = parseFloat(document.getElementById('inputAngle').value);
+            }
+
+            if(state.v0 > 0) {
+                const rad = state.angle * Math.PI / 180;
+                const h_m = state.h / 1000;
+                const vy0 = state.v0 * Math.sin(rad);
+                const vx0 = state.v0 * Math.cos(rad);
+                
+                const delta = vy0*vy0 + 2*state.g*h_m;
+                const t_flight = (vy0 + Math.sqrt(delta)) / state.g;
+                
+                const L_m = vx0 * t_flight;
+                state.Ltt = L_m * 1000; 
+                
+                document.getElementById('calcLtt').textContent = state.Ltt.toFixed(1) + ' mm';
             }
         }
 
-        // --- 2. LOGIC MÔ PHỎNG (VISUAL) ---
-        function runSimulation() {
-            updateCalculations();
-            if(state.v0 <= 0) {
-                alert("Hoàng Vũ ơi! Nhập thời gian Δt vào để tính vận tốc đã!");
+        function fire() {
+            calculatePhysics();
+            
+            if(state.mode === 1 && state.v0 <= 0) {
+                alert("Hoàng Vũ ơi! Hãy nhập thời gian Δt (ms) vào ô màu vàng đã!");
                 return;
             }
-
-            // Reset ball
-            state.ball = {
-                x: 0, 
-                y: state.h, // mm
-                vx: state.v0 * 1000, // Đổi m/s ra mm/s cho đồng nhất đơn vị tính toán
-                vy: 0,
-                t: 0
-            };
             
-            animate();
+            if(state.v0 <= 0) return;
+
+            const rad = state.angle * Math.PI / 180;
+            state.ball = {
+                x: 0,
+                y: state.h,
+                vx: state.v0 * Math.cos(rad) * 1000, 
+                vy: state.v0 * Math.sin(rad) * 1000, 
+                t: 0,
+                landed: false,
+                path: [{x:0, y:state.h}] // Start path
+            };
+            updateStatus("ĐANG BAY...");
         }
 
-        function animate() {
-            if(!state.ball) return;
+        // --- NEW INFINITE LOOP ---
+        function loop() {
+            updatePhysics();
+            drawScene();
+            requestAnimationFrame(loop);
+        }
+
+        function updatePhysics() {
+            if(!state.ball || state.ball.landed) return;
             
-            const dt = 0.016; // s (animation step)
-            // Tính toán vật lý từng bước
+            const dt = 0.016; 
+            
             state.ball.t += dt;
-            state.ball.x = state.ball.vx * state.ball.t; // x = v0 * t
-            state.ball.y = state.h - 0.5 * (state.g * 1000) * state.ball.t * state.ball.t; // y = h - 0.5gt^2 (g đổi ra mm/s^2)
+            state.ball.x += state.ball.vx * dt;
+            state.ball.vy -= (state.g * 1000) * dt; 
+            state.ball.y += state.ball.vy * dt;
+
+            // Save path every few frames or distance for smoother drawing
+            state.ball.path.push({x: state.ball.x, y: state.ball.y});
+
+            document.getElementById('hudVx').textContent = `Vx: ${(state.ball.vx/1000).toFixed(2)} m/s`;
+            document.getElementById('hudVy').textContent = `Vy: ${(state.ball.vy/1000).toFixed(2)} m/s`;
 
             if(state.ball.y <= 0) {
                 state.ball.y = 0;
-                drawScene();
-                // Dừng animation
-                state.ball = null; 
-                return;
+                state.ball.landed = true; 
+                state.ball.path.push({x: state.ball.x, y: 0}); // End point
+                updateStatus("ĐÃ CHẠM ĐẤT");
             }
+        }
 
-            drawScene();
-            requestAnimationFrame(animate);
+        function updateStatus(msg) {
+            document.getElementById('ballStatus').textContent = msg;
+        }
+
+        function drawStaticScene() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const ox = 50;
+            const oy = canvas.height - 50;
+
+            // Ground
+            ctx.strokeStyle = '#38bdf8';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(0, oy); ctx.lineTo(canvas.width, oy); ctx.stroke();
+
+            // Height pillar
+            const h_px = state.h * SCALE;
+            ctx.fillStyle = '#64748b';
+            ctx.fillRect(ox - 5, oy - h_px, 10, h_px);
+
+            // Gun
+            ctx.save();
+            ctx.translate(ox, oy - h_px);
+            ctx.rotate(-state.angle * Math.PI / 180);
+            ctx.fillStyle = '#eab308';
+            ctx.fillRect(0, -5, 40, 10);
+            ctx.restore();
+
+            // Meters
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.font = '10px sans-serif';
+            for(let m=0; m<5000; m+=500) {
+                let px = ox + m*SCALE;
+                if(px > canvas.width) break;
+                ctx.fillRect(px, oy, 1, 5);
+                ctx.fillText(m/1000 + 'm', px-5, oy+15);
+            }
         }
 
         function drawScene() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            const originX = 50;
-            const originY = canvas.height - 50; // Sàn nhà
+            drawStaticScene(); // Always redraw background
+            const ox = 50;
+            const oy = canvas.height - 50;
 
-            // Vẽ sàn
-            ctx.beginPath();
-            ctx.strokeStyle = '#38bdf8';
-            ctx.moveTo(0, originY);
-            ctx.lineTo(canvas.width, originY);
-            ctx.stroke();
-
-            // Vẽ cột độ cao
-            const h_px = state.h * SCALE;
-            ctx.fillStyle = '#64748b';
-            ctx.fillRect(originX - 10, originY - h_px, 10, h_px);
-            
-            // Vẽ súng
-            ctx.fillStyle = '#eab308';
-            ctx.fillRect(originX - 10, originY - h_px - 10, 40, 20);
-
-            // Vẽ vạch thước nền (Mỗi vạch 100mm)
-            ctx.fillStyle = '#475569';
-            ctx.font = '10px sans-serif';
-            for(let i=0; i < 2000; i+=200) {
-                let x_pos = originX + i * SCALE;
-                if(x_pos > canvas.width) break;
-                ctx.fillRect(x_pos, originY, 1, 5);
-                ctx.fillText(i, x_pos, originY + 15);
-            }
-
-            // Vẽ bóng
             if(state.ball) {
-                const bx = originX + state.ball.x * SCALE;
-                const by = originY - state.ball.y * SCALE;
+                const bx = ox + state.ball.x * SCALE;
+                const by = oy - state.ball.y * SCALE;
                 
+                // Draw Path (Trajectory)
+                if(state.ball.path.length > 0) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)'; // Red semi-transparent
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]); // Dashed line
+                    
+                    const startP = state.ball.path[0];
+                    ctx.moveTo(ox + startP.x * SCALE, oy - startP.y * SCALE);
+                    
+                    for(let i=1; i < state.ball.path.length; i++) {
+                        const p = state.ball.path[i];
+                        ctx.lineTo(ox + p.x * SCALE, oy - p.y * SCALE);
+                    }
+                    ctx.stroke();
+                    ctx.setLineDash([]); // Reset dash
+                }
+
+                // Draw Ball
                 ctx.beginPath();
-                ctx.arc(bx, by, 5, 0, Math.PI*2);
-                ctx.fillStyle = '#ef4444';
+                ctx.arc(bx, by, 6, 0, Math.PI*2); 
+                ctx.fillStyle = state.ball.landed ? '#ef4444' : '#f87171';
                 ctx.fill();
-            } else if (state.v0 > 0) {
-                 // Vẽ điểm rơi lý thuyết (Gợi ý)
-                 const targetX = originX + state.Ltt * SCALE;
-                 ctx.beginPath();
-                 ctx.arc(targetX, originY, 3, 0, Math.PI*2);
-                 ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
-                 ctx.fill();
-                 ctx.fillStyle = '#4ade80';
-                 ctx.fillText('L_tt', targetX - 10, originY - 10);
+                
+                if(state.ball.landed) {
+                     // Draw marker text
+                     ctx.fillStyle = '#fca5a5';
+                     ctx.font = '12px monospace';
+                     ctx.fillText('▼ Điểm rơi', bx-30, by-15);
+                } else {
+                    // Glow effect
+                    ctx.shadowBlur = 10; ctx.shadowColor = 'red'; ctx.stroke(); ctx.shadowBlur = 0;
+                }
+                
+            } else if (state.Ltt > 0 && !state.ball) {
+                // Hint for theoretical landing if ball is not present
+                const tx = ox + state.Ltt * SCALE;
+                ctx.beginPath(); ctx.arc(tx, oy, 3, 0, Math.PI*2);
+                ctx.fillStyle = 'rgba(74, 222, 128, 0.3)'; ctx.fill();
             }
         }
+        
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+            // drawStaticScene called by loop
+        }
 
-        // --- 3. LOGIC THƯỚC ĐO ---
         function setupRuler() {
-            const ruler = document.getElementById('ruler');
-            const display = document.getElementById('rulerVal');
-            const measureRes = document.getElementById('measureResult');
-            let isDragging = false;
+            const r = document.getElementById('ruler');
+            const d = document.getElementById('rulerVal');
+            const m = document.getElementById('measureResult');
+            const ox = 50;
+            let drag = false;
 
-            const originX = 50; // Trùng với drawScene
-
-            const onMove = (clientX) => {
-                // Tính vị trí relative trong container
-                const rect = canvas.parentElement.getBoundingClientRect();
-                let x = clientX - rect.left;
-                
-                // Giới hạn
-                if(x < 0) x = 0;
-                if(x > rect.width) x = rect.width;
-
-                ruler.style.left = x + 'px';
-                
-                // Tính khoảng cách thực tế (mm)
-                // Vị trí mũi tên thước so với gốc tọa độ (originX)
-                // Lưu ý: Mũi tên nằm ở giữa ruler div. ruler div style left là x.
-                // Ta căn chỉnh sao cho đầu mũi tên trỏ đúng tọa độ x
-                
-                let distPx = x - originX;
-                if(distPx < 0) distPx = 0;
-                
-                let distMM = distPx / SCALE;
-                state.Ltn = Math.round(distMM);
-                
-                display.textContent = state.Ltn + " mm";
-                measureRes.textContent = state.Ltn + " mm";
-            };
-
-            ruler.addEventListener('mousedown', () => isDragging = true);
-            window.addEventListener('mouseup', () => isDragging = false);
+            window.addEventListener('mousedown', (e) => { if(r.contains(e.target)) drag = true; });
+            window.addEventListener('mouseup', () => drag = false);
             window.addEventListener('mousemove', (e) => {
-                if(isDragging) onMove(e.clientX);
-            });
-            
-            // Touch support
-            ruler.addEventListener('touchstart', () => isDragging = true);
-            window.addEventListener('touchend', () => isDragging = false);
-            window.addEventListener('touchmove', (e) => {
-                if(isDragging) onMove(e.touches[0].clientX);
+                if(!drag) return;
+                const rect = canvas.parentElement.getBoundingClientRect();
+                let x = e.clientX - rect.left;
+                if(x < 0) x = 0;
+                r.style.left = x + 'px';
+                
+                let distMM = Math.max(0, (x - ox) / SCALE);
+                state.Ltn = Math.round(distMM);
+                d.textContent = state.Ltn + " mm";
+                m.textContent = state.Ltn + " mm";
             });
         }
 
-        // --- 4. GHI BẢNG ---
-        function recordData() {
-            if(state.v0 === 0) {
-                alert("Chưa có dữ liệu tính toán! Hãy nhập Δt và bấm 'Mô Phỏng' trước.");
-                return;
+        function record() {
+            counts[state.mode]++;
+            const tbody = document.getElementById(state.mode === 1 ? 'tbody1' : 'tbody2');
+            const tr = document.createElement('tr');
+            
+            let err = Math.abs(state.Ltt - state.Ltn)/state.Ltt * 100;
+            
+            if (state.mode === 1) {
+                data1.push(state.v0); 
+                tr.innerHTML = `
+                    <td class="text-slate-400">${counts[1]}</td>
+                    <td>${state.dt}</td>
+                    <td class="text-green-400 font-bold">${state.v0.toFixed(3)}</td>
+                    <td class="text-purple-400 font-bold">${state.Ltn}</td>
+                    <td class="text-slate-500">${state.Ltt.toFixed(0)}</td>
+                    <td class="${err < 5 ? 'text-green-500' : 'text-red-500'}">${err.toFixed(1)}%</td>
+                `;
+            } else {
+                tr.innerHTML = `
+                    <td class="text-slate-400">${counts[2]}</td>
+                    <td class="text-yellow-400 font-bold">${state.angle}°</td>
+                    <td class="text-green-400">${state.v0.toFixed(3)}</td>
+                    <td class="text-purple-400 font-bold">${state.Ltn}</td>
+                    <td class="text-slate-500">${state.Ltt.toFixed(0)}</td>
+                    <td class="${err < 5 ? 'text-green-500' : 'text-red-500'}">${err.toFixed(1)}%</td>
+                `;
             }
 
-            measurementCount++;
-            const table = document.getElementById('tableBody');
-            const row = table.insertRow();
-            
-            // Tính sai số
-            // Error = |Ltt - Ltn| / Ltt * 100
-            const error = Math.abs(state.Ltt - state.Ltn) / state.Ltt * 100;
-
-            row.innerHTML = `
-                <td class="font-bold text-slate-300">${measurementCount}</td>
-                <td>${state.dt.toFixed(2)}</td>
-                <td class="text-green-400 font-mono">${state.v0.toFixed(3)}</td>
-                <td class="text-purple-400 font-bold">${state.Ltn}</td>
-                <td class="text-slate-400">${state.Ltt.toFixed(1)}</td>
-                <td class="${error < 5 ? 'text-green-400' : 'text-red-400'} font-bold">${error.toFixed(2)}%</td>
-            `;
-            
-            // Scroll xuống dưới cùng bảng
+            tbody.appendChild(tr);
             const container = document.querySelector('.overflow-auto');
             container.scrollTop = container.scrollHeight;
         }
-        
-        function clearTable() {
-            document.getElementById('tableBody').innerHTML = '';
-            measurementCount = 0;
+
+        function clearCurrentTable() {
+            const id = state.mode === 1 ? 'tbody1' : 'tbody2';
+            document.getElementById(id).innerHTML = '';
+            counts[state.mode] = 0;
+            if(state.mode === 1) data1 = [];
         }
 
         init();
