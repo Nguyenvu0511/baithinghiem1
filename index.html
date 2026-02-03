@@ -2,242 +2,223 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hoàng Vũ Labs - Ultimate Physics Assistant</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hoàng Vũ Labs - Mobile Physics</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     <style>
-        body { font-family: 'Roboto', sans-serif; background-color: #0f172a; color: #e2e8f0; }
+        body { font-family: 'Roboto', sans-serif; background-color: #0f172a; color: #e2e8f0; touch-action: pan-y; }
         .tech-font { font-family: 'JetBrains Mono', monospace; }
         .neon-border { box-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
         .input-group label { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.25rem; }
-        .input-dark { background: #1e293b; border: 1px solid #334155; color: white; padding: 4px 8px; border-radius: 4px; width: 100%; font-family: 'JetBrains Mono'; transition: all 0.2s; }
+        .input-dark { background: #1e293b; border: 1px solid #334155; color: white; padding: 8px; border-radius: 6px; width: 100%; font-family: 'JetBrains Mono'; transition: all 0.2s; font-size: 16px; /* Prevent iOS zoom */ }
         .input-dark:focus { outline: none; border-color: #38bdf8; background: #0f172a; }
-        .input-disabled { background: #334155; color: #94a3b8; cursor: not-allowed; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        th, td { border: 1px solid #334155; padding: 8px; text-align: center; }
-        th { background-color: #1e293b; color: #38bdf8; }
+        
+        /* Mobile-friendly table */
+        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.75rem; min-width: 300px; }
+        th, td { border: 1px solid #334155; padding: 6px 4px; text-align: center; }
+        th { background-color: #1e293b; color: #38bdf8; white-space: nowrap; }
         tr:nth-child(even) { background-color: #0f172a; }
         
         /* Range Input Styling */
-        input[type=range] { -webkit-appearance: none; background: transparent; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #38bdf8; cursor: pointer; margin-top: -6px; }
+        input[type=range] { -webkit-appearance: none; background: transparent; height: 24px; } /* Taller for touch */
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%; background: #38bdf8; cursor: pointer; margin-top: -10px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #334155; border-radius: 2px; }
         
-        #ruler { cursor: grab; touch-action: none; }
+        #ruler { cursor: grab; touch-action: none; z-index: 100; }
         #ruler:active { cursor: grabbing; }
+        
+        /* Custom scrollbar for desktop mostly */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
     </style>
 </head>
-<body class="flex flex-col h-screen overflow-hidden">
+<body class="flex flex-col h-screen overflow-hidden text-sm">
 
-    <!-- Header -->
-    <header class="bg-slate-900 border-b border-slate-700 p-3 flex justify-between items-center shadow-lg shrink-0 z-20">
-        <div class="flex items-center space-x-3">
-            <div class="p-2 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg neon-border">
-                <i class="fa-solid fa-atom text-white"></i>
+    <!-- Header Compact -->
+    <header class="bg-slate-900 border-b border-slate-700 p-2 flex justify-between items-center shadow-lg shrink-0 z-30">
+        <div class="flex items-center space-x-2">
+            <div class="p-1.5 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg neon-border">
+                <i class="fa-solid fa-atom text-white text-sm"></i>
             </div>
             <div>
-                <h1 class="font-bold text-white uppercase tracking-wider text-sm md:text-base">Hoàng Vũ Labs - Ultimate</h1>
-                <p class="text-[10px] text-blue-400 tech-font">MODE: EXTENDED ANGLE (MAX 100°) | V4.6</p>
+                <h1 class="font-bold text-white uppercase tracking-wider text-xs leading-tight">Hoàng Vũ Labs</h1>
+                <p class="text-[9px] text-blue-400 tech-font">V5.2 MOBILE</p>
             </div>
         </div>
-        <div class="hidden sm:flex items-center space-x-2">
-            <span class="text-xs text-slate-400">Chọn bài thí nghiệm:</span>
-            <select id="labMode" class="bg-slate-800 text-white text-xs p-1 rounded border border-slate-600 focus:outline-none focus:border-blue-500">
-                <option value="1">Bài 1: Ném Ngang (Tìm v0)</option>
-                <option value="2">Bài 2: Ném Xiên (Tự do)</option>
+        <div class="flex items-center">
+            <select id="labMode" class="bg-slate-800 text-white text-xs p-1.5 rounded border border-slate-600 focus:outline-none focus:border-blue-500 max-w-[140px]">
+                <option value="1">Bài 1: Ném Ngang</option>
+                <option value="2">Bài 2: Ném Xiên</option>
             </select>
         </div>
     </header>
 
-    <div class="flex flex-1 overflow-hidden">
-        <!-- LEFT PANEL: CONTROL CENTER -->
-        <aside class="w-full md:w-80 bg-slate-800 border-r border-slate-700 flex flex-col overflow-y-auto custom-scrollbar z-10">
-            
-            <div class="p-4 space-y-4">
-                
-                <!-- Section 1: Thông số môi trường -->
-                <div class="bg-slate-900 p-3 rounded border border-slate-700 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-1 opacity-10"><i class="fa-solid fa-earth-asia text-4xl text-white"></i></div>
-                    <h3 class="text-yellow-400 font-bold text-xs uppercase mb-2 tracking-wider">1. Thông số Cố định</h3>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div class="input-group">
-                            <label>Gia tốc g (m/s²)</label>
-                            <input type="number" id="inputG" value="9.8" step="0.01" class="input-dark">
-                        </div>
-                        <div class="input-group">
-                            <label>Độ cao h (mm)</label>
-                            <input type="number" id="inputH" value="500" class="input-dark">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section 2: Chế độ Ném Ngang (Bài 1) -->
-                <div id="panelMode1" class="bg-slate-900 p-3 rounded border border-blue-500/30 shadow-[0_0_10px_rgba(59,130,246,0.1)] transition-all">
-                    <h3 class="text-blue-400 font-bold text-xs uppercase mb-2 flex justify-between">
-                        <span>2. Ném Ngang (Tìm v0)</span>
-                        <i class="fa-solid fa-1"></i>
-                    </h3>
-                    
-                    <div class="input-group mb-2">
-                        <label>Đường kính D (mm)</label>
-                        <input type="number" id="inputD" value="20" class="input-dark">
-                    </div>
-                    <div class="input-group mb-3">
-                        <label>Thời gian chắn cổng Δt (ms)</label>
-                        <input type="number" id="inputTime" placeholder="Ví dụ: 5.0" class="input-dark text-yellow-300 font-bold ring-1 ring-yellow-500/50">
-                    </div>
-
-                    <div class="p-2 bg-slate-800 rounded border border-slate-600 text-center mb-2">
-                        <p class="text-[10px] text-slate-400">Vận tốc v0 tính được:</p>
-                        <p id="resV0_1" class="text-green-400 font-bold tech-font text-lg">---</p>
-                        <p class="text-[10px] text-slate-500">m/s</p>
-                    </div>
-                    <p class="text-[10px] text-slate-500 italic">*Nhập Δt rồi bấm KHAI HỎA để thấy bóng!</p>
-                </div>
-
-                <!-- Section 3: Chế độ Ném Xiên (Bài 2) -->
-                <div id="panelMode2" class="bg-slate-900 p-3 rounded border border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.1)] opacity-50 pointer-events-none transition-all">
-                    <h3 class="text-purple-400 font-bold text-xs uppercase mb-2 flex justify-between">
-                        <span>2. Ném Xiên (Góc Tùy Chỉnh)</span>
-                        <i class="fa-solid fa-unlock text-xs"></i>
-                    </h3>
-
-                    <div class="input-group mb-2">
-                        <label class="flex justify-between">
-                            <span>Vận tốc đầu v0 (m/s)</span>
-                            <button id="btnAutoV0" class="text-[10px] text-blue-400 hover:text-white underline">Lấy TB từ Bảng 1</button>
-                        </label>
-                        <input type="number" id="inputV0_Manual" value="3.5" step="0.01" class="input-dark text-green-300 font-bold">
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="flex justify-between text-xs text-slate-400 mb-1">
-                            <span>Góc ném (α)</span>
-                            <span id="angleDisplay" class="text-white font-bold">45°</span>
-                        </label>
-                        <!-- UNLOCKED SLIDER 0-100 -->
-                        <input type="range" id="inputAngle" min="0" max="100" value="45" step="1" class="cursor-pointer accent-purple-500">
-                        <div class="flex justify-between text-[10px] text-slate-600 px-1">
-                            <span>0°</span><span>50°</span><span>100°</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="space-y-2">
-                    <div class="bg-slate-800 p-2 rounded flex justify-between items-center border border-slate-600">
-                        <span class="text-xs text-slate-300">L_lý_thuyết:</span>
-                        <span id="calcLtt" class="text-green-400 font-bold tech-font">0.0 mm</span>
-                    </div>
-                    
-                    <button id="btnSimulate" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white font-bold py-2 rounded text-sm shadow-lg transform active:scale-95 transition-all">
-                        <i class="fa-solid fa-rocket mr-1"></i> KHAI HỎA (FIRE)
-                    </button>
-
-                    <div class="flex gap-2">
-                        <div class="bg-slate-900 border border-slate-700 rounded p-2 flex-1 text-center">
-                            <p class="text-[10px] text-slate-400">Đo được (Thước)</p>
-                            <p id="measureResult" class="text-purple-400 font-bold tech-font text-sm">0 mm</p>
-                        </div>
-                        <button id="btnRecord" class="bg-green-600 hover:bg-green-500 text-white font-bold px-4 rounded text-xs shadow-lg flex flex-col justify-center items-center w-24 transform active:scale-95 transition-all">
-                            <i class="fa-solid fa-save mb-1"></i> GHI SỐ
-                        </button>
-                    </div>
-                </div>
-                
-            </div>
-        </aside>
-
-        <!-- RIGHT PANEL: VISUALIZATION -->
-        <main class="flex-1 flex flex-col bg-slate-950 relative">
+    <div class="flex flex-col md:flex-row flex-1 overflow-hidden">
+        
+        <!-- VISUALIZATION (Top on mobile) -->
+        <main class="h-[45vh] md:h-auto md:flex-1 flex flex-col bg-slate-950 relative order-1 md:order-2 border-b md:border-b-0 md:border-l border-slate-700">
             <!-- Canvas -->
-            <div class="relative flex-1 overflow-hidden border-b border-slate-700 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]">
-                <canvas id="simCanvas" class="w-full h-full block cursor-crosshair"></canvas>
+            <div class="relative flex-1 overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]">
+                <canvas id="simCanvas" class="w-full h-full block cursor-crosshair touch-none"></canvas>
                 
-                <!-- Ruler (Đã nâng lên cao) -->
-                <div id="ruler" class="absolute bottom-32 left-10 flex flex-col items-center group z-50" style="transform: translateX(0px);">
-                    <div class="w-0 h-0 border-x-8 border-x-transparent border-t-[12px] border-t-red-500 animate-bounce filter drop-shadow-[0_0_5px_rgba(239,68,68,0.8)]"></div>
-                    <div class="bg-yellow-400 text-black font-bold text-xs px-2 py-1 rounded shadow-lg border-2 border-yellow-600 min-w-[90px] text-center select-none cursor-grab active:cursor-grabbing">
+                <!-- Ruler (Optimized for touch) -->
+                <div id="ruler" class="absolute bottom-16 left-10 flex flex-col items-center group" style="transform: translateX(0px);">
+                    <div class="w-0 h-0 border-x-[10px] border-x-transparent border-t-[14px] border-t-red-500 animate-bounce filter drop-shadow-lg"></div>
+                    <div class="bg-yellow-400 text-black font-bold text-xs px-3 py-1.5 rounded-full shadow-lg border-2 border-yellow-600 min-w-[80px] text-center select-none active:scale-110 transition-transform">
                         <i class="fa-solid fa-ruler-combined mr-1"></i> <span id="rulerVal">0 mm</span>
                     </div>
-                    <!-- Dây dọi dài 2000px để vẫn chạm đất -->
-                    <div class="w-px h-[2000px] bg-red-500/60 absolute top-full left-1/2 -translate-x-1/2 border-l border-dashed border-red-500"></div>
+                    <div class="w-0.5 h-[2000px] bg-red-500/60 absolute top-full left-1/2 -translate-x-1/2 border-l border-dashed border-red-500"></div>
                 </div>
 
                 <!-- HUD Info -->
-                <div class="absolute top-4 right-4 text-right pointer-events-none">
-                    <div class="text-slate-500 text-xs">TRẠNG THÁI BÓNG</div>
-                    <div class="text-blue-400 font-mono text-xs" id="hudVx">Vx: 0.00 m/s</div>
-                    <div class="text-green-400 font-mono text-xs" id="hudVy">Vy: 0.00 m/s</div>
-                    <div id="ballStatus" class="text-yellow-500 font-bold text-xs mt-1">SẴN SÀNG</div>
-                </div>
-            </div>
-
-            <!-- Data Tables Container -->
-            <div class="h-64 bg-slate-900 overflow-hidden flex flex-col">
-                <div class="flex justify-between items-center px-4 py-2 bg-slate-800 sticky top-0 z-10 border-b border-slate-700">
-                    <h3 class="text-white font-bold text-xs uppercase" id="tableTitle">BẢNG SỐ LIỆU 1 (NÉM NGANG)</h3>
-                    <button onclick="clearCurrentTable()" class="text-[10px] text-red-400 hover:text-red-200 uppercase tracking-wider"><i class="fa-solid fa-trash"></i> Xóa bảng này</button>
-                </div>
-                
-                <div class="flex-1 overflow-auto custom-scrollbar relative">
-                    <!-- Table 1: Ném Ngang -->
-                    <table id="table1" class="w-full">
-                        <thead class="bg-slate-800 text-xs sticky top-0">
-                            <tr>
-                                <th>Lần</th>
-                                <th>Δt (ms)</th>
-                                <th>v0 (m/s)</th>
-                                <th>L_tn (mm)</th>
-                                <th>L_tt (mm)</th>
-                                <th>Sai số (%)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody1" class="text-xs font-mono"></tbody>
-                    </table>
-
-                    <!-- Table 2: Ném Xiên -->
-                    <table id="table2" class="w-full hidden">
-                        <thead class="bg-slate-800 text-xs sticky top-0">
-                            <tr>
-                                <th>Lần</th>
-                                <th>Góc (α)</th>
-                                <th>v0 (TB)</th>
-                                <th>L_tn (mm)</th>
-                                <th>L_tt (mm)</th>
-                                <th>Sai số (%)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbody2" class="text-xs font-mono"></tbody>
-                    </table>
+                <div class="absolute top-2 right-2 text-right pointer-events-none bg-black/30 p-1 rounded backdrop-blur-sm">
+                    <div class="text-blue-400 font-mono text-[10px]" id="hudVx">Vx: 0.00</div>
+                    <div class="text-green-400 font-mono text-[10px]" id="hudVy">Vy: 0.00</div>
+                    <div id="ballStatus" class="text-yellow-500 font-bold text-[10px] mt-0.5">SẴN SÀNG</div>
                 </div>
             </div>
         </main>
+
+        <!-- CONTROLS & DATA (Bottom on mobile) -->
+        <aside class="h-[55vh] md:h-auto md:w-80 bg-slate-800 flex flex-col order-2 md:order-1 z-20 shadow-[0_-5px_15px_rgba(0,0,0,0.5)] md:shadow-none">
+            
+            <!-- Scrollable Content -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3">
+                
+                <!-- Tab Controls -->
+                <div class="grid grid-cols-2 gap-2">
+                    <!-- Mode 1 Panel -->
+                    <div id="panelMode1" class="bg-slate-900 p-2.5 rounded border border-blue-500/40 transition-all">
+                        <h3 class="text-blue-400 font-bold text-[10px] uppercase mb-1 flex justify-between items-center">
+                            <span>1. Ném Ngang</span>
+                            <i class="fa-solid fa-1"></i>
+                        </h3>
+                        <div class="space-y-2">
+                            <div class="flex gap-2">
+                                <div class="flex-1">
+                                    <label class="text-[9px] text-slate-400">D (mm)</label>
+                                    <input type="number" id="inputD" value="20" class="input-dark py-1 text-xs">
+                                </div>
+                                <div class="flex-1">
+                                    <label class="text-[9px] text-slate-400">Δt (ms)</label>
+                                    <input type="number" id="inputTime" placeholder="5.0" class="input-dark py-1 text-xs text-yellow-300 font-bold ring-1 ring-yellow-500/30">
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center bg-slate-800 rounded px-2 py-1 border border-slate-700">
+                                <span class="text-[10px] text-slate-400">v0:</span>
+                                <span id="resV0_1" class="text-green-400 font-bold font-mono">---</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mode 2 Panel -->
+                    <div id="panelMode2" class="bg-slate-900 p-2.5 rounded border border-purple-500/40 transition-all opacity-50 pointer-events-none">
+                        <h3 class="text-purple-400 font-bold text-[10px] uppercase mb-1 flex justify-between items-center">
+                            <span>2. Ném Xiên</span>
+                            <i class="fa-solid fa-2"></i>
+                        </h3>
+                        <div class="space-y-2">
+                            <div>
+                                <label class="text-[9px] text-slate-400 flex justify-between">
+                                    v0 (m/s) <span id="btnAutoV0" class="text-blue-400 underline cursor-pointer">Lấy TB</span>
+                                </label>
+                                <input type="number" id="inputV0_Manual" value="3.5" step="0.01" class="input-dark py-1 text-xs text-green-300 font-bold">
+                            </div>
+                            <div>
+                                <label class="text-[9px] text-slate-400 flex justify-between">
+                                    Góc: <span id="angleDisplay" class="text-white font-bold">45°</span>
+                                </label>
+                                <input type="range" id="inputAngle" min="0" max="100" value="45" step="1" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Global Settings (Collapsible on mobile?) - Keep visible for now -->
+                <div class="flex gap-2 text-xs">
+                    <div class="flex-1 input-group">
+                        <label>g (m/s²)</label>
+                        <input type="number" id="inputG" value="9.8" class="input-dark py-1">
+                    </div>
+                    <div class="flex-1 input-group">
+                        <label>h (mm)</label>
+                        <input type="number" id="inputH" value="500" class="input-dark py-1">
+                    </div>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="btnSimulate" class="bg-blue-600 active:bg-blue-700 text-white font-bold py-2.5 rounded shadow-lg text-xs flex items-center justify-center">
+                        <i class="fa-solid fa-rocket mr-1"></i> BẮN
+                    </button>
+                    <button id="btnRecord" class="bg-green-600 active:bg-green-700 text-white font-bold py-2.5 rounded shadow-lg text-xs flex items-center justify-center">
+                        <i class="fa-solid fa-save mr-1"></i> LƯU
+                    </button>
+                </div>
+
+                <!-- Live Measurements -->
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="bg-slate-900 p-2 rounded border border-slate-700 text-center">
+                        <div class="text-slate-500 text-[10px]">THƯỚC ĐO (TN)</div>
+                        <div id="measureResult" class="text-purple-400 font-bold font-mono text-sm">0 mm</div>
+                    </div>
+                    <div class="bg-slate-900 p-2 rounded border border-slate-700 text-center">
+                        <div class="text-slate-500 text-[10px]">LÝ THUYẾT (TT)</div>
+                        <div id="calcLtt" class="text-green-400 font-bold font-mono text-sm">0.0 mm</div>
+                    </div>
+                </div>
+
+                <!-- Data Table Area -->
+                <div class="bg-slate-900 rounded border border-slate-700 overflow-hidden flex flex-col h-40">
+                    <div class="flex justify-between items-center px-2 py-1 bg-slate-800 border-b border-slate-700">
+                        <span class="text-[10px] font-bold text-slate-300 uppercase" id="tableTitle">BẢNG 1</span>
+                        <button onclick="clearCurrentTable()" class="text-[9px] text-red-400 p-1"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                    <div class="table-container flex-1 bg-slate-900 custom-scrollbar">
+                        <table id="table1" class="w-full">
+                            <thead class="bg-slate-800 text-xs">
+                                <tr><th>#</th><th>Δt</th><th>v0</th><th>L_tn</th><th>L_tt</th><th>Sai%</th></tr>
+                            </thead>
+                            <tbody id="tbody1" class="text-xs font-mono"></tbody>
+                        </table>
+                        <table id="table2" class="w-full hidden">
+                            <thead class="bg-slate-800 text-xs">
+                                <tr><th>#</th><th>α</th><th>v0</th><th>t_bay</th><th>L_tn</th><th>Sai%</th></tr>
+                            </thead>
+                            <tbody id="tbody2" class="text-xs font-mono"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
     </div>
 
     <script>
-        // --- HOANG VU PHYSICS ENGINE V4.6 (EXTENDED ANGLE) ---
+        // --- HOANG VU PHYSICS ENGINE V5.2 (MOBILE OPTIMIZED) ---
         const canvas = document.getElementById('simCanvas');
         const ctx = canvas.getContext('2d');
-        const SCALE = 0.4; 
+        const SCALE = 0.35; // Slightly smaller scale for mobile screens
         
         let state = {
-            mode: 1, // 1: Ném Ngang, 2: Ném Xiên
+            mode: 1, 
             g: 9.8,
-            h: 500, // mm
+            h: 500, 
             v0: 0, 
             angle: 0, 
             dt: 0,
-            ball: null, // Object: {x, y, vx, vy, t, landed, path: []}
+            flightTime: 0,
+            ball: null,
             Ltt: 0,
             Ltn: 0
         };
         
         let data1 = []; 
         let counts = { 1: 0, 2: 0 };
-        let animationId; // To control loop
 
         function init() {
             resizeCanvas();
@@ -247,7 +228,6 @@
                 setMode(parseInt(e.target.value));
             });
             
-            // Slider
             document.getElementById('inputAngle').addEventListener('input', (e) => {
                 document.getElementById('angleDisplay').textContent = e.target.value + '°';
                 calculatePhysics();
@@ -262,20 +242,20 @@
             
             document.getElementById('btnAutoV0').addEventListener('click', () => {
                 if(data1.length === 0) {
-                    alert("Chưa có dữ liệu ở Bảng 1 để tính!");
+                    alert("Chưa có dữ liệu Bảng 1!");
                     return;
                 }
-                const sumV0 = data1.reduce((a, b) => a + b, 0);
-                const avgV0 = sumV0 / data1.length;
+                const avgV0 = data1.reduce((a, b) => a + b, 0) / data1.length;
                 document.getElementById('inputV0_Manual').value = avgV0.toFixed(3);
                 calculatePhysics();
-                alert(`Đã lấy v0 trung bình: ${avgV0.toFixed(3)} m/s từ ${data1.length} lần đo.`);
+                // Flash feedback
+                const btn = document.getElementById('btnAutoV0');
+                btn.textContent = "OK!";
+                setTimeout(() => btn.textContent = "Lấy TB", 1000);
             });
 
             setupRuler();
             setMode(1); 
-            
-            // Start Infinite Loop
             loop();
         }
 
@@ -290,17 +270,14 @@
             if(m === 1) {
                 p1.style.opacity = '1'; p1.style.pointerEvents = 'auto';
                 p2.style.opacity = '0.5'; p2.style.pointerEvents = 'none';
-                t1.classList.remove('hidden');
-                t2.classList.add('hidden');
-                title.textContent = "BẢNG SỐ LIỆU 1 (NÉM NGANG)";
+                t1.classList.remove('hidden'); t2.classList.add('hidden');
+                title.textContent = "BẢNG 1 (NÉM NGANG)";
                 state.angle = 0;
             } else {
                 p1.style.opacity = '0.5'; p1.style.pointerEvents = 'none';
                 p2.style.opacity = '1'; p2.style.pointerEvents = 'auto';
-                t1.classList.add('hidden');
-                t2.classList.remove('hidden');
-                title.textContent = "BẢNG SỐ LIỆU 2 (NÉM XIÊN)";
-                // Use current slider value
+                t1.classList.add('hidden'); t2.classList.remove('hidden');
+                title.textContent = "BẢNG 2 (NÉM XIÊN)";
                 state.angle = parseFloat(document.getElementById('inputAngle').value);
             }
             calculatePhysics();
@@ -315,7 +292,6 @@
             if(state.mode === 1) {
                 const D = parseFloat(document.getElementById('inputD').value) || 20;
                 const dt = parseFloat(document.getElementById('inputTime').value) || 0;
-                
                 if(dt > 0) {
                     state.v0 = D / dt; 
                     state.dt = dt;
@@ -340,35 +316,28 @@
                 
                 const L_m = vx0 * t_flight;
                 state.Ltt = L_m * 1000; 
-                
                 document.getElementById('calcLtt').textContent = state.Ltt.toFixed(1) + ' mm';
             }
         }
 
         function fire() {
             calculatePhysics();
-            
             if(state.mode === 1 && state.v0 <= 0) {
-                alert("Hoàng Vũ ơi! Hãy nhập thời gian Δt (ms) vào ô màu vàng đã!");
+                alert("Nhập Δt (ms) trước!");
                 return;
             }
-            
             if(state.v0 <= 0) return;
 
             const rad = state.angle * Math.PI / 180;
             state.ball = {
-                x: 0,
-                y: state.h,
+                x: 0, y: state.h,
                 vx: state.v0 * Math.cos(rad) * 1000, 
                 vy: state.v0 * Math.sin(rad) * 1000, 
-                t: 0,
-                landed: false,
-                path: [{x:0, y:state.h}] // Start path
+                t: 0, landed: false, path: [{x:0, y:state.h}]
             };
             updateStatus("ĐANG BAY...");
         }
 
-        // --- NEW INFINITE LOOP ---
         function loop() {
             updatePhysics();
             drawScene();
@@ -377,25 +346,22 @@
 
         function updatePhysics() {
             if(!state.ball || state.ball.landed) return;
-            
             const dt = 0.016; 
-            
             state.ball.t += dt;
             state.ball.x += state.ball.vx * dt;
             state.ball.vy -= (state.g * 1000) * dt; 
             state.ball.y += state.ball.vy * dt;
-
-            // Save path every few frames or distance for smoother drawing
             state.ball.path.push({x: state.ball.x, y: state.ball.y});
 
-            document.getElementById('hudVx').textContent = `Vx: ${(state.ball.vx/1000).toFixed(2)} m/s`;
-            document.getElementById('hudVy').textContent = `Vy: ${(state.ball.vy/1000).toFixed(2)} m/s`;
+            document.getElementById('hudVx').textContent = `Vx:${(state.ball.vx/1000).toFixed(2)}`;
+            document.getElementById('hudVy').textContent = `Vy:${(state.ball.vy/1000).toFixed(2)}`;
 
             if(state.ball.y <= 0) {
                 state.ball.y = 0;
-                state.ball.landed = true; 
-                state.ball.path.push({x: state.ball.x, y: 0}); // End point
-                updateStatus("ĐÃ CHẠM ĐẤT");
+                state.ball.landed = true;
+                state.flightTime = state.ball.t;
+                state.ball.path.push({x: state.ball.x, y: 0});
+                updateStatus(`ĐÍCH: t=${state.flightTime.toFixed(2)}s`);
             }
         }
 
@@ -403,151 +369,146 @@
             document.getElementById('ballStatus').textContent = msg;
         }
 
-        function drawStaticScene() {
+        function drawScene() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const ox = 50;
-            const oy = canvas.height - 50;
+            const ox = 30; // Closer to edge for mobile
+            const oy = canvas.height - 30;
 
-            // Ground
+            // Grid/Ground
             ctx.strokeStyle = '#38bdf8';
             ctx.lineWidth = 2;
             ctx.beginPath(); ctx.moveTo(0, oy); ctx.lineTo(canvas.width, oy); ctx.stroke();
 
-            // Height pillar
+            // Pillar
             const h_px = state.h * SCALE;
-            ctx.fillStyle = '#64748b';
-            ctx.fillRect(ox - 5, oy - h_px, 10, h_px);
+            ctx.fillStyle = '#64748b'; ctx.fillRect(ox - 4, oy - h_px, 8, h_px);
 
-            // Gun
+            // Cannon
             ctx.save();
             ctx.translate(ox, oy - h_px);
             ctx.rotate(-state.angle * Math.PI / 180);
-            ctx.fillStyle = '#eab308';
-            ctx.fillRect(0, -5, 40, 10);
+            ctx.fillStyle = '#eab308'; ctx.fillRect(0, -4, 30, 8);
             ctx.restore();
 
-            // Meters
-            ctx.fillStyle = 'rgba(255,255,255,0.2)';
-            ctx.font = '10px sans-serif';
+            // Meters markers
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.font = '9px sans-serif';
             for(let m=0; m<5000; m+=500) {
                 let px = ox + m*SCALE;
                 if(px > canvas.width) break;
-                ctx.fillRect(px, oy, 1, 5);
-                ctx.fillText(m/1000 + 'm', px-5, oy+15);
+                ctx.fillRect(px, oy, 1, 4);
+                ctx.fillText(m/1000 + 'm', px-5, oy+12);
             }
-        }
 
-        function drawScene() {
-            drawStaticScene(); // Always redraw background
-            const ox = 50;
-            const oy = canvas.height - 50;
-
+            // Ball & Path
             if(state.ball) {
-                const bx = ox + state.ball.x * SCALE;
-                const by = oy - state.ball.y * SCALE;
-                
-                // Draw Path (Trajectory)
+                // Path
                 if(state.ball.path.length > 0) {
                     ctx.beginPath();
-                    ctx.strokeStyle = 'rgba(239, 68, 68, 0.5)'; // Red semi-transparent
+                    ctx.strokeStyle = 'rgba(239, 68, 68, 0.6)';
                     ctx.lineWidth = 2;
-                    ctx.setLineDash([5, 5]); // Dashed line
-                    
+                    ctx.setLineDash([4, 4]);
                     const startP = state.ball.path[0];
                     ctx.moveTo(ox + startP.x * SCALE, oy - startP.y * SCALE);
-                    
-                    for(let i=1; i < state.ball.path.length; i++) {
+                    for(let i=1; i < state.ball.path.length; i+=2) { // Skip points for perf
                         const p = state.ball.path[i];
                         ctx.lineTo(ox + p.x * SCALE, oy - p.y * SCALE);
                     }
                     ctx.stroke();
-                    ctx.setLineDash([]); // Reset dash
+                    ctx.setLineDash([]);
                 }
-
-                // Draw Ball
+                // Ball
+                const bx = ox + state.ball.x * SCALE;
+                const by = oy - state.ball.y * SCALE;
                 ctx.beginPath();
-                ctx.arc(bx, by, 6, 0, Math.PI*2); 
+                ctx.arc(bx, by, 5, 0, Math.PI*2);
                 ctx.fillStyle = state.ball.landed ? '#ef4444' : '#f87171';
                 ctx.fill();
                 
                 if(state.ball.landed) {
-                     // Draw marker text
-                     ctx.fillStyle = '#fca5a5';
-                     ctx.font = '12px monospace';
-                     ctx.fillText('▼ Điểm rơi', bx-30, by-15);
-                } else {
-                    // Glow effect
-                    ctx.shadowBlur = 10; ctx.shadowColor = 'red'; ctx.stroke(); ctx.shadowBlur = 0;
+                     ctx.fillStyle = '#fca5a5'; ctx.font = '10px monospace';
+                     ctx.fillText('▼', bx-3, by-8);
                 }
-                
-            } else if (state.Ltt > 0 && !state.ball) {
-                // Hint for theoretical landing if ball is not present
-                const tx = ox + state.Ltt * SCALE;
-                ctx.beginPath(); ctx.arc(tx, oy, 3, 0, Math.PI*2);
-                ctx.fillStyle = 'rgba(74, 222, 128, 0.3)'; ctx.fill();
             }
         }
         
         function resizeCanvas() {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-            // drawStaticScene called by loop
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
         }
 
+        // TOUCH & MOUSE RULER LOGIC
         function setupRuler() {
             const r = document.getElementById('ruler');
             const d = document.getElementById('rulerVal');
             const m = document.getElementById('measureResult');
-            const ox = 50;
+            const ox = 30; // Must match drawScene
             let drag = false;
 
-            window.addEventListener('mousedown', (e) => { if(r.contains(e.target)) drag = true; });
-            window.addEventListener('mouseup', () => drag = false);
-            window.addEventListener('mousemove', (e) => {
-                if(!drag) return;
+            const updatePos = (clientX) => {
                 const rect = canvas.parentElement.getBoundingClientRect();
-                let x = e.clientX - rect.left;
+                let x = clientX - rect.left;
                 if(x < 0) x = 0;
-                r.style.left = x + 'px';
+                if(x > rect.width) x = rect.width;
+                r.style.transform = `translateX(${x - 40}px)`; // Center ruler (left:10 + 30 offset)
+                
+                // Calc value based on arrow position (center of ruler)
+                // Ruler is at left:10px (css). Width ~80px. Center ~40px relative to div.
+                // Arrow screen X = rect.left + x. 
+                // Distance = x - ox (origin offset)
+                // Wait, simpler: We want the ARROW to point to x.
+                // The ruler div is positioned absolutely. 
+                // Let's just use the visual feedback.
+                // Arrow tip is visually at center of ruler div.
+                // We move the whole div so its center aligns with touch X.
+                // Initial left is 10px (2.5rem). We use transform translateX.
                 
                 let distMM = Math.max(0, (x - ox) / SCALE);
                 state.Ltn = Math.round(distMM);
                 d.textContent = state.Ltn + " mm";
                 m.textContent = state.Ltn + " mm";
-            });
+            };
+
+            const startDrag = (e) => { drag = true; r.classList.add('scale-110'); };
+            const endDrag = (e) => { drag = false; r.classList.remove('scale-110'); };
+            const doDrag = (e) => {
+                if(!drag) return;
+                e.preventDefault(); // Stop scroll
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                updatePos(clientX);
+            };
+
+            r.addEventListener('mousedown', startDrag);
+            r.addEventListener('touchstart', startDrag, {passive: false});
+            
+            window.addEventListener('mouseup', endDrag);
+            window.addEventListener('touchend', endDrag);
+            
+            window.addEventListener('mousemove', doDrag);
+            window.addEventListener('touchmove', doDrag, {passive: false});
         }
 
         function record() {
             counts[state.mode]++;
             const tbody = document.getElementById(state.mode === 1 ? 'tbody1' : 'tbody2');
             const tr = document.createElement('tr');
-            
-            let err = Math.abs(state.Ltt - state.Ltn)/state.Ltt * 100;
+            let err = state.Ltt > 0 ? Math.abs(state.Ltt - state.Ltn)/state.Ltt * 100 : 0;
             
             if (state.mode === 1) {
                 data1.push(state.v0); 
-                tr.innerHTML = `
-                    <td class="text-slate-400">${counts[1]}</td>
-                    <td>${state.dt}</td>
-                    <td class="text-green-400 font-bold">${state.v0.toFixed(3)}</td>
-                    <td class="text-purple-400 font-bold">${state.Ltn}</td>
-                    <td class="text-slate-500">${state.Ltt.toFixed(0)}</td>
-                    <td class="${err < 5 ? 'text-green-500' : 'text-red-500'}">${err.toFixed(1)}%</td>
-                `;
+                tr.innerHTML = `<td>${counts[1]}</td><td>${state.dt}</td><td>${state.v0.toFixed(2)}</td>
+                    <td>${state.Ltn}</td><td>${state.Ltt.toFixed(0)}</td>
+                    <td class="${err<5?'text-green-500':'text-red-500'}">${err.toFixed(1)}%</td>`;
             } else {
-                tr.innerHTML = `
-                    <td class="text-slate-400">${counts[2]}</td>
-                    <td class="text-yellow-400 font-bold">${state.angle}°</td>
-                    <td class="text-green-400">${state.v0.toFixed(3)}</td>
-                    <td class="text-purple-400 font-bold">${state.Ltn}</td>
-                    <td class="text-slate-500">${state.Ltt.toFixed(0)}</td>
-                    <td class="${err < 5 ? 'text-green-500' : 'text-red-500'}">${err.toFixed(1)}%</td>
-                `;
+                tr.innerHTML = `<td>${counts[2]}</td><td>${state.angle}°</td><td>${state.v0.toFixed(2)}</td>
+                    <td class="text-blue-300">${state.flightTime.toFixed(2)}</td>
+                    <td>${state.Ltn}</td>
+                    <td class="${err<5?'text-green-500':'text-red-500'}">${err.toFixed(1)}%</td>`;
             }
-
             tbody.appendChild(tr);
-            const container = document.querySelector('.overflow-auto');
-            container.scrollTop = container.scrollHeight;
+            // Auto scroll table container
+            tbody.parentElement.parentElement.scrollTop = tbody.parentElement.parentElement.scrollHeight;
         }
 
         function clearCurrentTable() {
