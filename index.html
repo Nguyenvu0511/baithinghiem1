@@ -1,343 +1,264 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Play, RotateCcw, Save, Trash2, Info, Settings, Wind, Ruler } from 'lucide-react';
-
-const App = () => {
-  // --- Hằng số vật lý ---
-  const G = 9.81; // Gia tốc trọng trường (m/s^2)
-  
-  // --- Trạng thái hệ thống (Input theo mẫu báo cáo) ---
-  const [voltage, setVoltage] = useState(15); 
-  const [angle, setAngle] = useState(30); 
-  const [h0_mm, setH0mm] = useState(500); // Chiều cao ban đầu (mm)
-  const [d_mm, setDmm] = useState(40); // Đường kính bóng (mm)
-  const [ballMass, setBallMass] = useState(0.0027); // kg
-  const [useAirResistance, setUseAirResistance] = useState(false);
-  
-  const [isLaunching, setIsLaunching] = useState(false);
-  const [path, setPath] = useState([]);
-  const [results, setResults] = useState([]);
-  const [timerData, setTimerData] = useState({ dt: "0", v0: "0" });
-  const [experimentalRange, setExperimentalRange] = useState("0");
-
-  const canvasRef = useRef(null);
-
-  // Tính v0 giả lập từ điện áp (v0 = D / dt)
-  const calculateV0 = (v) => {
-    // Giả định tốc độ động cơ tỉ lệ thuận với điện áp
-    const baseV0 = (v - 10) * 1.5 + 2; 
-    const noise = (Math.random() - 0.5) * 0.05; // Nhiễu nhỏ cho thực tế
-    return baseV0 + noise;
-  };
-
-  const launch = () => {
-    if (isLaunching) return;
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    const v0 = calculateV0(voltage);
-    const d_m = d_mm / 1000;
-    const dt = (d_m / v0) * 1000; // ms
-    
-    setTimerData({ dt: dt.toFixed(2), v0: v0.toFixed(2) });
-    setIsLaunching(true);
-    setPath([]);
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Solo%20System%22%2C%22short_name%22%3A%22System%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2300FF00%22%2C%22theme_color%22%3A%22%23a855f7%22%7D">
 
-    const dt_step = 0.01;
-    let currX = 0;
-    let currY = h0_mm / 1000; // Đổi sang mét để tính toán vật lý
-    let vx = v0 * Math.cos((angle * Math.PI) / 180);
-    let vy = v0 * Math.sin((angle * Math.PI) / 180);
-    
-    const newPath = [];
-    const airDensity = 1.225;
-    const dragCoeff = 0.47;
-    const area = Math.PI * Math.pow(d_m/2, 2);
-
-    const interval = setInterval(() => {
-      newPath.push({ x: currX, y: currY });
-      
-      if (useAirResistance) {
-        const v = Math.sqrt(vx*vx + vy*vy);
-        const dragF = 0.5 * airDensity * v * v * dragCoeff * area;
-        const ax = -(dragF * (vx/v)) / ballMass;
-        const ay = -G - (dragF * (vy/v)) / ballMass;
-        vx += ax * dt_step;
-        vy += ay * dt_step;
-      } else {
-        vy -= G * dt_step;
-      }
-
-      currX += vx * dt_step;
-      currY += vy * dt_step;
-
-      if (currY <= 0) {
-        currY = 0;
-        newPath.push({ x: currX, y: currY });
-        setExperimentalRange(currX.toFixed(4));
-        setPath(newPath);
-        setIsLaunching(false);
-        clearInterval(interval);
-      }
-      setPath([...newPath]);
-    }, 10);
-  };
-
-  const reset = () => {
-    setPath([]);
-    setTimerData({ dt: "0", v0: "0" });
-    setExperimentalRange("0");
-    setIsLaunching(false);
-  };
-
-  const saveToTable = () => {
-    const v0 = parseFloat(timerData.v0);
-    const rad = (angle * Math.PI) / 180;
-    const h0_m = h0_mm / 1000;
-    
-    // Công thức tính thời gian chuyển động t từ ảnh
-    const t_calc = (v0 * Math.sin(rad) + Math.sqrt(Math.pow(v0 * Math.sin(rad), 2) + 2 * G * h0_m)) / G;
-    // Công thức tầm xa lý thuyết LTT = v0 * cos(theta) * t
-    const L_TT_m = v0 * Math.cos(rad) * t_calc;
-    
-    const L_TN_m = parseFloat(experimentalRange);
-    const error = Math.abs((L_TN_m - L_TT_m) / L_TT_m) * 100;
-
-    const newResult = {
-      id: Date.now(),
-      angle: angle,
-      dt: timerData.dt,
-      v0: timerData.v0,
-      ltt: (L_TT_m * 1000).toFixed(1), // Đổi sang mm cho bảng
-      ltn: (L_TN_m * 1000).toFixed(1), // Đổi sang mm cho bảng
-      error: error.toFixed(2)
-    };
-    setResults([newResult, ...results].slice(0, 10));
-  };
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const w = canvas.width;
-    const h = canvas.height;
-    const scale = 150; 
-    const offsetX = 50;
-    const offsetY = h - 50;
-
-    ctx.clearRect(0, 0, w, h);
-
-    // Lưới
-    ctx.strokeStyle = '#f1f5f9';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < w; i += 50) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, h); ctx.stroke(); }
-    for (let i = 0; i < h; i += 50) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(w, i); ctx.stroke(); }
-
-    // Trục
-    ctx.strokeStyle = '#94a3b8';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(offsetX, 0); ctx.lineTo(offsetX, offsetY); ctx.lineTo(w, offsetY);
-    ctx.stroke();
-
-    // Vẽ giá phóng
-    ctx.save();
-    ctx.translate(offsetX, offsetY - (h0_mm / 1000) * scale);
-    ctx.rotate(-angle * Math.PI / 180);
-    ctx.fillStyle = '#475569';
-    ctx.fillRect(-5, -10, 50, 20); 
-    ctx.restore();
-
-    // Vẽ quỹ đạo
-    if (path.length > 1) {
-      ctx.beginPath();
-      ctx.setLineDash([4, 4]);
-      ctx.strokeStyle = '#f43f5e';
-      ctx.moveTo(offsetX + path[0].x * scale, offsetY - path[0].y * scale);
-      for (let i = 1; i < path.length; i++) {
-        ctx.lineTo(offsetX + path[i].x * scale, offsetY - path[i].y * scale);
-      }
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
-
-    // Vẽ bóng
-    if (path.length > 0) {
-      const last = path[path.length - 1];
-      ctx.beginPath();
-      ctx.arc(offsetX + last.x * scale, offsetY - last.y * scale, 6, 0, Math.PI * 2);
-      ctx.fillStyle = '#f59e0b';
-      ctx.fill();
-    }
-  }, [path, angle, h0_mm]);
-
-  return (
-    <div className="flex flex-col h-screen bg-slate-100 text-slate-800 font-sans p-4 overflow-hidden">
-      {/* Top Header */}
-      <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border mb-4">
-        <div>
-          <h1 className="text-lg font-bold uppercase tracking-tight text-blue-900">Báo cáo Thí nghiệm Số 1</h1>
-          <p className="text-xs text-slate-500 italic">Khảo sát chuyển động ném ngang, ném xiên - ĐH Duy Tân</p>
-        </div>
-        <div className="bg-slate-900 p-2 rounded-lg border-2 border-slate-700 shadow-inner">
-           <div className="text-[10px] text-blue-400 font-bold mb-1 uppercase text-center">Photogate Timer ($\Delta t$)</div>
-           <div className="text-3xl font-mono text-red-500 font-bold px-4 tracking-widest">
-             {timerData.dt.padStart(5, '0')} <span className="text-sm font-normal">ms</span>
-           </div>
-        </div>
-      </div>
-
-      <div className="flex flex-1 gap-4 overflow-hidden">
-        {/* Left Panel: Inputs */}
-        <div className="w-72 flex flex-col gap-3 overflow-y-auto pr-1">
-          <div className="bg-white p-4 rounded-xl shadow-sm border">
-            <h2 className="text-xs font-bold uppercase mb-3 flex items-center gap-2 border-b pb-2">
-              <Settings className="w-4 h-4" /> THIẾT LẬP THÔNG SỐ
-            </h2>
+    <title>Solo Leveling System - Amethyst Sapphire Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-green: #00FF00; /* Phông xanh để key hình */
             
-            <div className="space-y-4">
-              <div>
-                <label className="text-[11px] font-bold block mb-1 uppercase">{"Đường kính bóng $D$ (mm):"}</label>
-                <input 
-                  type="number" value={d_mm} onChange={(e) => setDmm(parseFloat(e.target.value))}
-                  className="w-full bg-slate-50 border rounded p-1.5 text-sm font-mono focus:ring-1 focus:ring-blue-500"
-                />
-              </div>
-
-              <div>
-                <label className="text-[11px] font-bold block mb-1 uppercase">{"Chiều cao $h_0$ (mm):"}</label>
-                <input 
-                  type="number" value={h0_mm} onChange={(e) => setH0mm(parseFloat(e.target.value))}
-                  className="w-full bg-slate-50 border rounded p-1.5 text-sm font-mono"
-                />
-              </div>
-
-              <div>
-                <div className="flex justify-between text-[11px] font-bold mb-1 uppercase">
-                  <span>{"Góc ném $\\theta_0$:"}</span>
-                  <span className="text-blue-600 font-mono">{angle}°</span>
-                </div>
-                <input 
-                  type="range" min="0" max="90" step="5" value={angle} 
-                  onChange={(e) => setAngle(parseInt(e.target.value))}
-                  className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                />
-              </div>
-
-              <div>
-                <div className="flex justify-between text-[11px] font-bold mb-1 uppercase">
-                  <span>{"Điện áp ném (V):"}</span>
-                  <span className="text-blue-600 font-mono">{voltage} V</span>
-                </div>
-                <input 
-                  type="range" min="12" max="17" step="0.1" value={voltage} 
-                  onChange={(e) => setVoltage(parseFloat(e.target.value))}
-                  className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                />
-              </div>
-
-              <div className="flex items-center gap-2 pt-2 border-t">
-                <input 
-                  type="checkbox" id="airRes" checked={useAirResistance}
-                  onChange={(e) => setUseAirResistance(e.target.checked)}
-                />
-                <label htmlFor="airRes" className="text-xs font-medium cursor-pointer flex items-center gap-1">
-                  <Wind className="w-3 h-3 text-slate-400" /> Sức cản không khí
-                </label>
-              </div>
-            </div>
-          </div>
-
-          <button 
-            onClick={launch} disabled={isLaunching}
-            className={`w-full py-3 rounded-xl font-bold text-white shadow-lg transition-all ${isLaunching ? 'bg-slate-400' : 'bg-blue-600 hover:bg-blue-700 active:scale-95'}`}
-          >
-            PHÓNG BÓNG
-          </button>
-
-          <div className="grid grid-cols-2 gap-2">
-            <button onClick={reset} className="flex items-center justify-center gap-1 py-2 bg-slate-200 hover:bg-slate-300 rounded-lg text-xs font-bold uppercase transition-all">
-              <RotateCcw className="w-3 h-3" /> RESET
-            </button>
-            <button onClick={saveToTable} disabled={path.length === 0 || isLaunching} className="flex items-center justify-center gap-1 py-2 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 rounded-lg text-xs font-bold uppercase transition-all disabled:opacity-50">
-              <Save className="w-3 h-3" /> LƯU
-            </button>
-          </div>
-        </div>
-
-        {/* Right Panel: Simulation & Table */}
-        <div className="flex-1 flex flex-col gap-4 overflow-hidden">
-          {/* Canvas Section */}
-          <div className="flex-1 bg-white rounded-xl shadow-sm border relative overflow-hidden">
-            <div className="absolute top-3 left-3 flex flex-col gap-1 z-10">
-               <div className="bg-white/90 backdrop-blur p-2 rounded border shadow-sm text-[10px] space-y-1">
-                 <p className="font-bold border-b pb-1 mb-1">CÔNG THỨC ÁP DỤNG</p>
-                 <p>{"$t = \\frac{v_0\\sin\\theta_0 + \\sqrt{(v_0\\sin\\theta_0)^2 + 2gh_0}}{g}$"}</p>
-                 <p>{"$L_{TT} = v_0\\cos\\theta_0 \\cdot t$"}</p>
-                 <p>{"$v_0 = D / \\Delta t$"}</p>
-               </div>
-            </div>
+            /* ---- BẢNG MÀU TÍM SAPPHIRE CAO CẤP ---- */
+            --sl-accent: #a855f7; 
+            --sl-bg-dark: rgba(10, 5, 25, 0.9); 
+            --sl-text: #e9d5ff; 
             
-            <canvas ref={canvasRef} width={800} height={500} className="w-full h-full" />
+            --sl-warning: #ef4444; 
+            --sl-success: #fbbf24; 
+            
+            --sl-text-glow: 0 0 10px rgba(168, 85, 247, 0.8), 0 0 20px rgba(168, 85, 247, 0.4);
+        }
 
-            <div className="absolute bottom-3 right-3 bg-white/90 p-3 rounded-lg border shadow-sm text-xs font-mono">
-              <div className="text-blue-700">{"$v_0$ thực: "} <span className="font-bold">{timerData.v0} m/s</span></div>
-              <div className="text-red-700">{"$L_{TN}$ thực: "} <span className="font-bold">{(experimentalRange * 1000).toFixed(1)} mm</span></div>
-            </div>
-          </div>
+        body {
+            background-color: var(--bg-green);
+            font-family: 'Rajdhani', 'Noto Sans JP', sans-serif;
+            overflow: hidden;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            perspective: 1000px;
+        }
 
-          {/* Table Section */}
-          <div className="h-56 bg-white rounded-xl shadow-sm border flex flex-col">
-            <div className="p-2.5 border-b bg-slate-50 flex justify-between items-center">
-              <h3 className="text-[11px] font-bold uppercase text-slate-600 flex items-center gap-2">
-                <Ruler className="w-4 h-4" /> BẢNG SỐ LIỆU 2: KHẢO SÁT CHUYỂN ĐỘNG NÉM XIÊN
-              </h3>
-              <button onClick={() => setResults([])} className="text-slate-400 hover:text-red-600">
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="overflow-auto flex-1">
-              <table className="w-full text-center text-[11px]">
-                <thead className="bg-slate-50 sticky top-0 border-b">
-                  <tr>
-                    <th className="p-2 border-r">Lần đo</th>
-                    <th className="p-2 border-r">{"$\\Delta t$ (ms)"}</th>
-                    <th className="p-2 border-r">{"$v_0$ (m/s)"}</th>
-                    <th className="p-2 border-r">{"$L_{TT}$ (mm)"}</th>
-                    <th className="p-2 border-r">{"$L_{TN}$ (mm)"}</th>
-                    <th className="p-2">{"Độ lệch $\\delta$ (%)"}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y">
-                  {results.map((r, i) => (
-                    <tr key={r.id} className="hover:bg-slate-50">
-                      <td className="p-2 font-bold">{results.length - i}</td>
-                      <td className="p-2 font-mono">{r.dt}</td>
-                      <td className="p-2 font-mono">{r.v0}</td>
-                      <td className="p-2 font-mono">{r.ltt}</td>
-                      <td className="p-2 font-mono font-bold text-blue-600">{r.ltn}</td>
-                      <td className={`p-2 font-bold ${parseFloat(r.error) > 5 ? 'text-red-500' : 'text-emerald-600'}`}>
-                        {r.error}
-                      </td>
-                    </tr>
-                  ))}
-                  {results.length === 0 && (
-                    <tr>
-                      <td colSpan="6" className="p-8 italic text-slate-400">Chưa có dữ liệu thí nghiệm.</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <div className="mt-3 text-[10px] text-slate-400 flex justify-between italic">
-        <span>* Ghi chú: Sử dụng thước kẹp để đo $D$, thước mét để đo $h_0$ trước khi ném.</span>
-        <span>Version: DTU-Phys-1.2 (Stable)</span>
-      </div>
+        body::after {
+            content: ""; position: absolute; inset: 0;
+            background: linear-gradient(rgba(10, 5, 25, 0) 50%, rgba(168, 85, 247, 0.1) 50%);
+            background-size: 100% 6px; z-index: 999; pointer-events: none; opacity: 0.7;
+        }
+
+        /* Wrapper để xử lý Zoom mà không làm hỏng Animation gốc */
+        #panel-wrapper {
+            transition: transform 0.4s ease;
+            transform-origin: center center;
+        }
+
+        /* Khung Panel - Màu Sapphire Than Chì */
+        .system-panel {
+            width: 850px;
+            min-height: 280px;
+            background: var(--sl-bg-dark);
+            border: 2px solid var(--sl-accent);
+            box-shadow: 0 0 35px rgba(168, 85, 247, 0.5), inset 0 0 25px rgba(168, 85, 247, 0.2);
+            position: relative;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            transform: scale(0.9) translateY(30px) rotateX(10deg);
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 25px), calc(100% - 25px) 100%, 0 100%);
+            animation: floating 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes floating {
+            0% { transform: scale(1) translateY(0px) rotateX(0deg); }
+            100% { transform: scale(1) translateY(-10px) rotateX(2deg); box-shadow: 0 10px 50px rgba(168, 85, 247, 0.6), inset 0 0 15px rgba(168, 85, 247, 0.15); }
+        }
+
+        .system-panel.active { opacity: 1; transform: scale(1) translateY(0) rotateX(0deg); }
+
+        /* Lưới nền Graphite */
+        .system-panel::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(168, 85, 247, 0.08) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(168, 85, 247, 0.08) 1px, transparent 1px);
+            background-size: 40px 40px; pointer-events: none; z-index: -1;
+            animation: gridMove 20s linear infinite;
+        }
+        @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 40px 40px; } }
+
+        /* HEADER */
+        .sys-header { font-size: 2rem; font-weight: 900; color: var(--sl-accent); border-bottom: 2px solid rgba(168, 85, 247, 0.6); padding-bottom: 12px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; letter-spacing: 2px; text-shadow: var(--sl-text-glow); }
+        
+        .panel-warning { border-color: var(--sl-warning); box-shadow: 0 0 50px rgba(239, 68, 68, 0.7), inset 0 0 35px rgba(239, 68, 68, 0.4); background: rgba(30, 5, 5, 0.95); animation: panelShake 0.4s ease-in-out infinite, pulseRed 1.5s infinite; }
+        @keyframes pulseRed { 0%, 100% { box-shadow: 0 0 50px rgba(239, 68, 68, 0.7), inset 0 0 35px rgba(239, 68, 68, 0.4); } 50% { box-shadow: 0 0 90px rgba(239, 68, 68, 0.9), inset 0 0 55px rgba(239, 68, 68, 0.6); } }
+        @keyframes panelShake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-2.5px) rotate(-0.6deg); } 40%, 80% { transform: translateX(2.5px) rotate(0.6deg); } }
+
+        .panel-success { border-color: var(--sl-success); box-shadow: 0 0 60px rgba(251, 191, 36, 0.6), inset 0 0 45px rgba(251, 191, 36, 0.4); animation: glowGold 2s infinite alternate; }
+        @keyframes glowGold { from { box-shadow: 0 0 60px rgba(251, 191, 36, 0.6), inset 0 0 45px rgba(251, 191, 36, 0.4); } to { box-shadow: 0 0 90px rgba(251, 191, 36, 0.9), inset 0 0 65px rgba(251, 191, 36, 0.6); } }
+
+        .panel-warning .sys-header { color: var(--sl-warning); border-bottom-color: var(--sl-warning); text-shadow: 0 0 15px rgba(239,68,68,0.95); }
+        .panel-success .sys-header { color: var(--sl-success); border-bottom-color: var(--sl-success); text-shadow: 0 0 15px rgba(251,191,36,0.95); }
+
+        /* NỘI DUNG */
+        .sys-content { font-size: 1.6rem; color: var(--sl-text); line-height: 1.35; min-height: 130px; font-weight: 700; letter-spacing: 1px; text-shadow: 0 2px 5px rgba(0,0,0,0.9); text-align: left; }
+        .sys-content .highlight { color: var(--sl-accent); font-weight: 900; text-shadow: var(--sl-text-glow); font-size: 1.8rem;}
+        .sys-content .penalty { color: var(--sl-warning); font-weight: 900; text-shadow: 0 0 12px var(--sl-warning);}
+        .panel-warning .sys-content { color: #ffcccc; font-size: 1.85rem; text-align: center; letter-spacing: 2.5px;}
+        .panel-success .sys-content { text-align: center; font-size: 1.85rem; color: #fff; }
+
+        /* SUB TIẾNG VIỆT */
+        .vi-title-sub, .vi-status-sub { display: block; font-size: 13px !important; opacity: 0.6; letter-spacing: 1px; margin-top: -2px; font-family: 'Rajdhani', sans-serif; font-weight: 600; color: #fbbf24 !important; text-shadow: none !important; }
+        .vi-sub { display: block; font-size: 14px !important; color: rgba(251, 191, 36, 0.45) !important; font-family: 'Rajdhani', sans-serif; font-weight: 500; margin-top: 4px; margin-bottom: 22px; line-height: 1.25; letter-spacing: 0.6px; text-shadow: none !important; }
+        .panel-warning .vi-sub { color: rgba(255, 120, 120, 0.75) !important; }
+        .panel-success .vi-sub { color: rgba(251, 191, 36, 0.6) !important; margin-bottom: 20px;}
+        .vi-btn-sub { display: block; font-size: 12px !important; font-family: 'Rajdhani', sans-serif; font-weight: 500; letter-spacing: 1px; opacity: 0.6; margin-top: 5px; color: #fbbf24 !important; text-shadow: none !important; }
+
+        /* Con trỏ */
+        .cursor { display: inline-block; width: 14px; height: 1.1em; background-color: var(--sl-accent); vertical-align: middle; animation: blink 0.8s step-end infinite; margin-left: 8px; box-shadow: 0 0 10px var(--sl-accent); }
+        .panel-warning .cursor { background-color: var(--sl-warning); box-shadow: 0 0 10px var(--sl-warning); }
+        .panel-success .cursor { background-color: var(--sl-success); box-shadow: 0 0 10px var(--sl-success); }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* NÚT BẤM */
+        .btn-group { display: flex; gap: 40px; margin-top: 20px; opacity: 0; transition: opacity 0.5s; justify-content: center; }
+        .btn-group.show { opacity: 1; }
+        .sys-btn { position: relative; padding: 12px 50px; font-weight: 900; font-size: 1.6rem; text-align: center; letter-spacing: 4px; clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px); cursor: pointer; transition: transform 0.3s ease, color 0.3s ease; overflow: hidden; }
+        .sys-btn.accept { border: 1px solid var(--sl-accent); color: var(--sl-accent); background: rgba(168, 85, 247, 0.15); text-shadow: var(--sl-text-glow); animation: pulseAccept 1.5s infinite alternate; }
+        @keyframes pulseAccept { from { box-shadow: inset 0 0 15px rgba(168, 85, 247, 0.25), 0 0 15px rgba(168,85,247,0.35); } to { box-shadow: inset 0 0 35px rgba(168, 85, 247, 0.6), 0 0 30px rgba(168,85,247,0.7); background: rgba(168, 85, 247, 0.3); } }
+        .sys-btn.decline { border: 1px solid var(--sl-warning); color: var(--sl-warning); background: rgba(239, 68, 68, 0.15); text-shadow: 0 0 10px rgba(239, 68, 68, 0.85); animation: pulseDecline 1.5s infinite alternate; }
+        @keyframes pulseDecline { from { box-shadow: inset 0 0 15px rgba(239, 68, 68, 0.25), 0 0 15px rgba(239, 68, 68, 0.35); } to { box-shadow: inset 0 0 35px rgba(239, 68, 68, 0.6), 0 0 30px rgba(239,68,68,0.7); background: rgba(239, 68, 68, 0.3); } }
+        .sys-btn:hover { transform: scale(1.1) translateY(-2px); color: #fff; }
+
+        /* VISUAL AREA */
+        .visual-area { display: flex; justify-content: center; margin-bottom: 25px; perspective: 500px; }
+        .radar-box { width: 120px; height: 120px; border: 2px solid var(--sl-accent); border-radius: 50%; position: relative; background: rgba(10, 5, 25, 0.4); box-shadow: 0 0 25px rgba(168,85,247,0.5); overflow: hidden; display: flex; justify-content: center; align-items: center; }
+        .radar-sweep { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: conic-gradient(from 0deg, transparent 70%, rgba(168, 85, 247, 0.85) 100%); animation: scan 2s linear infinite; border-radius: 50%; }
+        @keyframes scan { 100% { transform: rotate(360deg); } }
+        .radar-crosshair { position: absolute; width: 100%; height: 100%; background: linear-gradient(transparent 49%, var(--sl-accent) 49%, var(--sl-accent) 51%, transparent 51%), linear-gradient(90deg, transparent 49%, var(--sl-accent) 49%, var(--sl-accent) 51%, transparent 51%); opacity: 0.35; }
+        .radar-arrow { position: absolute; font-size: 30px; color: var(--sl-accent); z-index: 10; text-shadow: 0 0 15px var(--sl-accent); animation: pulseArrow 1s infinite alternate; }
+        .arrow-up { transform: rotate(-90deg); }
+        .arrow-right { transform: rotate(0deg); }
+        @keyframes pulseArrow { 0% { transform: scale(1) translateY(0); opacity: 0.8;} 100% { transform: scale(1.25) translateY(-5px); opacity: 1;} }
+
+        .level-up-container { position: relative; display: flex; justify-content: center; align-items: center; }
+        .level-up-text { font-size: 5.5rem; font-family: 'Rajdhani', sans-serif; color: var(--sl-success); font-weight: 800; text-align: center; text-shadow: 0 0 45px rgba(251, 191, 36, 1), 0 0 25px #fff; letter-spacing: 12px; animation: levelUpPop 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; position: relative; z-index: 10; }
+        .level-up-ring { position: absolute; width: 100px; height: 100px; border: 4px solid var(--sl-success); border-radius: 50%; opacity: 0; animation: ringExpand 1.5s ease-out forwards; }
+        @keyframes levelUpPop { 0% { transform: scale(0.5) translateY(50px); opacity: 0; filter: blur(10px); } 50% { transform: scale(1.15) translateY(-10px); opacity: 1; filter: blur(0px); } 100% { transform: scale(1) translateY(0); opacity: 1; filter: blur(0px); } }
+        @keyframes ringExpand { 0% { width: 50px; height: 50px; opacity: 1; border-color: var(--sl-accent); } 100% { width: 450px; height: 450px; opacity: 0; border-width: 12px; border-color: var(--sl-success); } }
+
+    </style>
+</head>
+<body>
+
+    <div id="mobile-controls" class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-3 opacity-70 hover:opacity-100 transition-opacity">
+        <button id="btn-zoom" class="bg-purple-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-bold border border-purple-400">🔍 Chỉnh kích thước</button>
+        <button id="btn-fullscreen" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-bold border border-blue-400">📱 Toàn màn hình</button>
+        <button id="btn-hide" class="bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-bold border border-red-400">❌ Ẩn nút để quay</button>
     </div>
-  );
-};
 
-export default App;
+    <div id="panel-wrapper">
+        <div id="system-panel" class="system-panel">
+            <div class="sys-header">
+                <div><span id="sys-title"></span></div>
+                <div><span id="sys-status"></span></div>
+            </div>
+            <div id="visual-area" class="visual-area"></div>
+            <div class="sys-content">
+                <span id="text-container"></span><span class="cursor" id="cursor"></span>
+            </div>
+            <div id="btn-group" class="btn-group">
+                <div class="sys-btn accept">承諾<span class="vi-btn-sub">Chấp nhận</span></div>
+                <div class="sys-btn decline">拒否<span class="vi-btn-sub">Từ chối</span></div>
+            </div>
+        </div>
+    </div>
 
-          
+    <script>
+        // --- LOGIC GIAO DIỆN QUAY ĐIỆN THOẠI ---
+        const panelWrapper = document.getElementById('panel-wrapper');
+        const mobileControls = document.getElementById('mobile-controls');
+        let isZoomed = false;
+
+        // 1. Chỉnh kích thước (Thu nhỏ tự động theo màn hình điện thoại)
+        document.getElementById('btn-zoom').addEventListener('click', () => {
+            isZoomed = !isZoomed;
+            if (isZoomed) {
+                // Thu nhỏ panel lại cho vừa với bề ngang điện thoại (có padding 20px)
+                const scaleValue = Math.min((window.innerWidth - 40) / 850, 1);
+                panelWrapper.style.transform = `scale(${scaleValue})`;
+            } else {
+                panelWrapper.style.transform = `scale(1)`;
+            }
+        });
+
+        // 2. Toàn màn hình / Thêm vào màn hình chính
+        document.getElementById('btn-fullscreen').addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Không thể mở toàn màn hình tự động. \n\nMẹo: Mở menu của Safari/Chrome và chọn "Thêm vào màn hình chính" (Add to Home Screen) để biến file này thành 1 App không có viền duyệt web!`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        // 3. Ẩn nút đi để bắt đầu quay xanh
+        document.getElementById('btn-hide').addEventListener('click', () => {
+            mobileControls.style.display = 'none';
+        });
+
+
+        // --- LOGIC SOLO LEVELING GỐC ---
+        const scriptScenes = [
+            { id: 1, theme: 'warning', title: '[ システム通知 ] <span class="vi-title-sub">Thông báo hệ thống</span>', status: 'ピロン！ <span class="vi-status-sub">Ping!</span>', text: `プレイヤーのヴーさん、新しいミッションです。<span class='vi-sub'>Người chơi Vũ, có nhiệm vụ mới.</span>`, visual: '', showBtn: false },
+            { id: 2, theme: 'normal', title: '[ 突発クエスト ] <span class="vi-title-sub">Nhiệm vụ đột xuất</span>', status: 'ランク: C <span class="vi-status-sub">Rank: C</span>', text: `カフェへ行ってください。<span class='vi-sub'>Hãy đi đến quán cà phê.</span>そして、その場所を紹介してください。<span class='vi-sub'>Và hãy giới thiệu địa điểm đó.</span>クエストを受諾しますか？<span class='vi-sub'>Bạn có muốn tiếp nhận nhiệm vụ?</span>`, visual: '', showBtn: true },
+            { id: 3, theme: 'normal', title: '[ ナビゲーション ] <span class="vi-title-sub">Hệ thống dẫn đường</span>', status: '経路案内 <span class="vi-status-sub">Chỉ đường</span>', text: `ここから、まっすぐ行ってください。<span class='vi-sub'>Từ đây, hãy đi thẳng.</span>`, visual: `<div class="radar-box"><div class="radar-crosshair"></div><div class="radar-sweep"></div><div class="radar-arrow arrow-up">➤</div></div>`, showBtn: false },
+            { id: 4, theme: 'normal', title: '[ ナビゲーション ] <span class="vi-title-sub">Hệ thống dẫn đường</span>', status: '経路案内 <span class="vi-status-sub">Chỉ đường</span>', text: `次の角を右に曲がってください。<span class='vi-sub'>Hãy rẽ phải ở góc cua tiếp theo.</span>`, visual: `<div class="radar-box"><div class="radar-crosshair"></div><div class="radar-sweep"></div><div class="radar-arrow arrow-right">➤</div></div>`, showBtn: false },
+            { id: 5, theme: 'normal', title: '[ データスキャン ] <span class="vi-title-sub">Quét dữ liệu</span>', status: '目的地到着 <span class="vi-status-sub">Đã đến đích</span>', text: `目的地に到着しました。<span class='vi-sub'>Đã đến đích.</span>データをスキャンしてください。<span class='vi-sub'>Hãy quét dữ liệu.</span>`, visual: '', showBtn: false },
+            { id: 6, theme: 'success', title: '[ システム通知 ] <span class="vi-title-sub">Thông báo hệ thống</span>', status: '完了 <span class="vi-status-sub">Hoàn thành</span>', text: `ミッションクリア！<span class='vi-sub'>Nhiệm vụ hoàn thành!</span>おめでとうございます！<span class='vi-sub'>Xin chúc mừng!</span>`, visual: `<div class="level-up-container"><div class="level-up-ring"></div><div class="level-up-text">LEVEL UP!</div></div>`, showBtn: false },
+            { id: 7, theme: 'hidden', text: "" }
+        ];
+
+        let currentScene = 0; let isTyping = false; let typeTimeout;
+        const panel = document.getElementById('system-panel'), titleEl = document.getElementById('sys-title'), statusEl = document.getElementById('sys-status'), textContainer = document.getElementById('text-container'), visualArea = document.getElementById('visual-area'), btnGroup = document.getElementById('btn-group');
+
+        function typeWriter(html, index, callback) {
+            if (index < html.length) {
+                let nextIndex = index;
+                if (html.charAt(nextIndex) === '<') { while (html.charAt(nextIndex) !== '>' && nextIndex < html.length) { nextIndex++; } nextIndex++; } else { nextIndex++; }
+                textContainer.innerHTML = html.substring(0, nextIndex);
+                typeTimeout = setTimeout(() => typeWriter(html, nextIndex, callback), Math.floor(Math.random() * 20) + 15);
+            } else { isTyping = false; if (callback) callback(); }
+        }
+
+        function loadScene(index) {
+            if (index >= scriptScenes.length) return;
+            const scene = scriptScenes[index]; isTyping = true; clearTimeout(typeTimeout); textContainer.innerHTML = ''; btnGroup.classList.remove('show');
+            panel.className = 'system-panel'; void panel.offsetWidth; panel.classList.add('active');
+            if (scene.theme === 'warning') panel.classList.add('panel-warning');
+            if (scene.theme === 'success') panel.classList.add('panel-success');
+            if (scene.theme === 'hidden') { panel.classList.remove('active'); return; }
+            titleEl.innerHTML = scene.title || ''; statusEl.innerHTML = scene.status || '';
+            if (scene.visual) { visualArea.innerHTML = scene.visual; visualArea.style.display = 'flex'; } else { visualArea.innerHTML = ''; visualArea.style.display = 'none'; }
+            typeWriter(scene.text, 0, () => { if (scene.showBtn) btnGroup.classList.add('show'); });
+        }
+
+        function nextScene() {
+            if (isTyping) { 
+                clearTimeout(typeTimeout); textContainer.innerHTML = scriptScenes[currentScene].text; isTyping = false; 
+                if (scriptScenes[currentScene].showBtn) btnGroup.classList.add('show'); 
+            } else { currentScene++; loadScene(currentScene); }
+        }
+
+        // TỰ ĐỘNG CHẠY (Chạy sau 2 giây để bạn kịp bấm Zoom hoặc Ẩn nút)
+        setTimeout(() => { 
+            loadScene(0); 
+            let sceneCount = 1;
+            const autoPlay = setInterval(() => {
+                nextScene(); sceneCount++;
+                if (sceneCount >= 6) { clearInterval(autoPlay); }
+            }, 15000); 
+        }, 2000); 
+    </script>
+</body>
+</html>
