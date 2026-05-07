@@ -48,7 +48,7 @@
 
         /* Wrapper để xử lý Zoom mà không làm hỏng Animation gốc */
         #panel-wrapper {
-            transition: transform 0.4s ease;
+            transition: transform 0.2s ease;
             transform-origin: center center;
         }
 
@@ -151,9 +151,12 @@
 <body>
 
     <div id="mobile-controls" class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-3 opacity-70 hover:opacity-100 transition-opacity">
-        <button id="btn-zoom" class="bg-purple-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-bold border border-purple-400">🔍 Chỉnh kích thước</button>
-        <button id="btn-fullscreen" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-bold border border-blue-400">📱 Toàn màn hình</button>
-        <button id="btn-hide" class="bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-bold border border-red-400">❌ Ẩn nút để quay</button>
+        <div class="flex gap-2">
+            <button id="btn-zoom-in" class="bg-purple-600 text-white px-4 py-2 rounded-lg shadow-lg text-lg font-bold border border-purple-400 w-full hover:bg-purple-500">➕ Zoom</button>
+            <button id="btn-zoom-out" class="bg-purple-600 text-white px-4 py-2 rounded-lg shadow-lg text-lg font-bold border border-purple-400 w-full hover:bg-purple-500">➖ Zoom</button>
+        </div>
+        <button id="btn-fullscreen" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-bold border border-blue-400 hover:bg-blue-500">📱 Toàn màn hình</button>
+        <button id="btn-hide" class="bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-bold border border-red-400 hover:bg-red-500">❌ Ẩn nút để quay</button>
     </div>
 
     <div id="panel-wrapper">
@@ -177,21 +180,25 @@
         // --- LOGIC GIAO DIỆN QUAY ĐIỆN THOẠI ---
         const panelWrapper = document.getElementById('panel-wrapper');
         const mobileControls = document.getElementById('mobile-controls');
-        let isZoomed = false;
+        
+        let currentScale = 1; // Bắt đầu ở kích thước gốc 100%
+        const scaleStep = 0.1; // Mỗi lần bấm thay đổi 10%
 
-        // 1. Chỉnh kích thước (Thu nhỏ tự động theo màn hình điện thoại)
-        document.getElementById('btn-zoom').addEventListener('click', () => {
-            isZoomed = !isZoomed;
-            if (isZoomed) {
-                // Thu nhỏ panel lại cho vừa với bề ngang điện thoại (có padding 20px)
-                const scaleValue = Math.min((window.innerWidth - 40) / 850, 1);
-                panelWrapper.style.transform = `scale(${scaleValue})`;
-            } else {
-                panelWrapper.style.transform = `scale(1)`;
-            }
+        // 1. Zoom To (+)
+        document.getElementById('btn-zoom-in').addEventListener('click', () => {
+            currentScale += scaleStep;
+            if (currentScale > 2) currentScale = 2; // Giới hạn to tối đa 200%
+            panelWrapper.style.transform = `scale(${currentScale})`;
         });
 
-        // 2. Toàn màn hình / Thêm vào màn hình chính
+        // 2. Zoom Nhỏ (-)
+        document.getElementById('btn-zoom-out').addEventListener('click', () => {
+            currentScale -= scaleStep;
+            if (currentScale < 0.3) currentScale = 0.3; // Giới hạn nhỏ tối đa 30%
+            panelWrapper.style.transform = `scale(${currentScale})`;
+        });
+
+        // 3. Toàn màn hình / Thêm vào màn hình chính
         document.getElementById('btn-fullscreen').addEventListener('click', () => {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().catch(err => {
@@ -202,7 +209,7 @@
             }
         });
 
-        // 3. Ẩn nút đi để bắt đầu quay xanh
+        // 4. Ẩn nút đi để bắt đầu quay xanh
         document.getElementById('btn-hide').addEventListener('click', () => {
             mobileControls.style.display = 'none';
         });
@@ -250,7 +257,7 @@
             } else { currentScene++; loadScene(currentScene); }
         }
 
-        // TỰ ĐỘNG CHẠY (Chạy sau 2 giây để bạn kịp bấm Zoom hoặc Ẩn nút)
+        // TỰ ĐỘNG CHẠY (Chạy sau 3 giây để bạn kịp canh chỉnh Zoom và Ẩn nút)
         setTimeout(() => { 
             loadScene(0); 
             let sceneCount = 1;
@@ -258,7 +265,7 @@
                 nextScene(); sceneCount++;
                 if (sceneCount >= 6) { clearInterval(autoPlay); }
             }, 15000); 
-        }, 2000); 
+        }, 3000); 
     </script>
 </body>
 </html>
