@@ -2,270 +2,497 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
-    <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Solo%20System%22%2C%22short_name%22%3A%22System%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%2300FF00%22%2C%22theme_color%22%3A%22%23a855f7%22%7D">
-
-    <title>Solo Leveling System - Amethyst Sapphire Edition</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAP 183 - Duolingo Style</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-green: #00FF00; /* Phông xanh để key hình */
-            
-            /* ---- BẢNG MÀU TÍM SAPPHIRE CAO CẤP ---- */
-            --sl-accent: #a855f7; 
-            --sl-bg-dark: rgba(10, 5, 25, 0.9); 
-            --sl-text: #e9d5ff; 
-            
-            --sl-warning: #ef4444; 
-            --sl-success: #fbbf24; 
-            
-            --sl-text-glow: 0 0 10px rgba(168, 85, 247, 0.8), 0 0 20px rgba(168, 85, 247, 0.4);
-        }
-
-        body {
-            background-color: var(--bg-green);
-            font-family: 'Rajdhani', 'Noto Sans JP', sans-serif;
+        body { 
+            font-family: 'Nunito', sans-serif; 
+            background: #fff; 
+            margin:0; 
+            display:flex; 
+            flex-direction:column; 
+            height: 100vh; 
             overflow: hidden;
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            user-select: none;
-            perspective: 1000px;
+            color: #3c3c3c;
         }
-
-        body::after {
-            content: ""; position: absolute; inset: 0;
-            background: linear-gradient(rgba(10, 5, 25, 0) 50%, rgba(168, 85, 247, 0.1) 50%);
-            background-size: 100% 6px; z-index: 999; pointer-events: none; opacity: 0.7;
-        }
-
-        /* Wrapper để xử lý Zoom mà không làm hỏng Animation gốc */
-        #panel-wrapper {
-            transition: transform 0.2s ease;
-            transform-origin: center center;
-        }
-
-        /* Khung Panel - Màu Sapphire Than Chì */
-        .system-panel {
-            width: 850px;
-            min-height: 280px;
-            background: var(--sl-bg-dark);
-            border: 2px solid var(--sl-accent);
-            box-shadow: 0 0 35px rgba(168, 85, 247, 0.5), inset 0 0 25px rgba(168, 85, 247, 0.2);
-            position: relative;
-            padding: 40px;
-            backdrop-filter: blur(10px);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            opacity: 0;
-            transform: scale(0.9) translateY(30px) rotateX(10deg);
-            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 25px), calc(100% - 25px) 100%, 0 100%);
-            animation: floating 4s ease-in-out infinite alternate;
-        }
-
-        @keyframes floating {
-            0% { transform: scale(1) translateY(0px) rotateX(0deg); }
-            100% { transform: scale(1) translateY(-10px) rotateX(2deg); box-shadow: 0 10px 50px rgba(168, 85, 247, 0.6), inset 0 0 15px rgba(168, 85, 247, 0.15); }
-        }
-
-        .system-panel.active { opacity: 1; transform: scale(1) translateY(0) rotateX(0deg); }
-
-        /* Lưới nền Graphite */
-        .system-panel::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(rgba(168, 85, 247, 0.08) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(168, 85, 247, 0.08) 1px, transparent 1px);
-            background-size: 40px 40px; pointer-events: none; z-index: -1;
-            animation: gridMove 20s linear infinite;
-        }
-        @keyframes gridMove { 0% { background-position: 0 0; } 100% { background-position: 40px 40px; } }
-
-        /* HEADER */
-        .sys-header { font-size: 2rem; font-weight: 900; color: var(--sl-accent); border-bottom: 2px solid rgba(168, 85, 247, 0.6); padding-bottom: 12px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; letter-spacing: 2px; text-shadow: var(--sl-text-glow); }
         
-        .panel-warning { border-color: var(--sl-warning); box-shadow: 0 0 50px rgba(239, 68, 68, 0.7), inset 0 0 35px rgba(239, 68, 68, 0.4); background: rgba(30, 5, 5, 0.95); animation: panelShake 0.4s ease-in-out infinite, pulseRed 1.5s infinite; }
-        @keyframes pulseRed { 0%, 100% { box-shadow: 0 0 50px rgba(239, 68, 68, 0.7), inset 0 0 35px rgba(239, 68, 68, 0.4); } 50% { box-shadow: 0 0 90px rgba(239, 68, 68, 0.9), inset 0 0 55px rgba(239, 68, 68, 0.6); } }
-        @keyframes panelShake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-2.5px) rotate(-0.6deg); } 40%, 80% { transform: translateX(2.5px) rotate(0.6deg); } }
+        header { 
+            display: flex; 
+            align-items: center; 
+            padding: 20px 40px; 
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .close-btn {
+            font-size: 24px;
+            color: #afafaf;
+            cursor: pointer;
+            font-weight: 800;
+        }
+        .progress-bar-bg { 
+            flex-grow: 1; 
+            background: #e5e5e5; 
+            height: 18px; 
+            border-radius: 9px; 
+            margin: 0 20px; 
+            position: relative; 
+            overflow: hidden;
+        }
+        .progress-bar-fill { 
+            background: #58cc02; 
+            height: 100%; 
+            border-radius: 9px; 
+            width: 0%; 
+            transition: width 0.4s ease; 
+        }
+        .progress-highlight {
+            position: absolute;
+            top: 4px;
+            left: 10px;
+            right: 10px;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+        }
 
-        .panel-success { border-color: var(--sl-success); box-shadow: 0 0 60px rgba(251, 191, 36, 0.6), inset 0 0 45px rgba(251, 191, 36, 0.4); animation: glowGold 2s infinite alternate; }
-        @keyframes glowGold { from { box-shadow: 0 0 60px rgba(251, 191, 36, 0.6), inset 0 0 45px rgba(251, 191, 36, 0.4); } to { box-shadow: 0 0 90px rgba(251, 191, 36, 0.9), inset 0 0 65px rgba(251, 191, 36, 0.6); } }
+        main { 
+            flex-grow: 1; 
+            padding: 0 20px; 
+            max-width: 600px; 
+            margin: 0 auto; 
+            width: 100%; 
+            display:flex; 
+            flex-direction:column; 
+            justify-content:center;
+            box-sizing: border-box;
+        }
+        
+        .question-title { 
+            font-size: 28px; 
+            font-weight: 800; 
+            margin-bottom: 10px; 
+        }
+        .question-subtitle {
+            font-size: 18px;
+            color: #777;
+            margin-bottom: 30px;
+        }
+        
+        .question-content { 
+            font-size: 32px; 
+            margin-bottom: 40px; 
+            text-align: center; 
+            color: #1cb0f6;
+        }
+        
+        .options { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 15px; 
+        }
+        .option { 
+            border: 2px solid #e5e5e5; 
+            border-radius: 15px; 
+            padding: 18px 20px; 
+            font-size: 20px; 
+            cursor: pointer; 
+            transition: all 0.1s; 
+            color: #4b4b4b; 
+            font-weight: 700; 
+            background: white;
+            box-shadow: 0 2px 0 #e5e5e5;
+        }
+        .option:hover { 
+            background: #f7f7f7; 
+        }
+        .option:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+        .option.selected { 
+            border-color: #84d8ff; 
+            background: #ddf4ff; 
+            color: #1cb0f6; 
+            box-shadow: 0 2px 0 #84d8ff;
+        }
+        .option.disabled {
+            pointer-events: none;
+        }
+        
+        .bottom-bar { 
+            padding: 30px 20px; 
+            border-top: 2px solid #e5e5e5; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            transition: background 0.3s;
+        }
+        .bottom-bar.correct { 
+            background: #d7ffb8; 
+            border-color: #d7ffb8; 
+        }
+        .bottom-bar.incorrect { 
+            background: #ffdfe0; 
+            border-color: #ffdfe0; 
+        }
+        
+        .feedback { 
+            display:none; 
+            flex-grow: 1; 
+        }
+        .feedback h2 { 
+            margin: 0; 
+            font-size: 24px; 
+            font-weight: 800;
+        }
+        .bottom-bar.correct .feedback h2 { color: #58a700; }
+        .bottom-bar.incorrect .feedback h2 { color: #ea2b2b; }
+        
+        .btn-check { 
+            background: #e5e5e5; 
+            color: #afafaf; 
+            border: none; 
+            padding: 15px 40px; 
+            font-size: 18px; 
+            font-weight: 800; 
+            border-radius: 15px; 
+            cursor: default; 
+            margin-left: auto; 
+            text-transform: uppercase;
+            font-family: 'Nunito', sans-serif;
+        }
+        .btn-check.active { 
+            background: #58cc02; 
+            color: #fff; 
+            cursor: pointer; 
+            box-shadow: 0 4px 0 #58a700; 
+        }
+        .btn-check.active:active { 
+            transform: translateY(4px); 
+            box-shadow: none; 
+        }
+        
+        .bottom-bar.correct .btn-check { 
+            background: #58cc02; 
+            box-shadow: 0 4px 0 #58a700; 
+            color: white;
+            cursor: pointer;
+        }
+        .bottom-bar.incorrect .btn-check { 
+            background: #ff4b4b; 
+            box-shadow: 0 4px 0 #ea2b2b; 
+            color: white;
+            cursor: pointer;
+        }
 
-        .panel-warning .sys-header { color: var(--sl-warning); border-bottom-color: var(--sl-warning); text-shadow: 0 0 15px rgba(239,68,68,0.95); }
-        .panel-success .sys-header { color: var(--sl-success); border-bottom-color: var(--sl-success); text-shadow: 0 0 15px rgba(251,191,36,0.95); }
+        .explanation { 
+            font-size: 16px; 
+            margin-top: 10px; 
+            font-weight: 700;
+            display: none;
+        }
+        .bottom-bar.incorrect .explanation, .bottom-bar.correct .explanation { 
+            display: block; 
+        }
+        .bottom-bar.correct .explanation { color: #58a700; }
+        .bottom-bar.incorrect .explanation { color: #ea2b2b; }
 
-        /* NỘI DUNG */
-        .sys-content { font-size: 1.6rem; color: var(--sl-text); line-height: 1.35; min-height: 130px; font-weight: 700; letter-spacing: 1px; text-shadow: 0 2px 5px rgba(0,0,0,0.9); text-align: left; }
-        .sys-content .highlight { color: var(--sl-accent); font-weight: 900; text-shadow: var(--sl-text-glow); font-size: 1.8rem;}
-        .sys-content .penalty { color: var(--sl-warning); font-weight: 900; text-shadow: 0 0 12px var(--sl-warning);}
-        .panel-warning .sys-content { color: #ffcccc; font-size: 1.85rem; text-align: center; letter-spacing: 2.5px;}
-        .panel-success .sys-content { text-align: center; font-size: 1.85rem; color: #fff; }
-
-        /* SUB TIẾNG VIỆT */
-        .vi-title-sub, .vi-status-sub { display: block; font-size: 13px !important; opacity: 0.6; letter-spacing: 1px; margin-top: -2px; font-family: 'Rajdhani', sans-serif; font-weight: 600; color: #fbbf24 !important; text-shadow: none !important; }
-        .vi-sub { display: block; font-size: 14px !important; color: rgba(251, 191, 36, 0.45) !important; font-family: 'Rajdhani', sans-serif; font-weight: 500; margin-top: 4px; margin-bottom: 22px; line-height: 1.25; letter-spacing: 0.6px; text-shadow: none !important; }
-        .panel-warning .vi-sub { color: rgba(255, 120, 120, 0.75) !important; }
-        .panel-success .vi-sub { color: rgba(251, 191, 36, 0.6) !important; margin-bottom: 20px;}
-        .vi-btn-sub { display: block; font-size: 12px !important; font-family: 'Rajdhani', sans-serif; font-weight: 500; letter-spacing: 1px; opacity: 0.6; margin-top: 5px; color: #fbbf24 !important; text-shadow: none !important; }
-
-        /* Con trỏ */
-        .cursor { display: inline-block; width: 14px; height: 1.1em; background-color: var(--sl-accent); vertical-align: middle; animation: blink 0.8s step-end infinite; margin-left: 8px; box-shadow: 0 0 10px var(--sl-accent); }
-        .panel-warning .cursor { background-color: var(--sl-warning); box-shadow: 0 0 10px var(--sl-warning); }
-        .panel-success .cursor { background-color: var(--sl-success); box-shadow: 0 0 10px var(--sl-success); }
-        @keyframes blink { 50% { opacity: 0; } }
-
-        /* NÚT BẤM */
-        .btn-group { display: flex; gap: 40px; margin-top: 20px; opacity: 0; transition: opacity 0.5s; justify-content: center; }
-        .btn-group.show { opacity: 1; }
-        .sys-btn { position: relative; padding: 12px 50px; font-weight: 900; font-size: 1.6rem; text-align: center; letter-spacing: 4px; clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px); cursor: pointer; transition: transform 0.3s ease, color 0.3s ease; overflow: hidden; }
-        .sys-btn.accept { border: 1px solid var(--sl-accent); color: var(--sl-accent); background: rgba(168, 85, 247, 0.15); text-shadow: var(--sl-text-glow); animation: pulseAccept 1.5s infinite alternate; }
-        @keyframes pulseAccept { from { box-shadow: inset 0 0 15px rgba(168, 85, 247, 0.25), 0 0 15px rgba(168,85,247,0.35); } to { box-shadow: inset 0 0 35px rgba(168, 85, 247, 0.6), 0 0 30px rgba(168,85,247,0.7); background: rgba(168, 85, 247, 0.3); } }
-        .sys-btn.decline { border: 1px solid var(--sl-warning); color: var(--sl-warning); background: rgba(239, 68, 68, 0.15); text-shadow: 0 0 10px rgba(239, 68, 68, 0.85); animation: pulseDecline 1.5s infinite alternate; }
-        @keyframes pulseDecline { from { box-shadow: inset 0 0 15px rgba(239, 68, 68, 0.25), 0 0 15px rgba(239, 68, 68, 0.35); } to { box-shadow: inset 0 0 35px rgba(239, 68, 68, 0.6), 0 0 30px rgba(239,68,68,0.7); background: rgba(239, 68, 68, 0.3); } }
-        .sys-btn:hover { transform: scale(1.1) translateY(-2px); color: #fff; }
-
-        /* VISUAL AREA */
-        .visual-area { display: flex; justify-content: center; margin-bottom: 25px; perspective: 500px; }
-        .radar-box { width: 120px; height: 120px; border: 2px solid var(--sl-accent); border-radius: 50%; position: relative; background: rgba(10, 5, 25, 0.4); box-shadow: 0 0 25px rgba(168,85,247,0.5); overflow: hidden; display: flex; justify-content: center; align-items: center; }
-        .radar-sweep { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: conic-gradient(from 0deg, transparent 70%, rgba(168, 85, 247, 0.85) 100%); animation: scan 2s linear infinite; border-radius: 50%; }
-        @keyframes scan { 100% { transform: rotate(360deg); } }
-        .radar-crosshair { position: absolute; width: 100%; height: 100%; background: linear-gradient(transparent 49%, var(--sl-accent) 49%, var(--sl-accent) 51%, transparent 51%), linear-gradient(90deg, transparent 49%, var(--sl-accent) 49%, var(--sl-accent) 51%, transparent 51%); opacity: 0.35; }
-        .radar-arrow { position: absolute; font-size: 30px; color: var(--sl-accent); z-index: 10; text-shadow: 0 0 15px var(--sl-accent); animation: pulseArrow 1s infinite alternate; }
-        .arrow-up { transform: rotate(-90deg); }
-        .arrow-right { transform: rotate(0deg); }
-        @keyframes pulseArrow { 0% { transform: scale(1) translateY(0); opacity: 0.8;} 100% { transform: scale(1.25) translateY(-5px); opacity: 1;} }
-
-        .level-up-container { position: relative; display: flex; justify-content: center; align-items: center; }
-        .level-up-text { font-size: 5.5rem; font-family: 'Rajdhani', sans-serif; color: var(--sl-success); font-weight: 800; text-align: center; text-shadow: 0 0 45px rgba(251, 191, 36, 1), 0 0 25px #fff; letter-spacing: 12px; animation: levelUpPop 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; position: relative; z-index: 10; }
-        .level-up-ring { position: absolute; width: 100px; height: 100px; border: 4px solid var(--sl-success); border-radius: 50%; opacity: 0; animation: ringExpand 1.5s ease-out forwards; }
-        @keyframes levelUpPop { 0% { transform: scale(0.5) translateY(50px); opacity: 0; filter: blur(10px); } 50% { transform: scale(1.15) translateY(-10px); opacity: 1; filter: blur(0px); } 100% { transform: scale(1) translateY(0); opacity: 1; filter: blur(0px); } }
-        @keyframes ringExpand { 0% { width: 50px; height: 50px; opacity: 1; border-color: var(--sl-accent); } 100% { width: 450px; height: 450px; opacity: 0; border-width: 12px; border-color: var(--sl-success); } }
-
+        #end-screen { 
+            display: none; 
+            text-align: center; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center;
+            height: 100%;
+        }
+        #end-screen h1 { 
+            color: #f49000; 
+            font-size: 36px; 
+            margin-bottom: 20px;
+        }
+        #end-screen p {
+            font-size: 20px;
+            color: #777;
+        }
+        
+        /* Audio elements */
+        audio { display: none; }
     </style>
 </head>
 <body>
 
-    <div id="mobile-controls" class="fixed bottom-4 right-4 z-[9999] flex flex-col gap-3 opacity-70 hover:opacity-100 transition-opacity">
-        <div class="flex gap-2">
-            <button id="btn-zoom-in" class="bg-purple-600 text-white px-4 py-2 rounded-lg shadow-lg text-lg font-bold border border-purple-400 w-full hover:bg-purple-500">➕ Zoom</button>
-            <button id="btn-zoom-out" class="bg-purple-600 text-white px-4 py-2 rounded-lg shadow-lg text-lg font-bold border border-purple-400 w-full hover:bg-purple-500">➖ Zoom</button>
-        </div>
-        <button id="btn-fullscreen" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-bold border border-blue-400 hover:bg-blue-500">📱 Toàn màn hình</button>
-        <button id="btn-hide" class="bg-red-600 text-white px-4 py-2 rounded-lg shadow-lg text-sm font-bold border border-red-400 hover:bg-red-500">❌ Ẩn nút để quay</button>
+<header id="header">
+    <div class="close-btn">✖</div>
+    <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar"><div class="progress-highlight"></div></div>
     </div>
+</header>
 
-    <div id="panel-wrapper">
-        <div id="system-panel" class="system-panel">
-            <div class="sys-header">
-                <div><span id="sys-title"></span></div>
-                <div><span id="sys-status"></span></div>
-            </div>
-            <div id="visual-area" class="visual-area"></div>
-            <div class="sys-content">
-                <span id="text-container"></span><span class="cursor" id="cursor"></span>
-            </div>
-            <div id="btn-group" class="btn-group">
-                <div class="sys-btn accept">承諾<span class="vi-btn-sub">Chấp nhận</span></div>
-                <div class="sys-btn decline">拒否<span class="vi-btn-sub">Từ chối</span></div>
-            </div>
-        </div>
+<main id="quiz-screen">
+    <div class="question-title" id="q-title">Chọn nghĩa đúng</div>
+    <div class="question-subtitle" id="q-subtitle">Từ vựng</div>
+    <div class="question-content" id="q-content">からい</div>
+    
+    <div class="options" id="options-container">
+        <!-- Options injected here via JS -->
     </div>
+</main>
 
-    <script>
-        // --- LOGIC GIAO DIỆN QUAY ĐIỆN THOẠI ---
-        const panelWrapper = document.getElementById('panel-wrapper');
-        const mobileControls = document.getElementById('mobile-controls');
+<main id="end-screen">
+    <h1>Hoàn thành bài học! 🎉</h1>
+    <p>Cậu đã nắm vững các câu hỏi trong đề thi ngày mai.</p>
+    <button class="btn-check active" style="margin: 30px auto; display: block;" onclick="location.reload()">Học lại từ đầu</button>
+</main>
+
+<div class="bottom-bar" id="bottom-bar">
+    <div class="feedback" id="feedback-container">
+        <h2 id="feedback-title">Chính xác!</h2>
+        <div class="explanation" id="feedback-explanation">Mẹo: Nhớ kỹ nhé!</div>
+    </div>
+    <button class="btn-check" id="btn-check" onclick="onCheckClick()">Kiểm tra</button>
+</div>
+
+<script>
+    const questions = [
+        {
+            type: "vocab",
+            title: "Từ này có nghĩa là gì?",
+            subtitle: "Nhìn kĩ tiếng Nhật nhé",
+            content: "からい (karai)",
+            options: ["Cay", "Ngọt", "Đắng", "Rau"],
+            correct: 0,
+            explanation: "からい (karai) nghĩa là CAY."
+        },
+        {
+            type: "vocab",
+            title: "Chọn từ tiếng Nhật đúng",
+            subtitle: "Dịch sang tiếng Nhật",
+            content: "Cơm hộp",
+            options: ["サラダ (sarada)", "おべんとう (obentou)", "ビール (biiru)", "ワイン (wain)"],
+            correct: 1,
+            explanation: "Cơm hộp là おべんとう (obentou)."
+        },
+        {
+            type: "grammar",
+            title: "Điền vào chỗ trống",
+            subtitle: "Học vẹt ngữ pháp",
+            content: "ピクニックは 土曜日（___） 日曜日（___） どちらが いいですか。",
+            options: ["に / に", "で / で", "と / と", "が / が"],
+            correct: 2,
+            explanation: "Hỏi so sánh 2 cái (どちらがいいですか) thì luôn dùng と / と."
+        },
+        {
+            type: "vocab",
+            title: "Từ này có nghĩa là gì?",
+            subtitle: "Nhớ mặt chữ",
+            content: "まずい (mazui)",
+            options: ["Dở (vị)", "Ngon", "Đáng tiếc", "Chua"],
+            correct: 0,
+            explanation: "まずい (mazui) nghĩa là dở, không ngon."
+        },
+        {
+            type: "grammar",
+            title: "Chọn cụm từ đúng",
+            subtitle: "Biến đổi từ: つめたい (lạnh)",
+            content: "今日はとても暑いです。このジュースは（___）、おいしくないです。",
+            options: ["つめたいです", "つめたくなくて", "つめたいから", "つめたいで"],
+            correct: 1,
+            explanation: "Chuyển thành KHÔNG LẠNH: つめたくなくて (hoặc つめたくないですから)."
+        },
+        {
+            type: "vocab",
+            title: "Dịch sang tiếng Việt",
+            subtitle: "Nhớ mặt chữ Hán",
+            content: "料理 (りょうり)",
+            options: ["Đồ uống", "Màu sắc", "Món ăn", "Đồ ăn"],
+            correct: 2,
+            explanation: "料理 (ryouri) là Món ăn / Việc nấu ăn. (Khác với 食べ物 là Đồ ăn chung chung)."
+        },
+        {
+            type: "grammar",
+            title: "Điền vào chỗ trống",
+            subtitle: "Nối câu với tính từ",
+            content: "この こうえんは（ しずか → ___ ）、きもちが いいです。",
+            options: ["しずかに", "しずかだ", "しずかくて", "しずかで"],
+            correct: 3,
+            explanation: "Tính từ 'shizuka' là tính từ đuôi NA. Nối câu phải dùng で (de)."
+        },
+        {
+            type: "vocab",
+            title: "Sắp xếp câu đúng",
+            subtitle: "Đề bài: それは (ナイフ/ ですね/べんり/そうな)。",
+            content: "Đâu là câu hoàn chỉnh đúng?",
+            options: [
+                "それは べんり ナイフ そうな ですね。",
+                "それは ナイフ そうな べんり ですね。",
+                "それは べんりそうな ナイフ ですね。"
+            ],
+            correct: 2,
+            explanation: "Thứ tự: べんり (tiện) -> そうな (có vẻ) -> ナイフ (dao) -> ですね (nhỉ)."
+        },
+        {
+            type: "vocab",
+            title: "Chọn từ tiếng Nhật đúng",
+            subtitle: "Nhớ cách viết",
+            content: "Chua",
+            options: ["あまい (amai)", "からい (karai)", "すっぱい (suppai)"],
+            correct: 2,
+            explanation: "Chua là すっぱい (suppai)."
+        },
+        {
+            type: "grammar",
+            title: "Điền vào chỗ trống",
+            subtitle: "Từ để hỏi",
+            content: "ピクニックの日はいつがいいですか。（ ___ ）いいです。",
+            options: ["いつでも", "どこでも", "どっちでも"],
+            correct: 0,
+            explanation: "Người ta hỏi いつ (Khi nào) thì trả lời là いつでも (Khi nào cũng được)."
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let selectedOption = null;
+    let isChecked = false;
+    
+    const ui = {
+        title: document.getElementById('q-title'),
+        subtitle: document.getElementById('q-subtitle'),
+        content: document.getElementById('q-content'),
+        optionsContainer: document.getElementById('options-container'),
+        btnCheck: document.getElementById('btn-check'),
+        bottomBar: document.getElementById('bottom-bar'),
+        feedbackContainer: document.getElementById('feedback-container'),
+        feedbackTitle: document.getElementById('feedback-title'),
+        feedbackExplanation: document.getElementById('feedback-explanation'),
+        progressBar: document.getElementById('progress-bar'),
+        quizScreen: document.getElementById('quiz-screen'),
+        endScreen: document.getElementById('end-screen'),
+        header: document.getElementById('header')
+    };
+
+    const ttsMap = {"からい (karai)": "tts_2.mp3", "からい (karai) nghĩa là CAY.": "tts_3.mp3", "サラダ (sarada)": "tts_4.mp3", "おべんとう (obentou)": "tts_5.mp3", "ビール (biiru)": "tts_6.mp3", "ワイン (wain)": "tts_7.mp3", "Cơm hộp là おべんとう (obentou).": "tts_8.mp3", "ピクニックは 土曜日（___） 日曜日（___） どちらが いいですか。": "tts_9.mp3", "に / に": "tts_10.mp3", "で / で": "tts_11.mp3", "と / と": "tts_12.mp3", "が / が": "tts_13.mp3", "まずい (mazui)": "tts_14.mp3", "まずい (mazui) nghĩa là dở, không ngon.": "tts_15.mp3", "Biến đổi từ: つめたい (lạnh)": "tts_16.mp3", "今日はとても暑いです。このジュースは（___）、おいしくないです。": "tts_17.mp3", "つめたいです": "tts_18.mp3", "つめたくなくて": "tts_19.mp3", "つめたいから": "tts_20.mp3", "つめたいで": "tts_21.mp3", "Chuyển thành KHÔNG LẠNH: つめたくなくて (hoặc つめたくないですから).": "tts_22.mp3", "料理 (りょうり)": "tts_23.mp3", "料理 (ryouri) là Món ăn / Việc nấu ăn. (Khác với 食べ物 là Đồ ăn chung chung).": "tts_24.mp3", "この こうえんは（ しずか → ___ ）、きもちが いいです。": "tts_25.mp3", "しずかに": "tts_26.mp3", "しずかだ": "tts_27.mp3", "しずかくて": "tts_28.mp3", "しずかで": "tts_29.mp3", "Tính từ 'shizuka' là tính từ đuôi NA. Nối câu phải dùng で (de).": "tts_30.mp3", "Đề bài: それは (ナイフ/ ですね/べんり/そうな)。": "tts_31.mp3", "それは べんり ナイフ そうな ですね。": "tts_32.mp3", "それは ナイフ そうな べんり ですね。": "tts_33.mp3", "それは べんりそうな ナイフ ですね。": "tts_34.mp3", "Thứ tự: べんり (tiện) -> そうな (có vẻ) -> ナイフ (dao) -> ですね (nhỉ).": "tts_35.mp3", "あまい (amai)": "tts_36.mp3", "すっぱい (suppai)": "tts_37.mp3", "Chua là すっぱい (suppai).": "tts_38.mp3", "ピクニックの日はいつがいいですか。（ ___ ）いいです。": "tts_39.mp3", "いつでも": "tts_40.mp3", "どこでも": "tts_41.mp3", "どっちでも": "tts_42.mp3", "Người ta hỏi いつ (Khi nào) thì trả lời là いつでも (Khi nào cũng được).": "tts_43.mp3"};
+
+    function speakJP(text) {
+        if (ttsMap[text]) {
+            const a = new Audio(ttsMap[text]);
+            a.play().catch(e=>console.log(e));
+        }
+    }
+
+
+    function loadQuestion() {
+        if (currentQuestionIndex >= questions.length) {
+            ui.quizScreen.style.display = 'none';
+            ui.header.style.display = 'none';
+            ui.bottomBar.style.display = 'none';
+            ui.endScreen.style.display = 'flex';
+            return;
+        }
+
+        const q = questions[currentQuestionIndex];
+        ui.title.innerText = q.title;
+        ui.subtitle.innerText = q.subtitle;
+        ui.content.innerText = q.content;
         
-        let currentScale = 1; // Bắt đầu ở kích thước gốc 100%
-        const scaleStep = 0.1; // Mỗi lần bấm thay đổi 10%
+        // Auto-play question if it's Japanese
+        setTimeout(() => speakJP(q.content), 300);
 
-        // 1. Zoom To (+)
-        document.getElementById('btn-zoom-in').addEventListener('click', () => {
-            currentScale += scaleStep;
-            if (currentScale > 2) currentScale = 2; // Giới hạn to tối đa 200%
-            panelWrapper.style.transform = `scale(${currentScale})`;
+        ui.optionsContainer.innerHTML = '';
+        selectedOption = null;
+        isChecked = false;
+        
+        q.options.forEach((opt, index) => {
+            const div = document.createElement('div');
+            div.className = 'option';
+            div.innerText = opt;
+            div.onclick = () => {
+                selectOption(div, index);
+                speakJP(opt);
+            };
+            ui.optionsContainer.appendChild(div);
         });
 
-        // 2. Zoom Nhỏ (-)
-        document.getElementById('btn-zoom-out').addEventListener('click', () => {
-            currentScale -= scaleStep;
-            if (currentScale < 0.3) currentScale = 0.3; // Giới hạn nhỏ tối đa 30%
-            panelWrapper.style.transform = `scale(${currentScale})`;
-        });
+        // Reset bottom bar
+        ui.bottomBar.className = 'bottom-bar';
+        ui.feedbackContainer.style.display = 'none';
+        ui.btnCheck.className = 'btn-check';
+        ui.btnCheck.innerText = 'Kiểm tra';
+        
+        // Update progress bar
+        const progress = (currentQuestionIndex / questions.length) * 100;
+        ui.progressBar.style.width = progress + '%';
+    }
 
-        // 3. Toàn màn hình / Thêm vào màn hình chính
-        document.getElementById('btn-fullscreen').addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    alert(`Không thể mở toàn màn hình tự động. \n\nMẹo: Mở menu của Safari/Chrome và chọn "Thêm vào màn hình chính" (Add to Home Screen) để biến file này thành 1 App không có viền duyệt web!`);
-                });
+    function selectOption(el, index) {
+        if (isChecked) return;
+        
+        document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedOption = index;
+        
+        ui.btnCheck.classList.add('active');
+    }
+
+    const audioCorrect = new Audio('duolingo-correct.mp3');
+    const audioWrong = new Audio('duolingo-wrong.mp3');
+
+    function playCorrectSound() {
+        audioCorrect.currentTime = 0;
+        audioCorrect.play().catch(e => console.log(e));
+    }
+
+    function playIncorrectSound() {
+        audioWrong.currentTime = 0;
+        audioWrong.play().catch(e => console.log(e));
+    }
+
+    function onCheckClick() {
+        if (selectedOption === null) return;
+
+        if (!isChecked) {
+            // Check answer
+            isChecked = true;
+            const q = questions[currentQuestionIndex];
+            const isCorrect = selectedOption === q.correct;
+            
+            ui.btnCheck.innerText = 'Tiếp tục';
+            ui.feedbackContainer.style.display = 'block';
+            ui.feedbackExplanation.innerText = q.explanation || "";
+
+            // Disable all options
+            document.querySelectorAll('.option').forEach(opt => opt.classList.add('disabled'));
+
+            if (isCorrect) {
+                ui.bottomBar.className = 'bottom-bar correct';
+                ui.feedbackTitle.innerText = 'Chính xác! Làm tốt lắm!';
+                playCorrectSound();
             } else {
-                document.exitFullscreen();
+                ui.bottomBar.className = 'bottom-bar incorrect';
+                ui.feedbackTitle.innerText = 'Chưa đúng rồi!';
+                playIncorrectSound();
+                // Also highlight correct answer
+                document.querySelectorAll('.option')[q.correct].style.borderColor = '#58cc02';
+                document.querySelectorAll('.option')[q.correct].style.color = '#58cc02';
             }
-        });
-
-        // 4. Ẩn nút đi để bắt đầu quay xanh
-        document.getElementById('btn-hide').addEventListener('click', () => {
-            mobileControls.style.display = 'none';
-        });
-
-
-        // --- LOGIC SOLO LEVELING GỐC ---
-        const scriptScenes = [
-            { id: 1, theme: 'warning', title: '[ システム通知 ] <span class="vi-title-sub">Thông báo hệ thống</span>', status: 'ピロン！ <span class="vi-status-sub">Ping!</span>', text: `プレイヤーのヴーさん、新しいミッションです。<span class='vi-sub'>Người chơi Vũ, có nhiệm vụ mới.</span>`, visual: '', showBtn: false },
-            { id: 2, theme: 'normal', title: '[ 突発クエスト ] <span class="vi-title-sub">Nhiệm vụ đột xuất</span>', status: 'ランク: C <span class="vi-status-sub">Rank: C</span>', text: `カフェへ行ってください。<span class='vi-sub'>Hãy đi đến quán cà phê.</span>そして、その場所を紹介してください。<span class='vi-sub'>Và hãy giới thiệu địa điểm đó.</span>クエストを受諾しますか？<span class='vi-sub'>Bạn có muốn tiếp nhận nhiệm vụ?</span>`, visual: '', showBtn: true },
-            { id: 3, theme: 'normal', title: '[ ナビゲーション ] <span class="vi-title-sub">Hệ thống dẫn đường</span>', status: '経路案内 <span class="vi-status-sub">Chỉ đường</span>', text: `ここから、まっすぐ行ってください。<span class='vi-sub'>Từ đây, hãy đi thẳng.</span>`, visual: `<div class="radar-box"><div class="radar-crosshair"></div><div class="radar-sweep"></div><div class="radar-arrow arrow-up">➤</div></div>`, showBtn: false },
-            { id: 4, theme: 'normal', title: '[ ナビゲーション ] <span class="vi-title-sub">Hệ thống dẫn đường</span>', status: '経路案内 <span class="vi-status-sub">Chỉ đường</span>', text: `次の角を右に曲がってください。<span class='vi-sub'>Hãy rẽ phải ở góc cua tiếp theo.</span>`, visual: `<div class="radar-box"><div class="radar-crosshair"></div><div class="radar-sweep"></div><div class="radar-arrow arrow-right">➤</div></div>`, showBtn: false },
-            { id: 5, theme: 'normal', title: '[ データスキャン ] <span class="vi-title-sub">Quét dữ liệu</span>', status: '目的地到着 <span class="vi-status-sub">Đã đến đích</span>', text: `目的地に到着しました。<span class='vi-sub'>Đã đến đích.</span>データをスキャンしてください。<span class='vi-sub'>Hãy quét dữ liệu.</span>`, visual: '', showBtn: false },
-            { id: 6, theme: 'success', title: '[ システム通知 ] <span class="vi-title-sub">Thông báo hệ thống</span>', status: '完了 <span class="vi-status-sub">Hoàn thành</span>', text: `ミッションクリア！<span class='vi-sub'>Nhiệm vụ hoàn thành!</span>おめでとうございます！<span class='vi-sub'>Xin chúc mừng!</span>`, visual: `<div class="level-up-container"><div class="level-up-ring"></div><div class="level-up-text">LEVEL UP!</div></div>`, showBtn: false },
-            { id: 7, theme: 'hidden', text: "" }
-        ];
-
-        let currentScene = 0; let isTyping = false; let typeTimeout;
-        const panel = document.getElementById('system-panel'), titleEl = document.getElementById('sys-title'), statusEl = document.getElementById('sys-status'), textContainer = document.getElementById('text-container'), visualArea = document.getElementById('visual-area'), btnGroup = document.getElementById('btn-group');
-
-        function typeWriter(html, index, callback) {
-            if (index < html.length) {
-                let nextIndex = index;
-                if (html.charAt(nextIndex) === '<') { while (html.charAt(nextIndex) !== '>' && nextIndex < html.length) { nextIndex++; } nextIndex++; } else { nextIndex++; }
-                textContainer.innerHTML = html.substring(0, nextIndex);
-                typeTimeout = setTimeout(() => typeWriter(html, nextIndex, callback), Math.floor(Math.random() * 20) + 15);
-            } else { isTyping = false; if (callback) callback(); }
+        } else {
+            // Move to next question
+            const q = questions[currentQuestionIndex];
+            if (selectedOption === q.correct) {
+                currentQuestionIndex++;
+            } else {
+                // Duolingo logic: push failed question to the end of the array
+                questions.push(questions.splice(currentQuestionIndex, 1)[0]);
+                // do not increase currentQuestionIndex
+            }
+            loadQuestion();
         }
+    }
 
-        function loadScene(index) {
-            if (index >= scriptScenes.length) return;
-            const scene = scriptScenes[index]; isTyping = true; clearTimeout(typeTimeout); textContainer.innerHTML = ''; btnGroup.classList.remove('show');
-            panel.className = 'system-panel'; void panel.offsetWidth; panel.classList.add('active');
-            if (scene.theme === 'warning') panel.classList.add('panel-warning');
-            if (scene.theme === 'success') panel.classList.add('panel-success');
-            if (scene.theme === 'hidden') { panel.classList.remove('active'); return; }
-            titleEl.innerHTML = scene.title || ''; statusEl.innerHTML = scene.status || '';
-            if (scene.visual) { visualArea.innerHTML = scene.visual; visualArea.style.display = 'flex'; } else { visualArea.innerHTML = ''; visualArea.style.display = 'none'; }
-            typeWriter(scene.text, 0, () => { if (scene.showBtn) btnGroup.classList.add('show'); });
-        }
-
-        function nextScene() {
-            if (isTyping) { 
-                clearTimeout(typeTimeout); textContainer.innerHTML = scriptScenes[currentScene].text; isTyping = false; 
-                if (scriptScenes[currentScene].showBtn) btnGroup.classList.add('show'); 
-            } else { currentScene++; loadScene(currentScene); }
-        }
-
-        // TỰ ĐỘNG CHẠY (Chạy sau 3 giây để bạn kịp canh chỉnh Zoom và Ẩn nút)
-        setTimeout(() => { 
-            loadScene(0); 
-            let sceneCount = 1;
-            const autoPlay = setInterval(() => {
-                nextScene(); sceneCount++;
-                if (sceneCount >= 6) { clearInterval(autoPlay); }
-            }, 15000); 
-        }, 3000); 
-    </script>
+    // Start
+    loadQuestion();
+</script>
 </body>
 </html>
