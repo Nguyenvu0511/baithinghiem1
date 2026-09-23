@@ -256,11 +256,17 @@
 </head>
 <body>
 
+<div id="start-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+    <h1 style="color:#1cb0f6;">Sẵn sàng học chưa?</h1>
+    <button class="btn-check active" style="margin-top:20px; padding:15px 40px; cursor:pointer;" onclick="startApp()">BẮT ĐẦU</button>
+</div>
+
 <header id="header">
-    <div class="close-btn">✖</div>
+    <div class="close-btn" onclick="goBack()" style="font-size:28px;">&lt;</div>
     <div class="progress-bar-bg">
         <div class="progress-bar-fill" id="progress-bar"><div class="progress-highlight"></div></div>
     </div>
+    <div class="close-btn" onclick="restartApp()" style="font-size:28px;">⟲</div>
 </header>
 
 <main id="quiz-screen">
@@ -276,7 +282,7 @@
 <main id="end-screen">
     <h1>Hoàn thành bài học! 🎉</h1>
     <p>Cậu đã nắm vững các câu hỏi trong đề thi ngày mai.</p>
-    <button class="btn-check active" style="margin: 30px auto; display: block;" onclick="location.reload()">Học lại từ đầu</button>
+    <button class="btn-check active" style="margin: 30px auto; display: block;" onclick="restartApp()">Học lại từ đầu</button>
 </main>
 
 <div class="bottom-bar" id="bottom-bar">
@@ -288,7 +294,7 @@
 </div>
 
 <script>
-    const questions = [
+    let questions = [
     {
         "type": "vocab",
         "title": "Chọn nghĩa đúng",
@@ -732,6 +738,12 @@
                 document.querySelectorAll('.option')[q.correct].style.color = '#58cc02';
             }
         } else {
+            // Save history BEFORE moving to next question
+            historyState.push({
+                index: currentQuestionIndex,
+                qs: JSON.parse(JSON.stringify(questions))
+            });
+
             // Move to next question
             const q = questions[currentQuestionIndex];
             if (selectedOption === q.correct) {
@@ -741,12 +753,60 @@
                 questions.push(questions.splice(currentQuestionIndex, 1)[0]);
                 // do not increase currentQuestionIndex
             }
+            saveState(); // Save progress
             loadQuestion();
         }
     }
 
-    // Start
-    loadQuestion();
+    let historyState = [];
+
+    function saveState() {
+        localStorage.setItem('jap183_saved', JSON.stringify({
+            index: currentQuestionIndex,
+            qs: questions,
+            hist: historyState
+        }));
+    }
+
+    function loadState() {
+        const saved = localStorage.getItem('jap183_saved');
+        if (saved) {
+            try {
+                const state = JSON.parse(saved);
+                if (state.qs && state.qs.length === questions.length) {
+                    currentQuestionIndex = state.index;
+                    questions = state.qs;
+                    historyState = state.hist || [];
+                }
+            } catch(e) {}
+        }
+    }
+
+    function startApp() {
+        document.documentElement.requestFullscreen().catch(e=>console.log(e));
+        document.getElementById('start-overlay').style.display = 'none';
+        loadState();
+        loadQuestion();
+    }
+
+    function restartApp() {
+        if(confirm("Bạn có chắc chắn muốn làm lại từ đầu không? Toàn bộ tiến trình sẽ bị xóa.")) {
+            localStorage.removeItem('jap183_saved');
+            location.reload();
+        }
+    }
+
+    function goBack() {
+        if (historyState.length > 0) {
+            const prevState = historyState.pop();
+            currentQuestionIndex = prevState.index;
+            questions = prevState.qs;
+            saveState();
+            loadQuestion();
+        } else {
+            alert("Đây là câu hỏi đầu tiên, không thể quay lại được nữa!");
+        }
+    }
 </script>
 </body>
 </html>
