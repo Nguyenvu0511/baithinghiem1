@@ -274,7 +274,12 @@
     <div class="question-subtitle" id="q-subtitle">Từ vựng</div>
     <div class="question-content" id="q-content" onclick="replayQuestionAudio()">からい</div>
     
-    <button id="btn-toggle-options" class="btn-check active" style="margin: 0 auto 20px auto; display: block; padding: 10px 20px; font-size: 16px;" onclick="toggleAnswers()">Hiện đáp án</button>
+    <div id="q-hint" style="color: #bbb; font-size: 18px; margin-top: -15px; margin-bottom: 20px; text-align: center; font-style: italic; display: none;"></div>
+
+    <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
+        <button id="btn-toggle-hint" class="btn-check active" style="padding: 10px 15px; font-size: 14px;" onclick="toggleHint()">Dịch tiếng Việt</button>
+        <button id="btn-toggle-options" class="btn-check active" style="padding: 10px 15px; font-size: 14px;" onclick="toggleAnswers()">Hiện đáp án</button>
+    </div>
 
     <div class="options" id="options-container" style="display: none;">
         <!-- Options injected here via JS -->
@@ -309,7 +314,8 @@
             "Rau"
         ],
         "correct": 0,
-        "explanation": "からい (karai) nghĩa là CAY."
+        "explanation": "からい (karai) nghĩa là CAY.",
+        "vi_hint": "Cay"
     },
     {
         "type": "vocab",
@@ -323,7 +329,8 @@
             "Rượu vang"
         ],
         "correct": 1,
-        "explanation": "サラダ (sarada) là Salad (Rau trộn)."
+        "explanation": "サラダ (sarada) là Salad (Rau trộn).",
+        "vi_hint": "Salad / Rau trộn"
     },
     {
         "type": "vocab",
@@ -337,7 +344,8 @@
             "Mệt mỏi"
         ],
         "correct": 1,
-        "explanation": "ざんねん (zannen) nghĩa là đáng tiếc / tiếc nuối."
+        "explanation": "ざんねん (zannen) nghĩa là đáng tiếc / tiếc nuối.",
+        "vi_hint": "Đáng tiếc"
     },
     {
         "type": "vocab",
@@ -351,7 +359,8 @@
             "ワイン (wain)"
         ],
         "correct": 2,
-        "explanation": "Phô mai là チーズ (chiizu)."
+        "explanation": "Phô mai là チーズ (chiizu).",
+        "vi_hint": "チーズ (chiizu)"
     },
     {
         "type": "vocab",
@@ -365,7 +374,8 @@
             "Chua"
         ],
         "correct": 0,
-        "explanation": "まずい (mazui) nghĩa là dở, không ngon."
+        "explanation": "まずい (mazui) nghĩa là dở, không ngon.",
+        "vi_hint": "Dở / Không ngon"
     },
     {
         "type": "vocab",
@@ -379,7 +389,8 @@
             "Trái cây"
         ],
         "correct": 1,
-        "explanation": "やさい (yasai) là Rau."
+        "explanation": "やさい (yasai) là Rau.",
+        "vi_hint": "Rau"
     },
     {
         "type": "vocab",
@@ -393,7 +404,8 @@
             "おべんとう (obentou)"
         ],
         "correct": 2,
-        "explanation": "Bia là ビール (biiru)."
+        "explanation": "Bia là ビール (biiru).",
+        "vi_hint": "ビール (biiru)"
     },
     {
         "type": "vocab",
@@ -407,7 +419,8 @@
             "Mệt mỏi"
         ],
         "correct": 0,
-        "explanation": "すいた (suita) thường dùng trong câu おなかがすいた (Đói bụng)."
+        "explanation": "すいた (suita) thường dùng trong câu おなかがすいた (Đói bụng).",
+        "vi_hint": "Đói bụng"
     },
     {
         "type": "vocab",
@@ -421,7 +434,8 @@
             "ワイン (wain)"
         ],
         "correct": 1,
-        "explanation": "Cơm hộp là おべんとう (obentou)."
+        "explanation": "Cơm hộp là おべんとう (obentou).",
+        "vi_hint": "おべんとう (obentou)"
     },
     {
         "type": "vocab",
@@ -435,7 +449,8 @@
             "チーズ (chiizu)"
         ],
         "correct": 1,
-        "explanation": "Rượu vang là ワイン (wain)."
+        "explanation": "Rượu vang là ワイン (wain).",
+        "vi_hint": "ワイン (wain)"
     },
     {
         "type": "vocab",
@@ -449,7 +464,8 @@
             "まずい (mazui)"
         ],
         "correct": 2,
-        "explanation": "Chua là すっぱい (suppai)."
+        "explanation": "Chua là すっぱい (suppai).",
+        "vi_hint": "すっぱい (suppai)"
     },
     {
         "type": "vocab",
@@ -463,7 +479,8 @@
             "Đồ ăn"
         ],
         "correct": 2,
-        "explanation": "料理 (ryouri) là Món ăn / Việc nấu ăn. (Khác với 食べ物 là Đồ ăn chung chung)."
+        "explanation": "料理 (ryouri) là Món ăn / Việc nấu ăn. (Khác với 食べ物 là Đồ ăn chung chung).",
+        "vi_hint": "Món ăn / Việc nấu ăn"
     },
     {
         "type": "vocab",
@@ -477,7 +494,8 @@
             "Rau"
         ],
         "correct": 2,
-        "explanation": "食べ物 (tabemono) là Đồ ăn (thực phẩm nói chung)."
+        "explanation": "食べ物 (tabemono) là Đồ ăn (thực phẩm nói chung).",
+        "vi_hint": "Đồ ăn"
     },
     {
         "type": "vocab",
@@ -491,7 +509,8 @@
             "Mùi vị"
         ],
         "correct": 0,
-        "explanation": "色 (iro) nghĩa là Màu sắc."
+        "explanation": "色 (iro) nghĩa là Màu sắc.",
+        "vi_hint": "Màu sắc"
     },
     {
         "type": "vocab",
@@ -505,7 +524,8 @@
             "Đang uống"
         ],
         "correct": 1,
-        "explanation": "入っています (haitteimasu) nghĩa là Có chứa, có bỏ vào bên trong."
+        "explanation": "入っています (haitteimasu) nghĩa là Có chứa, có bỏ vào bên trong.",
+        "vi_hint": "Có chứa / Bỏ vào"
     },
     {
         "type": "vocab",
@@ -519,7 +539,8 @@
             "Nước ngọt"
         ],
         "correct": 2,
-        "explanation": "お酒 (osake) là Rượu (nói chung)."
+        "explanation": "お酒 (osake) là Rượu (nói chung).",
+        "vi_hint": "Rượu / Đồ uống có cồn"
     },
     {
         "type": "vocab",
@@ -533,7 +554,8 @@
             "Ăn thử"
         ],
         "correct": 1,
-        "explanation": "持っていきます (motteikimasu) nghĩa là Mang đi (Mang một vật đi đâu đó)."
+        "explanation": "持っていきます (motteikimasu) nghĩa là Mang đi (Mang một vật đi đâu đó).",
+        "vi_hint": "Mang đi"
     },
     {
         "type": "grammar",
@@ -547,7 +569,8 @@
             "が / が"
         ],
         "correct": 2,
-        "explanation": "Hỏi so sánh 2 cái (どちらがいいですか) thì luôn dùng と / と."
+        "explanation": "Hỏi so sánh 2 cái (どちらがいいですか) thì luôn dùng と / と.",
+        "vi_hint": "Picnic thì Thứ Bảy hay Chủ Nhật, ngày nào tốt hơn?"
     },
     {
         "type": "grammar",
@@ -561,7 +584,8 @@
             "つめたいで"
         ],
         "correct": 1,
-        "explanation": "Chuyển thành KHÔNG LẠNH: つめたくなくて (hoặc つめたくないですから)."
+        "explanation": "Chuyển thành KHÔNG LẠNH: つめたくなくて (hoặc つめたくないですから).",
+        "vi_hint": "Hôm nay rất nóng. Nước ép này (không lạnh) nên không ngon."
     },
     {
         "type": "grammar",
@@ -575,7 +599,8 @@
             "しずかで"
         ],
         "correct": 3,
-        "explanation": "Tính từ 'shizuka' là tính từ đuôi NA. Nối câu phải dùng で (de)."
+        "explanation": "Tính từ 'shizuka' là tính từ đuôi NA. Nối câu phải dùng で (de).",
+        "vi_hint": "Công viên này (yên tĩnh) nên cảm giác rất dễ chịu."
     },
     {
         "type": "grammar",
@@ -588,7 +613,8 @@
             "それは べんりそうな ナイフ ですね。"
         ],
         "correct": 2,
-        "explanation": "Thứ tự: べんり (tiện) -> そうな (có vẻ) -> ナイフ (dao) -> ですね (nhỉ)."
+        "explanation": "Thứ tự: べんり (tiện) -> そうな (có vẻ) -> ナイフ (dao) -> ですね (nhỉ).",
+        "vi_hint": "Đó là một con dao trông có vẻ tiện lợi nhỉ."
     },
     {
         "type": "grammar",
@@ -601,7 +627,8 @@
             "どっちでも"
         ],
         "correct": 0,
-        "explanation": "Người ta hỏi いつ (Khi nào) thì trả lời là いつでも (Khi nào cũng được)."
+        "explanation": "Người ta hỏi いつ (Khi nào) thì trả lời là いつでも (Khi nào cũng được).",
+        "vi_hint": "Ngày picnic thì khi nào tốt? (Lúc nào cũng) được."
     }
 ];
 
@@ -639,6 +666,18 @@
         speakJP(questions[currentQuestionIndex].content);
     }
 
+    function toggleHint() {
+        const hint = document.getElementById('q-hint');
+        const btn = document.getElementById('btn-toggle-hint');
+        if (hint.style.display === 'none') {
+            hint.style.display = 'block';
+            btn.innerText = 'Ẩn tiếng Việt';
+        } else {
+            hint.style.display = 'none';
+            btn.innerText = 'Dịch tiếng Việt';
+        }
+    }
+
     function toggleAnswers() {
         const container = document.getElementById('options-container');
         const btn = document.getElementById('btn-toggle-options');
@@ -664,6 +703,17 @@
         ui.title.innerText = q.title;
         ui.subtitle.innerText = q.subtitle;
         ui.content.innerText = q.content;
+        
+        document.getElementById('q-hint').innerText = q.vi_hint || '';
+        document.getElementById('q-hint').style.display = 'none';
+        
+        const btnHint = document.getElementById('btn-toggle-hint');
+        btnHint.innerText = 'Dịch tiếng Việt';
+        if (q.vi_hint) {
+            btnHint.style.display = 'block';
+        } else {
+            btnHint.style.display = 'none';
+        }
         
         if (ttsMap[q.content]) {
             ui.content.style.cursor = 'pointer';
@@ -741,8 +791,9 @@
 
             // Disable all options
             document.querySelectorAll('.option').forEach(opt => opt.classList.add('disabled'));
-            // Hide toggle button
+            // Hide toggle buttons
             document.getElementById('btn-toggle-options').style.display = 'none';
+            document.getElementById('btn-toggle-hint').style.display = 'none';
 
             if (isCorrect) {
                 ui.bottomBar.className = 'bottom-bar correct';
