@@ -274,7 +274,9 @@
     <div class="question-subtitle" id="q-subtitle">Từ vựng</div>
     <div class="question-content" id="q-content" onclick="replayQuestionAudio()">からい</div>
     
-    <div class="options" id="options-container">
+    <button id="btn-toggle-options" class="btn-check active" style="margin: 0 auto 20px auto; display: block; padding: 10px 20px; font-size: 16px;" onclick="toggleAnswers()">Hiện đáp án</button>
+
+    <div class="options" id="options-container" style="display: none;">
         <!-- Options injected here via JS -->
     </div>
 </main>
@@ -637,6 +639,18 @@
         speakJP(questions[currentQuestionIndex].content);
     }
 
+    function toggleAnswers() {
+        const container = document.getElementById('options-container');
+        const btn = document.getElementById('btn-toggle-options');
+        if (container.style.display === 'none') {
+            container.style.display = 'grid';
+            btn.innerText = 'Ẩn đáp án';
+        } else {
+            container.style.display = 'none';
+            btn.innerText = 'Hiện đáp án';
+        }
+    }
+
     function loadQuestion() {
         if (currentQuestionIndex >= questions.length) {
             ui.quizScreen.style.display = 'none';
@@ -661,6 +675,9 @@
         setTimeout(() => speakJP(q.content), 300);
 
         ui.optionsContainer.innerHTML = '';
+        ui.optionsContainer.style.display = 'none';
+        document.getElementById('btn-toggle-options').style.display = 'block';
+        document.getElementById('btn-toggle-options').innerText = 'Hiện đáp án';
         selectedOption = null;
         isChecked = false;
         
@@ -724,6 +741,8 @@
 
             // Disable all options
             document.querySelectorAll('.option').forEach(opt => opt.classList.add('disabled'));
+            // Hide toggle button
+            document.getElementById('btn-toggle-options').style.display = 'none';
 
             if (isCorrect) {
                 ui.bottomBar.className = 'bottom-bar correct';
