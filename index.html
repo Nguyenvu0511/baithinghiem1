@@ -223,25 +223,12 @@
         /* Audio elements */
         audio { display: none; }
 
-        .speaker-btn {
-            background: #1cb0f6;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            font-size: 24px;
-            cursor: pointer;
-            margin-right: 15px;
-            vertical-align: middle;
-            box-shadow: 0 4px 0 #1899d6;
-            transition: all 0.1s;
+        .question-content {
+            transition: opacity 0.1s;
         }
-        .speaker-btn:active {
-            transform: translateY(4px);
-            box-shadow: none;
+        .question-content:active {
+            opacity: 0.5;
         }
-        .speaker-btn.hidden { display: none; }
 
         /* --- MOBILE OPTIMIZATIONS --- */
         @media (max-width: 600px) {
@@ -249,7 +236,6 @@
             .question-title { font-size: 22px; margin-bottom: 5px; }
             .question-subtitle { font-size: 16px; margin-bottom: 20px; }
             .question-content { font-size: 24px; margin-bottom: 25px; }
-            .speaker-btn { width: 40px; height: 40px; font-size: 18px; margin-right: 10px; }
             .option { padding: 12px 15px; font-size: 16px; border-radius: 12px; }
             
             .bottom-bar { 
@@ -280,10 +266,7 @@
 <main id="quiz-screen">
     <div class="question-title" id="q-title">Chọn nghĩa đúng</div>
     <div class="question-subtitle" id="q-subtitle">Từ vựng</div>
-    <div class="question-content">
-        <button class="speaker-btn" id="q-speaker" onclick="replayQuestionAudio()">🔊</button>
-        <span id="q-content">からい</span>
-    </div>
+    <div class="question-content" id="q-content" onclick="replayQuestionAudio()">からい</div>
     
     <div class="options" id="options-container">
         <!-- Options injected here via JS -->
@@ -622,7 +605,6 @@
         title: document.getElementById('q-title'),
         subtitle: document.getElementById('q-subtitle'),
         content: document.getElementById('q-content'),
-        speakerBtn: document.getElementById('q-speaker'),
         optionsContainer: document.getElementById('options-container'),
         btnCheck: document.getElementById('btn-check'),
         bottomBar: document.getElementById('bottom-bar'),
@@ -664,9 +646,9 @@
         ui.content.innerText = q.content;
         
         if (ttsMap[q.content]) {
-            ui.speakerBtn.classList.remove('hidden');
+            ui.content.style.cursor = 'pointer';
         } else {
-            ui.speakerBtn.classList.add('hidden');
+            ui.content.style.cursor = 'default';
         }
         
         // Auto-play question if it's Japanese
