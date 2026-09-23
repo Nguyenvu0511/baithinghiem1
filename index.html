@@ -257,101 +257,313 @@
 
 <script>
     const questions = [
-        {
-            type: "vocab",
-            title: "Từ này có nghĩa là gì?",
-            subtitle: "Nhìn kĩ tiếng Nhật nhé",
-            content: "からい (karai)",
-            options: ["Cay", "Ngọt", "Đắng", "Rau"],
-            correct: 0,
-            explanation: "からい (karai) nghĩa là CAY."
-        },
-        {
-            type: "vocab",
-            title: "Chọn từ tiếng Nhật đúng",
-            subtitle: "Dịch sang tiếng Nhật",
-            content: "Cơm hộp",
-            options: ["サラダ (sarada)", "おべんとう (obentou)", "ビール (biiru)", "ワイン (wain)"],
-            correct: 1,
-            explanation: "Cơm hộp là おべんとう (obentou)."
-        },
-        {
-            type: "grammar",
-            title: "Điền vào chỗ trống",
-            subtitle: "Học vẹt ngữ pháp",
-            content: "ピクニックは 土曜日（___） 日曜日（___） どちらが いいですか。",
-            options: ["に / に", "で / で", "と / と", "が / が"],
-            correct: 2,
-            explanation: "Hỏi so sánh 2 cái (どちらがいいですか) thì luôn dùng と / と."
-        },
-        {
-            type: "vocab",
-            title: "Từ này có nghĩa là gì?",
-            subtitle: "Nhớ mặt chữ",
-            content: "まずい (mazui)",
-            options: ["Dở (vị)", "Ngon", "Đáng tiếc", "Chua"],
-            correct: 0,
-            explanation: "まずい (mazui) nghĩa là dở, không ngon."
-        },
-        {
-            type: "grammar",
-            title: "Chọn cụm từ đúng",
-            subtitle: "Biến đổi từ: つめたい (lạnh)",
-            content: "今日はとても暑いです。このジュースは（___）、おいしくないです。",
-            options: ["つめたいです", "つめたくなくて", "つめたいから", "つめたいで"],
-            correct: 1,
-            explanation: "Chuyển thành KHÔNG LẠNH: つめたくなくて (hoặc つめたくないですから)."
-        },
-        {
-            type: "vocab",
-            title: "Dịch sang tiếng Việt",
-            subtitle: "Nhớ mặt chữ Hán",
-            content: "料理 (りょうり)",
-            options: ["Đồ uống", "Màu sắc", "Món ăn", "Đồ ăn"],
-            correct: 2,
-            explanation: "料理 (ryouri) là Món ăn / Việc nấu ăn. (Khác với 食べ物 là Đồ ăn chung chung)."
-        },
-        {
-            type: "grammar",
-            title: "Điền vào chỗ trống",
-            subtitle: "Nối câu với tính từ",
-            content: "この こうえんは（ しずか → ___ ）、きもちが いいです。",
-            options: ["しずかに", "しずかだ", "しずかくて", "しずかで"],
-            correct: 3,
-            explanation: "Tính từ 'shizuka' là tính từ đuôi NA. Nối câu phải dùng で (de)."
-        },
-        {
-            type: "vocab",
-            title: "Sắp xếp câu đúng",
-            subtitle: "Đề bài: それは (ナイフ/ ですね/べんり/そうな)。",
-            content: "Đâu là câu hoàn chỉnh đúng?",
-            options: [
-                "それは べんり ナイフ そうな ですね。",
-                "それは ナイフ そうな べんり ですね。",
-                "それは べんりそうな ナイフ ですね。"
-            ],
-            correct: 2,
-            explanation: "Thứ tự: べんり (tiện) -> そうな (có vẻ) -> ナイフ (dao) -> ですね (nhỉ)."
-        },
-        {
-            type: "vocab",
-            title: "Chọn từ tiếng Nhật đúng",
-            subtitle: "Nhớ cách viết",
-            content: "Chua",
-            options: ["あまい (amai)", "からい (karai)", "すっぱい (suppai)"],
-            correct: 2,
-            explanation: "Chua là すっぱい (suppai)."
-        },
-        {
-            type: "grammar",
-            title: "Điền vào chỗ trống",
-            subtitle: "Từ để hỏi",
-            content: "ピクニックの日はいつがいいですか。（ ___ ）いいです。",
-            options: ["いつでも", "どこでも", "どっちでも"],
-            correct: 0,
-            explanation: "Người ta hỏi いつ (Khi nào) thì trả lời là いつでも (Khi nào cũng được)."
-        }
-    ];
+    {
+        "type": "vocab",
+        "title": "Chọn nghĩa đúng",
+        "subtitle": "Từ vựng",
+        "content": "からい (karai)",
+        "options": [
+            "Cay",
+            "Ngọt",
+            "Đắng",
+            "Rau"
+        ],
+        "correct": 0,
+        "explanation": "からい (karai) nghĩa là CAY."
+    },
+    {
+        "type": "vocab",
+        "title": "Chọn nghĩa đúng",
+        "subtitle": "Từ vựng",
+        "content": "サラダ (sarada)",
+        "options": [
+            "Cơm hộp",
+            "Salad (Rau trộn)",
+            "Phô mai",
+            "Rượu vang"
+        ],
+        "correct": 1,
+        "explanation": "サラダ (sarada) là Salad (Rau trộn)."
+    },
+    {
+        "type": "vocab",
+        "title": "Chọn nghĩa đúng",
+        "subtitle": "Từ vựng",
+        "content": "ざんねん (zannen)",
+        "options": [
+            "Vui vẻ",
+            "Đáng tiếc",
+            "Tuyệt vời",
+            "Mệt mỏi"
+        ],
+        "correct": 1,
+        "explanation": "ざんねん (zannen) nghĩa là đáng tiếc / tiếc nuối."
+    },
+    {
+        "type": "vocab",
+        "title": "Chọn từ tiếng Nhật đúng",
+        "subtitle": "Dịch sang tiếng Nhật",
+        "content": "Phô mai",
+        "options": [
+            "サラダ (sarada)",
+            "ビール (biiru)",
+            "チーズ (chiizu)",
+            "ワイン (wain)"
+        ],
+        "correct": 2,
+        "explanation": "Phô mai là チーズ (chiizu)."
+    },
+    {
+        "type": "vocab",
+        "title": "Từ này có nghĩa là gì?",
+        "subtitle": "Nhớ mặt chữ",
+        "content": "まずい (mazui)",
+        "options": [
+            "Dở (vị)",
+            "Ngon",
+            "Cay",
+            "Chua"
+        ],
+        "correct": 0,
+        "explanation": "まずい (mazui) nghĩa là dở, không ngon."
+    },
+    {
+        "type": "vocab",
+        "title": "Chọn nghĩa đúng",
+        "subtitle": "Từ vựng",
+        "content": "やさい (yasai)",
+        "options": [
+            "Thịt",
+            "Rau",
+            "Cá",
+            "Trái cây"
+        ],
+        "correct": 1,
+        "explanation": "やさい (yasai) là Rau."
+    },
+    {
+        "type": "vocab",
+        "title": "Chọn từ tiếng Nhật đúng",
+        "subtitle": "Dịch sang tiếng Nhật",
+        "content": "Bia",
+        "options": [
+            "お酒 (osake)",
+            "ワイン (wain)",
+            "ビール (biiru)",
+            "おべんとう (obentou)"
+        ],
+        "correct": 2,
+        "explanation": "Bia là ビール (biiru)."
+    },
+    {
+        "type": "vocab",
+        "title": "Chọn nghĩa đúng",
+        "subtitle": "Từ vựng",
+        "content": "すいた (suita)",
+        "options": [
+            "Đói bụng",
+            "Khát nước",
+            "Buồn ngủ",
+            "Mệt mỏi"
+        ],
+        "correct": 0,
+        "explanation": "すいた (suita) thường dùng trong câu おなかがすいた (Đói bụng)."
+    },
+    {
+        "type": "vocab",
+        "title": "Chọn từ tiếng Nhật đúng",
+        "subtitle": "Dịch sang tiếng Nhật",
+        "content": "Cơm hộp",
+        "options": [
+            "サラダ (sarada)",
+            "おべんとう (obentou)",
+            "ビール (biiru)",
+            "ワイン (wain)"
+        ],
+        "correct": 1,
+        "explanation": "Cơm hộp là おべんとう (obentou)."
+    },
+    {
+        "type": "vocab",
+        "title": "Chọn từ tiếng Nhật đúng",
+        "subtitle": "Dịch sang tiếng Nhật",
+        "content": "Rượu vang",
+        "options": [
+            "お酒 (osake)",
+            "ワイン (wain)",
+            "ビール (biiru)",
+            "チーズ (chiizu)"
+        ],
+        "correct": 1,
+        "explanation": "Rượu vang là ワイン (wain)."
+    },
+    {
+        "type": "vocab",
+        "title": "Chọn từ tiếng Nhật đúng",
+        "subtitle": "Nhớ cách viết",
+        "content": "Chua",
+        "options": [
+            "あまい (amai)",
+            "からい (karai)",
+            "すっぱい (suppai)",
+            "まずい (mazui)"
+        ],
+        "correct": 2,
+        "explanation": "Chua là すっぱい (suppai)."
+    },
+    {
+        "type": "vocab",
+        "title": "Dịch sang tiếng Việt",
+        "subtitle": "Nhớ mặt chữ Hán",
+        "content": "料理 (りょうり)",
+        "options": [
+            "Đồ uống",
+            "Màu sắc",
+            "Món ăn",
+            "Đồ ăn"
+        ],
+        "correct": 2,
+        "explanation": "料理 (ryouri) là Món ăn / Việc nấu ăn. (Khác với 食べ物 là Đồ ăn chung chung)."
+    },
+    {
+        "type": "vocab",
+        "title": "Dịch sang tiếng Việt",
+        "subtitle": "Nhớ mặt chữ Hán",
+        "content": "食べ物 (たべもの)",
+        "options": [
+            "Món ăn",
+            "Đồ uống",
+            "Đồ ăn",
+            "Rau"
+        ],
+        "correct": 2,
+        "explanation": "食べ物 (tabemono) là Đồ ăn (thực phẩm nói chung)."
+    },
+    {
+        "type": "vocab",
+        "title": "Dịch sang tiếng Việt",
+        "subtitle": "Nhớ mặt chữ Hán",
+        "content": "色 (いろ)",
+        "options": [
+            "Màu sắc",
+            "Hình dáng",
+            "Kích thước",
+            "Mùi vị"
+        ],
+        "correct": 0,
+        "explanation": "色 (iro) nghĩa là Màu sắc."
+    },
+    {
+        "type": "vocab",
+        "title": "Từ này có nghĩa là gì?",
+        "subtitle": "Động từ",
+        "content": "入っています (はいっています)",
+        "options": [
+            "Đang ăn",
+            "Có chứa (bên trong)",
+            "Mang đi",
+            "Đang uống"
+        ],
+        "correct": 1,
+        "explanation": "入っています (haitteimasu) nghĩa là Có chứa, có bỏ vào bên trong."
+    },
+    {
+        "type": "vocab",
+        "title": "Chọn nghĩa đúng",
+        "subtitle": "Nhớ mặt chữ Hán",
+        "content": "お酒 (おさけ)",
+        "options": [
+            "Bia",
+            "Rượu vang",
+            "Rượu (nói chung)",
+            "Nước ngọt"
+        ],
+        "correct": 2,
+        "explanation": "お酒 (osake) là Rượu (nói chung)."
+    },
+    {
+        "type": "vocab",
+        "title": "Từ này có nghĩa là gì?",
+        "subtitle": "Động từ",
+        "content": "持っていきます (もっていきます)",
+        "options": [
+            "Có chứa",
+            "Mang đi",
+            "Mang đến",
+            "Ăn thử"
+        ],
+        "correct": 1,
+        "explanation": "持っていきます (motteikimasu) nghĩa là Mang đi (Mang một vật đi đâu đó)."
+    },
+    {
+        "type": "grammar",
+        "title": "Điền vào chỗ trống",
+        "subtitle": "Học vẹt ngữ pháp",
+        "content": "ピクニックは 土曜日（___） 日曜日（___） どちらが いいですか。",
+        "options": [
+            "に / に",
+            "で / で",
+            "と / と",
+            "が / が"
+        ],
+        "correct": 2,
+        "explanation": "Hỏi so sánh 2 cái (どちらがいいですか) thì luôn dùng と / と."
+    },
+    {
+        "type": "grammar",
+        "title": "Chọn cụm từ đúng",
+        "subtitle": "Biến đổi từ: つめたい (lạnh)",
+        "content": "今日はとても暑いです。このジュースは（___）、おいしくないです。",
+        "options": [
+            "つめたいです",
+            "つめたくなくて",
+            "つめたいから",
+            "つめたいで"
+        ],
+        "correct": 1,
+        "explanation": "Chuyển thành KHÔNG LẠNH: つめたくなくて (hoặc つめたくないですから)."
+    },
+    {
+        "type": "grammar",
+        "title": "Điền vào chỗ trống",
+        "subtitle": "Nối câu với tính từ",
+        "content": "この こうえんは（ しずか → ___ ）、きもちが いいです。",
+        "options": [
+            "しずかに",
+            "しずかだ",
+            "しずかくて",
+            "しずかで"
+        ],
+        "correct": 3,
+        "explanation": "Tính từ 'shizuka' là tính từ đuôi NA. Nối câu phải dùng で (de)."
+    },
+    {
+        "type": "grammar",
+        "title": "Sắp xếp câu đúng",
+        "subtitle": "Đề bài: それは (ナイフ/ ですね/べんり/そうな)。",
+        "content": "Đâu là câu hoàn chỉnh đúng?",
+        "options": [
+            "それは べんり ナイフ そうな ですね。",
+            "それは ナイフ そうな べんり ですね。",
+            "それは べんりそうな ナイフ ですね。"
+        ],
+        "correct": 2,
+        "explanation": "Thứ tự: べんり (tiện) -> そうな (có vẻ) -> ナイフ (dao) -> ですね (nhỉ)."
+    },
+    {
+        "type": "grammar",
+        "title": "Điền vào chỗ trống",
+        "subtitle": "Từ để hỏi",
+        "content": "ピクニックの日はいつがいいですか。（ ___ ）いいです。",
+        "options": [
+            "いつでも",
+            "どこでも",
+            "どっちでも"
+        ],
+        "correct": 0,
+        "explanation": "Người ta hỏi いつ (Khi nào) thì trả lời là いつでも (Khi nào cũng được)."
+    }
+];
 
     let currentQuestionIndex = 0;
     let selectedOption = null;
@@ -373,7 +585,9 @@
         header: document.getElementById('header')
     };
 
-    const ttsMap = {"からい (karai)": "tts_2.mp3", "からい (karai) nghĩa là CAY.": "tts_3.mp3", "サラダ (sarada)": "tts_4.mp3", "おべんとう (obentou)": "tts_5.mp3", "ビール (biiru)": "tts_6.mp3", "ワイン (wain)": "tts_7.mp3", "Cơm hộp là おべんとう (obentou).": "tts_8.mp3", "ピクニックは 土曜日（___） 日曜日（___） どちらが いいですか。": "tts_9.mp3", "に / に": "tts_10.mp3", "で / で": "tts_11.mp3", "と / と": "tts_12.mp3", "が / が": "tts_13.mp3", "まずい (mazui)": "tts_14.mp3", "まずい (mazui) nghĩa là dở, không ngon.": "tts_15.mp3", "Biến đổi từ: つめたい (lạnh)": "tts_16.mp3", "今日はとても暑いです。このジュースは（___）、おいしくないです。": "tts_17.mp3", "つめたいです": "tts_18.mp3", "つめたくなくて": "tts_19.mp3", "つめたいから": "tts_20.mp3", "つめたいで": "tts_21.mp3", "Chuyển thành KHÔNG LẠNH: つめたくなくて (hoặc つめたくないですから).": "tts_22.mp3", "料理 (りょうり)": "tts_23.mp3", "料理 (ryouri) là Món ăn / Việc nấu ăn. (Khác với 食べ物 là Đồ ăn chung chung).": "tts_24.mp3", "この こうえんは（ しずか → ___ ）、きもちが いいです。": "tts_25.mp3", "しずかに": "tts_26.mp3", "しずかだ": "tts_27.mp3", "しずかくて": "tts_28.mp3", "しずかで": "tts_29.mp3", "Tính từ 'shizuka' là tính từ đuôi NA. Nối câu phải dùng で (de).": "tts_30.mp3", "Đề bài: それは (ナイフ/ ですね/べんり/そうな)。": "tts_31.mp3", "それは べんり ナイフ そうな ですね。": "tts_32.mp3", "それは ナイフ そうな べんり ですね。": "tts_33.mp3", "それは べんりそうな ナイフ ですね。": "tts_34.mp3", "Thứ tự: べんり (tiện) -> そうな (có vẻ) -> ナイフ (dao) -> ですね (nhỉ).": "tts_35.mp3", "あまい (amai)": "tts_36.mp3", "すっぱい (suppai)": "tts_37.mp3", "Chua là すっぱい (suppai).": "tts_38.mp3", "ピクニックの日はいつがいいですか。（ ___ ）いいです。": "tts_39.mp3", "いつでも": "tts_40.mp3", "どこでも": "tts_41.mp3", "どっちでも": "tts_42.mp3", "Người ta hỏi いつ (Khi nào) thì trả lời là いつでも (Khi nào cũng được).": "tts_43.mp3"};
+    const ttsMap = {">からい</div>
+    
+    <div class=": "tts_1.mp3", "からい (karai)": "tts_2.mp3", "からい (karai) nghĩa là CAY.": "tts_3.mp3", "サラダ (sarada)": "tts_4.mp3", "サラダ (sarada) là Salad (Rau trộn).": "tts_5.mp3", "ざんねん (zannen)": "tts_6.mp3", "ざんねん (zannen) nghĩa là đáng tiếc / tiếc nuối.": "tts_7.mp3", "ビール (biiru)": "tts_8.mp3", "チーズ (chiizu)": "tts_9.mp3", "ワイン (wain)": "tts_10.mp3", "Phô mai là チーズ (chiizu).": "tts_11.mp3", "まずい (mazui)": "tts_12.mp3", "まずい (mazui) nghĩa là dở, không ngon.": "tts_13.mp3", "やさい (yasai)": "tts_14.mp3", "やさい (yasai) là Rau.": "tts_15.mp3", "お酒 (osake)": "tts_16.mp3", "おべんとう (obentou)": "tts_17.mp3", "Bia là ビール (biiru).": "tts_18.mp3", "すいた (suita)": "tts_19.mp3", "すいた (suita) thường dùng trong câu おなかがすいた (Đói bụng).": "tts_20.mp3", "Cơm hộp là おべんとう (obentou).": "tts_21.mp3", "Rượu vang là ワイン (wain).": "tts_22.mp3", "あまい (amai)": "tts_23.mp3", "すっぱい (suppai)": "tts_24.mp3", "Chua là すっぱい (suppai).": "tts_25.mp3", "料理 (りょうり)": "tts_26.mp3", "料理 (ryouri) là Món ăn / Việc nấu ăn. (Khác với 食べ物 là Đồ ăn chung chung).": "tts_27.mp3", "食べ物 (たべもの)": "tts_28.mp3", "食べ物 (tabemono) là Đồ ăn (thực phẩm nói chung).": "tts_29.mp3", "色 (いろ)": "tts_30.mp3", "色 (iro) nghĩa là Màu sắc.": "tts_31.mp3", "入っています (はいっています)": "tts_32.mp3", "入っています (haitteimasu) nghĩa là Có chứa, có bỏ vào bên trong.": "tts_33.mp3", "お酒 (おさけ)": "tts_34.mp3", "お酒 (osake) là Rượu (nói chung).": "tts_35.mp3", "持っていきます (もっていきます)": "tts_36.mp3", "持っていきます (motteikimasu) nghĩa là Mang đi (Mang một vật đi đâu đó).": "tts_37.mp3", "ピクニックは 土曜日（___） 日曜日（___） どちらが いいですか。": "tts_38.mp3", "に / に": "tts_39.mp3", "で / で": "tts_40.mp3", "と / と": "tts_41.mp3", "が / が": "tts_42.mp3", "Biến đổi từ: つめたい (lạnh)": "tts_43.mp3", "今日はとても暑いです。このジュースは（___）、おいしくないです。": "tts_44.mp3", "つめたいです": "tts_45.mp3", "つめたくなくて": "tts_46.mp3", "つめたいから": "tts_47.mp3", "つめたいで": "tts_48.mp3", "Chuyển thành KHÔNG LẠNH: つめたくなくて (hoặc つめたくないですから).": "tts_49.mp3", "この こうえんは（ しずか → ___ ）、きもちが いいです。": "tts_50.mp3", "しずかに": "tts_51.mp3", "しずかだ": "tts_52.mp3", "しずかくて": "tts_53.mp3", "しずかで": "tts_54.mp3", "Tính từ 'shizuka' là tính từ đuôi NA. Nối câu phải dùng で (de).": "tts_55.mp3", "Đề bài: それは (ナイフ/ ですね/べんり/そうな)。": "tts_56.mp3", "それは べんり ナイフ そうな ですね。": "tts_57.mp3", "それは ナイフ そうな べんり ですね。": "tts_58.mp3", "それは べんりそうな ナイフ ですね。": "tts_59.mp3", "Thứ tự: べんり (tiện) -> そうな (có vẻ) -> ナイフ (dao) -> ですね (nhỉ).": "tts_60.mp3", "ピクニックの日はいつがいいですか。（ ___ ）いいです。": "tts_61.mp3", "いつでも": "tts_62.mp3", "どこでも": "tts_63.mp3", "どっちでも": "tts_64.mp3", "Người ta hỏi いつ (Khi nào) thì trả lời là いつでも (Khi nào cũng được).": "tts_65.mp3"};
 
     function speakJP(text) {
         if (ttsMap[text]) {
