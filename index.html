@@ -145,24 +145,80 @@
         
         .bottom-bar.incorrect .btn-check.active { background: var(--red); box-shadow: 0 4px 0 var(--red-dark); }
         
-        /* START SCREEN */
+        /* START SCREEN - DUOLINGO PATH UI */
         #start-overlay {
             position: fixed; top:0; left:0; width:100%; height:100%; background: #fff; z-index:9999;
-            display:flex; flex-direction:column; align-items:center; overflow-y: auto; padding: 40px 20px;
+            display:flex; flex-direction:column; align-items:center; overflow-y: auto; padding: 20px;
         }
-        .duo-logo { width: 150px; height: 150px; background: url('https://d35aaqx5ub95lt.cloudfront.net/images/owls/74bc0560a0ce733a1cc59cfaaa823053.svg') no-repeat center; background-size: contain; margin-bottom: 20px; flex-shrink:0; }
+        .unit-banner {
+            background-color: var(--green); color: white; padding: 20px; border-radius: 15px;
+            margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;
+            width: 100%; max-width: 500px;
+        }
+        .unit-banner h2 { margin: 0; font-size: 24px; font-weight: 900; }
+        .unit-banner p { margin: 5px 0 0 0; font-size: 16px; font-weight: 700; opacity: 0.9; }
+        
+        .path-container {
+            display: flex; flex-direction: column; align-items: center;
+            width: 100%; padding-bottom: 50px;
+        }
+
+        .level-node-wrapper {
+            position: relative; margin: 15px 0; display: flex; justify-content: center; width: 100%;
+        }
+
+        .level-node {
+            width: 70px; height: 70px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: none; transition: 0.1s; position: relative; z-index: 2;
+        }
+        .level-node svg { width: 32px; height: 32px; fill: white; }
+
+        .level-node.completed { background: var(--green); box-shadow: 0 6px 0 var(--green-dark); }
+        .level-node.completed:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+
+        .level-node.active-node { background: var(--green); box-shadow: 0 6px 0 var(--green-dark); }
+        .level-node.active-node:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+        
+        .active-ring {
+            position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px;
+            border: 4px solid var(--gray); border-radius: 50%;
+            border-top-color: var(--green); transform: rotate(-45deg); z-index: 1;
+        }
+
+        .level-node.locked { background: var(--gray); box-shadow: 0 6px 0 #cfcfcf; cursor: not-allowed; }
+        .level-node.locked svg { fill: var(--gray-dark); }
+
+        .start-tooltip {
+            position: absolute; top: -45px; background: white; color: var(--green);
+            padding: 8px 15px; border-radius: 10px; font-weight: 900; font-size: 14px;
+            letter-spacing: 1px; border: 2px solid var(--gray);
+            animation: bounce 2s infinite; pointer-events: none; z-index: 3;
+        }
+        .start-tooltip::after {
+            content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+            border-width: 8px 8px 0; border-style: solid; border-color: var(--gray) transparent transparent transparent;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
         
     </style>
 </head>
 <body>
 
 <div id="start-overlay">
-    <div class="duo-logo"></div>
-    <h1 style="color:var(--green); font-weight:900; margin-bottom: 5px;">Hành trình JAP 13-14</h1>
-    <h3 style="color:var(--gray-dark); margin-top:0; margin-bottom: 30px;">Chọn một Cửa ải để bắt đầu!</h3>
-    
-    <div id="level-container" style="display:flex; flex-direction:column; gap:15px; width: 100%; max-width: 300px;">
-        <!-- Level buttons injected here -->
+    <div class="unit-banner">
+        <div>
+            <h2>Unit 1</h2>
+            <p>Khởi động Bài 13-14</p>
+        </div>
+    </div>
+    <div class="path-container" id="level-container">
+        <!-- Nodes injected here -->
     </div>
 </div>
 
@@ -171,7 +227,7 @@
     <div class="progress-bar-bg">
         <div class="progress-bar-fill" id="progress-bar"><div class="progress-highlight"></div></div>
     </div>
-    <div style="width: 40px;"></div> <!-- Spacer to center progress bar -->
+    <div style="width: 40px;"></div>
 </header>
 
 <main id="quiz-screen" style="display:none;">
@@ -193,7 +249,7 @@
 </main>
 
 <main id="end-screen" style="display: none; align-items: center; justify-content: center; text-align: center; flex-direction:column; height: 100vh;">
-    <div class="duo-logo" style="margin:0 auto; width: 200px; height: 200px;"></div>
+    <div class="duo-logo" style="margin:0 auto; width: 150px; height: 150px; background: url('https://d35aaqx5ub95lt.cloudfront.net/images/owls/74bc0560a0ce733a1cc59cfaaa823053.svg') no-repeat center; background-size: contain;"></div>
     <h1 style="color:var(--gold); font-weight:900; font-size:36px; margin-bottom:10px;">Hoàn thành!</h1>
     <p style="font-size: 18px; font-weight:700; color:var(--gray-dark);">Cậu đã vượt qua ải này xuất sắc!</p>
     <button class="btn-check active" style="margin-top:40px; width:200px;" onclick="backToMap()">VỀ TRANG CHỦ</button>
@@ -244,29 +300,60 @@
     const audioCorrect = new Audio('duolingo-correct.mp3');
     const audioWrong = new Audio('duolingo-wrong.mp3');
 
-    // Init Map
+    const SVGS = {
+        check: '<svg viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>',
+        star: '<svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>',
+        crown: '<svg viewBox="0 0 24 24"><path d="M5 16h14l1.5-9-4 3-4-6-4 6-4-3 1.5 9zM4 18v2h16v-2H4z"/></svg>'
+    };
+
+    // Init Map (The Path)
     function renderLevels() {
         const container = document.getElementById('level-container');
         container.innerHTML = '';
         const numLevels = Math.ceil(questions.length / 10);
+        
+        let activeLevel = 0;
+        while(completedLevels.includes(activeLevel) && activeLevel < numLevels) {
+            activeLevel++;
+        }
+        if(activeLevel >= numLevels) activeLevel = numLevels - 1;
+
+        const offsets = [0, -35, -55, -35, 0, 35, 55, 35];
+        
         for(let i=0; i<numLevels; i++) {
-            const btn = document.createElement('button');
+            const wrapper = document.createElement('div');
+            wrapper.className = 'level-node-wrapper';
+            wrapper.style.transform = `translateX(${offsets[i % offsets.length]}px)`;
+
             const isCompleted = completedLevels.includes(i);
-            btn.className = 'btn-check active';
-            btn.style.width = '100%';
-            btn.style.marginBottom = '15px';
-            btn.style.padding = '20px';
-            btn.style.fontSize = '20px';
+            const isActive = (i === activeLevel);
+            const isLocked = !isCompleted && !isActive;
+
+            const btn = document.createElement('button');
+            btn.className = 'level-node ' + (isCompleted ? 'completed' : isActive ? 'active-node' : 'locked');
             
-            if(isCompleted) {
-                btn.style.background = 'var(--gold)';
-                btn.style.boxShadow = '0 5px 0 var(--gold-dark)';
-                btn.innerText = `🌟 CỬA ẢI ${i+1} (HOÀN THÀNH)`;
+            if (isActive) {
+                btn.innerHTML = SVGS.star;
+                const ring = document.createElement('div');
+                ring.className = 'active-ring';
+                btn.appendChild(ring);
+                
+                const tooltip = document.createElement('div');
+                tooltip.className = 'start-tooltip';
+                tooltip.innerText = 'START';
+                wrapper.appendChild(tooltip);
+            } else if (isCompleted) {
+                btn.innerHTML = SVGS.check;
             } else {
-                btn.innerText = `CỬA ẢI ${i+1}`;
+                btn.innerHTML = (i === numLevels - 1) ? SVGS.crown : SVGS.star;
             }
-            btn.onclick = () => startLevel(i);
-            container.appendChild(btn);
+            
+            if(!isLocked) {
+                btn.onclick = () => startLevel(i);
+            }
+            
+            wrapper.appendChild(btn);
+            container.appendChild(wrapper);
         }
     }
     renderLevels();
@@ -287,7 +374,6 @@
         currentLevelIndex = index;
         const start = index * 10;
         const end = start + 10;
-        // Deep copy the subset of questions for this level
         activeQuestions = JSON.parse(JSON.stringify(questions.slice(start, end)));
         
         document.getElementById('start-overlay').style.display = 'none';
@@ -319,7 +405,6 @@
 
     function loadQuestion() {
         if (currentQuestionIndex >= activeQuestions.length) {
-            // Finished level
             if(!completedLevels.includes(currentLevelIndex)) {
                 completedLevels.push(currentLevelIndex);
                 localStorage.setItem('jap_completed_levels', JSON.stringify(completedLevels));
@@ -396,7 +481,6 @@
             ui.btnCheck.innerText = 'TIẾP TỤC';
             ui.feedbackContainer.style.display = 'block';
             
-            // SHOW JAPANESE TEXT IN FEEDBACK SO THEY CAN LEARN!
             let explainHtml = `<span style="font-size:22px; font-weight:900; color:var(--text-main);">${q.content}</span>`;
             if (q.explanation) {
                 explainHtml += `<br><span style="margin-top:5px; display:inline-block;">${q.explanation}</span>`;
@@ -424,7 +508,6 @@
             if (selectedOption === q.correct) {
                 currentQuestionIndex++;
             } else {
-                // Push failed question to end of current level!
                 activeQuestions.push(activeQuestions.splice(currentQuestionIndex, 1)[0]);
             }
             loadQuestion();
