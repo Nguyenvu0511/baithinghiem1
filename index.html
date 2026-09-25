@@ -195,11 +195,9 @@
         <button class="listen-btn" onclick="replayQuestionAudio()">🔊</button>
     </div>
     
-    <div class="hint-text" id="q-hint">Cay</div>
+    
 
-    <div class="action-btns">
-        <button id="btn-toggle-hint" class="mini-btn" onclick="toggleHint()">Dịch nghĩa</button>
-    </div>
+    
 
     <div class="options-grid" id="options-container">
         <!-- Options injected here -->
@@ -312,17 +310,7 @@
         speakJP(questions[currentQuestionIndex].content);
     }
 
-    function toggleHint() {
-        const hint = document.getElementById('q-hint');
-        const btn = document.getElementById('btn-toggle-hint');
-        if (hint.style.display === 'none') {
-            hint.style.display = 'block';
-            btn.innerText = 'Ẩn dịch nghĩa';
-        } else {
-            hint.style.display = 'none';
-            btn.innerText = 'Dịch nghĩa';
-        }
-    }
+    
 
     function loadQuestion() {
         if (currentQuestionIndex >= questions.length) {
@@ -345,19 +333,19 @@
             ui.title.innerText = "Lắng nghe và chọn đáp án";
             ui.qCard.style.display = 'none';
             ui.listenCard.style.display = 'block';
-            document.getElementById('btn-toggle-hint').style.display = 'none'; // hide hint in listen mode
+            
         } else {
             ui.title.innerText = q.title;
             ui.qCard.style.display = 'flex';
             ui.listenCard.style.display = 'none';
             ui.content.innerText = q.content;
             
-            document.getElementById('q-hint').innerText = q.vi_hint || '';
-            document.getElementById('q-hint').style.display = 'none';
             
-            const btnHint = document.getElementById('btn-toggle-hint');
-            btnHint.innerText = 'Dịch nghĩa';
-            btnHint.style.display = q.vi_hint ? 'inline-block' : 'none';
+            
+            
+            
+            
+            
         }
         
         // Auto-play
@@ -405,7 +393,7 @@
             ui.feedbackExplanation.innerText = q.explanation || "";
 
             document.querySelectorAll('.option').forEach(opt => opt.classList.add('disabled'));
-            document.getElementById('btn-toggle-hint').style.display = 'none';
+            
 
             if (isCorrect) {
                 ui.bottomBar.className = 'bottom-bar correct';
