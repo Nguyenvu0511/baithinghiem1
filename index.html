@@ -2,315 +2,242 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JAP 183 - Duolingo Style</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Duolingo Clone - JAP 183</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Nunito', sans-serif; 
-            background: #fff; 
-            margin:0; 
-            display:flex; 
-            flex-direction:column; 
-            height: 100vh; 
-            overflow: hidden;
-            color: #3c3c3c;
+        :root {
+            --green: #58cc02;
+            --green-dark: #58a700;
+            --green-hover: #46a302;
+            --gray: #e5e5e5;
+            --gray-dark: #afafaf;
+            --text-main: #3c3c3c;
+            --blue: #1cb0f6;
+            --blue-dark: #1899d6;
+            --red: #ff4b4b;
+            --red-dark: #ea2b2b;
+            --bg: #ffffff;
         }
         
-        header { 
-            display: flex; 
-            align-items: center; 
-            padding: 20px 40px; 
-            max-width: 800px;
-            margin: 0 auto;
-            width: 100%;
-            box-sizing: border-box;
+        * { box-sizing: border-box; user-select: none; font-family: 'Nunito', sans-serif; }
+        body { 
+            margin: 0; background: var(--bg); color: var(--text-main); 
+            display: flex; flex-direction: column; height: 100vh;
+        }
+        
+        /* HEADER */
+        header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px; max-width: 800px; margin: 0 auto; width: 100%;
         }
         .close-btn {
-            font-size: 24px;
-            color: #afafaf;
-            cursor: pointer;
-            font-weight: 800;
+            cursor: pointer; font-size: 28px; color: var(--gray-dark); font-weight: 900;
+            width: 40px; text-align: center; transition: 0.2s;
         }
-        .progress-bar-bg { 
-            flex-grow: 1; 
-            background: #e5e5e5; 
-            height: 18px; 
-            border-radius: 9px; 
-            margin: 0 20px; 
-            position: relative; 
-            overflow: hidden;
+        .close-btn:hover { color: #777; }
+        .progress-bar-bg {
+            flex-grow: 1; background: var(--gray); height: 16px; border-radius: 8px;
+            margin: 0 15px; position: relative; overflow: hidden;
         }
-        .progress-bar-fill { 
-            background: #58cc02; 
-            height: 100%; 
-            border-radius: 9px; 
-            width: 0%; 
-            transition: width 0.4s ease; 
+        .progress-bar-fill {
+            background: var(--green); height: 100%; width: 0%;
+            border-radius: 8px; transition: width 0.3s ease-out; position: relative;
         }
         .progress-highlight {
-            position: absolute;
-            top: 4px;
-            left: 10px;
-            right: 10px;
-            height: 4px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 2px;
+            position: absolute; top: 4px; left: 10px; right: 10px; height: 4px;
+            background: rgba(255,255,255,0.3); border-radius: 4px;
         }
 
-        main { 
-            flex-grow: 1; 
-            padding: 0 20px; 
-            max-width: 600px; 
-            margin: 0 auto; 
-            width: 100%; 
-            display:flex; 
-            flex-direction:column; 
-            justify-content:center;
-            box-sizing: border-box;
-            overflow-y: auto;
-            overflow-x: hidden;
+        /* MAIN CONTENT */
+        main {
+            flex-grow: 1; display: flex; flex-direction: column; 
+            max-width: 600px; margin: 0 auto; width: 100%; padding: 0 20px;
+            overflow-y: auto; padding-bottom: 120px;
         }
         
-        .question-title { 
-            font-size: 28px; 
-            font-weight: 800; 
-            margin-bottom: 10px; 
+        h1.title { font-size: 28px; font-weight: 800; margin-bottom: 20px; color: var(--text-main); }
+        
+        .question-card {
+            display: flex; align-items: center; margin-bottom: 30px; gap: 15px;
         }
-        .question-subtitle {
-            font-size: 18px;
-            color: #777;
-            margin-bottom: 30px;
+        .mascot {
+            width: 100px; height: 120px;
+            background: url('https://d35aaqx5ub95lt.cloudfront.net/images/owls/74bc0560a0ce733a1cc59cfaaa823053.svg') no-repeat center;
+            background-size: contain;
+        }
+        .speech-bubble {
+            border: 2px solid var(--gray); border-radius: 15px; padding: 15px 20px;
+            position: relative; font-size: 22px; font-weight: 700; color: var(--text-main);
+            flex-grow: 1; min-height: 80px; display: flex; align-items: center;
+        }
+        .speech-bubble::before {
+            content: ''; position: absolute; left: -10px; top: 50%; transform: translateY(-50%);
+            border-width: 10px 12px 10px 0; border-style: solid;
+            border-color: transparent var(--gray) transparent transparent;
+        }
+        .speech-bubble::after {
+            content: ''; position: absolute; left: -7px; top: 50%; transform: translateY(-50%);
+            border-width: 8px 10px 8px 0; border-style: solid;
+            border-color: transparent #fff transparent transparent;
         }
         
-        .question-content { 
-            font-size: 32px; 
-            margin-bottom: 40px; 
-            text-align: center; 
-            color: #1cb0f6;
+        /* BIG LISTENING BUTTON */
+        .listen-btn {
+            background: var(--blue); color: white; border: none; border-radius: 15px;
+            width: 80px; height: 80px; font-size: 40px; cursor: pointer;
+            box-shadow: 0 5px 0 var(--blue-dark); transition: 0.1s; display: flex;
+            align-items: center; justify-content: center; margin: 0 auto;
         }
-        
-        .options { 
-            display: grid; 
-            grid-template-columns: 1fr; 
-            gap: 15px; 
-        }
-        .option { 
-            border: 2px solid #e5e5e5; 
-            border-radius: 15px; 
-            padding: 18px 20px; 
-            font-size: 20px; 
-            cursor: pointer; 
-            transition: all 0.1s; 
-            color: #4b4b4b; 
-            font-weight: 700; 
-            background: white;
-            box-shadow: 0 2px 0 #e5e5e5;
-        }
-        .option:hover { 
-            background: #f7f7f7; 
-        }
-        .option:active {
-            transform: translateY(2px);
-            box-shadow: none;
-        }
-        .option.selected { 
-            border-color: #84d8ff; 
-            background: #ddf4ff; 
-            color: #1cb0f6; 
-            box-shadow: 0 2px 0 #84d8ff;
-        }
-        .option.disabled {
-            pointer-events: none;
-        }
-        
-        .bottom-bar { 
-            padding: 30px 20px; 
-            border-top: 2px solid #e5e5e5; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            transition: background 0.3s;
-        }
-        .bottom-bar.correct { 
-            background: #d7ffb8; 
-            border-color: #d7ffb8; 
-        }
-        .bottom-bar.incorrect { 
-            background: #ffdfe0; 
-            border-color: #ffdfe0; 
-        }
-        
-        .feedback { 
-            display:none; 
-            flex-grow: 1; 
-        }
-        .feedback h2 { 
-            margin: 0; 
-            font-size: 24px; 
-            font-weight: 800;
-        }
-        .bottom-bar.correct .feedback h2 { color: #58a700; }
-        .bottom-bar.incorrect .feedback h2 { color: #ea2b2b; }
-        
-        .btn-check { 
-            background: #e5e5e5; 
-            color: #afafaf; 
-            border: none; 
-            padding: 15px 40px; 
-            font-size: 18px; 
-            font-weight: 800; 
-            border-radius: 15px; 
-            cursor: default; 
-            margin-left: auto; 
-            text-transform: uppercase;
-            font-family: 'Nunito', sans-serif;
-        }
-        .btn-check.active { 
-            background: #58cc02; 
-            color: #fff; 
-            cursor: pointer; 
-            box-shadow: 0 4px 0 #58a700; 
-        }
-        .btn-check.active:active { 
-            transform: translateY(4px); 
-            box-shadow: none; 
-        }
-        
-        .bottom-bar.correct .btn-check { 
-            background: #58cc02; 
-            box-shadow: 0 4px 0 #58a700; 
-            color: white;
-            cursor: pointer;
-        }
-        .bottom-bar.incorrect .btn-check { 
-            background: #ff4b4b; 
-            box-shadow: 0 4px 0 #ea2b2b; 
-            color: white;
-            cursor: pointer;
-        }
+        .listen-btn:active { transform: translateY(5px); box-shadow: 0 0 0 transparent; }
 
-        .explanation { 
-            font-size: 16px; 
-            margin-top: 10px; 
-            font-weight: 700;
-            display: none;
+        /* OPTIONS */
+        .options-grid {
+            display: grid; grid-template-columns: 1fr; gap: 15px; width: 100%;
         }
-        .bottom-bar.incorrect .explanation, .bottom-bar.correct .explanation { 
-            display: block; 
-        }
-        .bottom-bar.correct .explanation { color: #58a700; }
-        .bottom-bar.incorrect .explanation { color: #ea2b2b; }
-
-        #end-screen { 
-            display: none; 
-            text-align: center; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center;
-            height: 100%;
-        }
-        #end-screen h1 { 
-            color: #f49000; 
-            font-size: 36px; 
-            margin-bottom: 20px;
-        }
-        #end-screen p {
-            font-size: 20px;
-            color: #777;
-        }
+        @media (min-width: 500px) { .options-grid { grid-template-columns: 1fr 1fr; } }
         
-        /* Audio elements */
-        audio { display: none; }
-
-        .question-content {
-            transition: opacity 0.1s;
+        .option {
+            border: 2px solid var(--gray); border-radius: 15px; padding: 15px;
+            font-size: 18px; font-weight: 700; cursor: pointer; text-align: center;
+            box-shadow: 0 4px 0 var(--gray); transition: 0.1s;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 70px;
         }
-        .question-content:active {
-            opacity: 0.5;
+        .option:active:not(.disabled) { transform: translateY(4px); box-shadow: none; }
+        .option.selected {
+            border-color: var(--blue); background: #ddf4ff; color: var(--blue);
+            box-shadow: 0 4px 0 var(--blue-dark);
         }
-
-        /* --- MOBILE OPTIMIZATIONS --- */
-        @media (max-width: 600px) {
-            header { padding: 15px 20px; }
-            .question-title { font-size: 22px; margin-bottom: 5px; }
-            .question-subtitle { font-size: 16px; margin-bottom: 20px; }
-            .question-content { font-size: 24px; margin-bottom: 25px; }
-            .option { padding: 12px 15px; font-size: 16px; border-radius: 12px; }
-            
-            .bottom-bar { 
-                padding: 15px; 
-                flex-direction: column; 
-                gap: 15px; 
-                align-items: stretch;
-            }
-            .feedback h2 { font-size: 20px; text-align: center; }
-            .explanation { font-size: 14px; text-align: center; }
-            .btn-check { 
-                width: 100%; 
-                margin: 0; 
-                padding: 15px; 
-            }
+        .option.disabled { opacity: 0.5; cursor: default; pointer-events: none; box-shadow: none; transform: translateY(4px); }
+        
+        /* HINTS */
+        .hint-text {
+            text-align: center; color: #a0a0a0; font-size: 16px; font-weight: 700;
+            margin-top: -15px; margin-bottom: 20px; display: none;
         }
+        .action-btns { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .mini-btn {
+            background: none; border: 2px solid var(--gray); border-radius: 10px;
+            padding: 8px 15px; font-size: 14px; font-weight: 700; color: var(--gray-dark);
+            cursor: pointer; box-shadow: 0 2px 0 var(--gray); transition: 0.1s;
+        }
+        .mini-btn:active { transform: translateY(2px); box-shadow: none; }
+        
+        /* BOTTOM BAR */
+        .bottom-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            padding: 20px; border-top: 2px solid var(--gray); background: #fff;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .bottom-bar.correct { background: #d7ffb8; border-color: #d7ffb8; }
+        .bottom-bar.incorrect { background: #ffdfe0; border-color: #ffdfe0; }
+        
+        .bottom-content {
+            max-width: 800px; width: 100%; display: flex; align-items: center; justify-content: space-between;
+        }
+        .feedback { display: none; flex-grow: 1; }
+        .feedback h2 { margin: 0 0 5px 0; font-size: 24px; font-weight: 900; }
+        .bottom-bar.correct .feedback h2 { color: var(--green-dark); }
+        .bottom-bar.incorrect .feedback h2 { color: var(--red-dark); }
+        
+        .feedback .explanation { font-size: 16px; font-weight: 700; color: #777; }
+        
+        .btn-check {
+            background: var(--gray); color: var(--gray-dark);
+            border: none; border-radius: 15px; padding: 15px 30px; font-size: 18px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px; cursor: default;
+            transition: 0.1s; min-width: 150px;
+        }
+        .btn-check.active {
+            background: var(--green); color: white; cursor: pointer;
+            box-shadow: 0 4px 0 var(--green-dark);
+        }
+        .btn-check.active:active { transform: translateY(4px); box-shadow: none; }
+        
+        .bottom-bar.incorrect .btn-check.active { background: var(--red); box-shadow: 0 4px 0 var(--red-dark); }
+        
+        /* START SCREEN */
+        #start-overlay {
+            position: fixed; top:0; left:0; width:100%; height:100%; background: #fff; z-index:9999;
+            display:flex; flex-direction:column; justify-content:center; align-items:center;
+        }
+        .duo-logo { width: 150px; height: 150px; background: url('https://d35aaqx5ub95lt.cloudfront.net/images/owls/74bc0560a0ce733a1cc59cfaaa823053.svg') no-repeat center; background-size: contain; margin-bottom: 20px; }
+        
     </style>
 </head>
 <body>
 
-<div id="start-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:9999; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-    <h1 style="color:#1cb0f6;">Sẵn sàng học chưa?</h1>
-    <button class="btn-check active" style="margin-top:20px; padding:15px 40px; cursor:pointer;" onclick="startApp()">BẮT ĐẦU</button>
+<div id="start-overlay">
+    <div class="duo-logo"></div>
+    <h1 style="color:var(--green); font-weight:900;">Duolingo Clone</h1>
+    <h3 style="color:var(--gray-dark); margin-top:0;">Bài học: JAP 13-14</h3>
+    <button class="btn-check active" style="margin-top:30px; width: 250px;" onclick="startApp()">BẮT ĐẦU</button>
 </div>
 
 <header id="header">
-    <div class="close-btn" onclick="goBack()" style="font-size:28px;">&lt;</div>
+    <div class="close-btn" onclick="goBack()" title="Quay lại">❮</div>
     <div class="progress-bar-bg">
         <div class="progress-bar-fill" id="progress-bar"><div class="progress-highlight"></div></div>
     </div>
-    <div class="close-btn" onclick="restartApp()" style="font-size:28px;">⟲</div>
+    <div class="close-btn" onclick="restartApp()" title="Làm lại từ đầu">↻</div>
 </header>
 
 <main id="quiz-screen">
-    <div class="question-title" id="q-title">Chọn nghĩa đúng</div>
-    <div class="question-subtitle" id="q-subtitle">Từ vựng</div>
-    <div class="question-content" id="q-content" onclick="replayQuestionAudio()">からい</div>
+    <h1 class="title" id="q-title">Viết lại bằng tiếng Việt</h1>
     
-    <div id="q-hint" style="color: #bbb; font-size: 18px; margin-top: -15px; margin-bottom: 20px; text-align: center; font-style: italic; display: none;"></div>
+    <div class="question-card" id="q-card">
+        <div class="mascot"></div>
+        <div class="speech-bubble" id="q-content" onclick="replayQuestionAudio()" style="cursor:pointer;">からい</div>
+    </div>
+    
+    <div id="listen-card" style="display:none; text-align:center; margin-bottom:40px;">
+        <button class="listen-btn" onclick="replayQuestionAudio()">🔊</button>
+    </div>
+    
+    <div class="hint-text" id="q-hint">Cay</div>
 
-    <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
-        <button id="btn-toggle-hint" class="btn-check active" style="padding: 10px 15px; font-size: 14px;" onclick="toggleHint()">Dịch tiếng Việt</button>
-        <button id="btn-toggle-options" class="btn-check active" style="padding: 10px 15px; font-size: 14px;" onclick="toggleAnswers()">Hiện đáp án</button>
+    <div class="action-btns">
+        <button id="btn-toggle-hint" class="mini-btn" onclick="toggleHint()">Dịch nghĩa</button>
     </div>
 
-    <div class="options" id="options-container" style="display: none;">
-        <!-- Options injected here via JS -->
+    <div class="options-grid" id="options-container">
+        <!-- Options injected here -->
     </div>
 </main>
 
-<main id="end-screen">
-    <h1>Hoàn thành bài học! 🎉</h1>
-    <p>Cậu đã nắm vững các câu hỏi trong đề thi ngày mai.</p>
-    <button class="btn-check active" style="margin: 30px auto; display: block;" onclick="restartApp()">Học lại từ đầu</button>
+<main id="end-screen" style="display: none; align-items: center; justify-content: center; text-align: center;">
+    <div class="duo-logo" style="margin:0 auto; width: 200px; height: 200px;"></div>
+    <h1 style="color:#ffc800; font-weight:900; font-size:36px; margin-bottom:10px;">Hoàn thành!</h1>
+    <p style="font-size: 18px; font-weight:700; color:var(--gray-dark);">Bạn đã nắm vững toàn bộ kiến thức!</p>
+    <button class="btn-check active" style="margin-top:40px;" onclick="restartApp()">Học lại từ đầu</button>
 </main>
 
 <div class="bottom-bar" id="bottom-bar">
-    <div class="feedback" id="feedback-container">
-        <h2 id="feedback-title">Chính xác!</h2>
-        <div class="explanation" id="feedback-explanation">Mẹo: Nhớ kỹ nhé!</div>
+    <div class="bottom-content">
+        <div class="feedback" id="feedback-container">
+            <h2 id="feedback-title">Chính xác!</h2>
+            <div class="explanation" id="feedback-explanation">Mẹo: Nhớ kỹ nhé!</div>
+        </div>
+        <button class="btn-check" id="btn-check" onclick="onCheckClick()">KIỂM TRA</button>
     </div>
-    <button class="btn-check" id="btn-check" onclick="onCheckClick()">Kiểm tra</button>
 </div>
 
 <script>
     let questions = [{"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 13", "content": "あいさつ", "options": ["Chào hỏi", "Tạm biệt", "Cảm ơn", "Xin lỗi"], "correct": 0, "vi_hint": "Chào hỏi"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 13", "content": "オフィス", "options": ["Nhà xưởng", "Văn phòng", "Cửa hàng", "Bệnh viện"], "correct": 1, "vi_hint": "Văn phòng"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 13", "content": "がいこくじん", "options": ["Người nhà", "Người quen", "Người nước ngoài", "Người Nhật"], "correct": 2, "vi_hint": "Người nước ngoài"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 13", "content": "くうこう", "options": ["Nhà ga", "Bến xe", "Bến cảng", "Sân bay"], "correct": 3, "vi_hint": "Sân bay"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 13", "content": "シャワー", "options": ["Vòi sen", "Bồn tắm", "Nhà vệ sinh", "Phòng ngủ"], "correct": 0, "vi_hint": "Vòi sen"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 13", "content": "たんとう", "options": ["Quản lý", "Đảm nhiệm", "Nhân viên", "Giám đốc"], "correct": 1, "vi_hint": "Đảm nhiệm"}, {"type": "vocab", "title": "Chọn tiếng Nhật đúng", "subtitle": "Từ vựng Bài 13", "content": "đèn điện", "options": ["でんき", "でんわ", "でんしゃ", "でんち"], "correct": 0, "vi_hint": "でんき (Đèn điện)"}, {"type": "vocab", "title": "Chọn tiếng Nhật đúng", "subtitle": "Từ vựng Bài 13", "content": "hành lý", "options": ["きっぷ", "にもつ", "さいふ", "かばん"], "correct": 1, "vi_hint": "にもつ (Hành lý)"}, {"type": "vocab", "title": "Chọn tiếng Nhật đúng", "subtitle": "Từ vựng Bài 13", "content": "nguội", "options": ["あつい", "つめたい", "さめます", "あたたかい"], "correct": 2, "vi_hint": "さめます (Nguội)"}, {"type": "vocab", "title": "Chọn tiếng Nhật đúng", "subtitle": "Từ vựng Bài 13", "content": "giá cả", "options": ["おかね", "ねだん", "きゅうりょう", "りょうきん"], "correct": 1, "vi_hint": "ねだん (Giá cả)"}, {"type": "vocab", "title": "Chọn tiếng Nhật đúng", "subtitle": "Từ vựng Bài 13", "content": "chuyến bay", "options": ["びん", "きっぷ", "パスポート", "ビザ"], "correct": 0, "vi_hint": "びん (Chuyến bay)"}, {"type": "vocab", "title": "Chọn tiếng Nhật đúng", "subtitle": "Từ vựng Bài 13", "content": "đón", "options": ["おくります", "むかえます", "まちます", "よびます"], "correct": 1, "vi_hint": "むかえます (Đón)"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 13", "content": "会社", "options": ["Công ty", "Trường học", "Bệnh viện", "Nhà hàng"], "correct": 0, "vi_hint": "Công ty"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 13", "content": "本社", "options": ["Nhà sách", "Trụ sở chính", "Chi nhánh", "Tạp chí"], "correct": 1, "vi_hint": "Trụ sở chính"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 13", "content": "午前", "options": ["Buổi sáng (AM)", "Buổi chiều (PM)", "Buổi tối", "Ban đêm"], "correct": 0, "vi_hint": "Buổi sáng (AM)"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 13", "content": "出張", "options": ["Du lịch", "Du học", "Công tác", "Chuyển nhà"], "correct": 2, "vi_hint": "Công tác"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 13", "content": "空港", "options": ["Sân bay", "Nhà ga", "Cầu cảng", "Bến xe"], "correct": 0, "vi_hint": "Sân bay"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 13", "content": "到着", "options": ["Khởi hành", "Đến nơi", "Chờ đợi", "Trễ giờ"], "correct": 1, "vi_hint": "Đến nơi"}, {"type": "grammar", "title": "Chọn từ thích hợp", "subtitle": "Ngữ pháp Bài 13", "content": "わたしは日本に（___）ことがあります。", "options": ["行きます", "行く", "行った", "行かない"], "correct": 2, "explanation": "Vた + ことがあります: Đã từng làm gì đó. Do đó 行きます chia thành 行った.", "vi_hint": "Tôi (đã từng đi) Nhật Bản."}, {"type": "grammar", "title": "Chọn từ thích hợp", "subtitle": "Ngữ pháp Bài 13", "content": "このコーヒーは（___）すぎます。", "options": ["にが", "にがい", "にがく", "にがくて"], "correct": 0, "explanation": "A(bỏ i) + すぎます: Quá... (chỉ sự thái quá). にがい bỏ い thành にが.", "vi_hint": "Cà phê này (đắng) quá."}, {"type": "grammar", "title": "Chọn từ thích hợp", "subtitle": "Ngữ pháp Bài 13", "content": "このへやは（___）すぎてちょっとこわいです。", "options": ["しずか", "しずかな", "しずかで", "しずかに"], "correct": 0, "explanation": "Na(bỏ na) + すぎます. Do đó しずかな bỏ な thành しずか.", "vi_hint": "Phòng này (yên tĩnh) quá nên hơi sợ."}, {"type": "grammar", "title": "Chọn trợ từ", "subtitle": "Ngữ pháp Bài 13", "content": "エアコンがあります（___）こわれています。", "options": ["が", "で", "と", "に"], "correct": 0, "explanation": "が mang nghĩa 'nhưng'. Có máy lạnh NHƯNG bị hỏng.", "vi_hint": "Có máy lạnh (nhưng) bị hỏng."}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 14", "content": "かります", "options": ["Mượn", "Cho mượn", "Mua", "Bán"], "correct": 0, "vi_hint": "Mượn"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 14", "content": "けします", "options": ["Bật", "Tắt", "Mở", "Đóng"], "correct": 1, "vi_hint": "Tắt"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 14", "content": "じょうず", "options": ["Dở", "Xấu", "Giỏi", "Đẹp"], "correct": 2, "vi_hint": "Giỏi"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 14", "content": "はじめます", "options": ["Kết thúc", "Chuẩn bị", "Bắt đầu", "Tiếp tục"], "correct": 2, "vi_hint": "Bắt đầu"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 14", "content": "ずっと", "options": ["Một chút", "Thỉnh thoảng", "Đôi khi", "Suốt / Rất"], "correct": 3, "vi_hint": "Suốt / Rất"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 14", "content": "パソコン", "options": ["Điện thoại", "Máy tính", "Máy in", "Máy lạnh"], "correct": 1, "vi_hint": "Máy tính"}, {"type": "vocab", "title": "Chọn tiếng Nhật đúng", "subtitle": "Từ vựng Bài 14", "content": "lễ tân", "options": ["うけつけ", "かいぎしつ", "しょくどう", "じむしょ"], "correct": 0, "vi_hint": "うけつけ (Lễ tân)"}, {"type": "vocab", "title": "Chọn tiếng Nhật đúng", "subtitle": "Từ vựng Bài 14", "content": "máy photocopy", "options": ["ファクス", "コピーき", "パソコン", "エアコン"], "correct": 1, "vi_hint": "コピーき (Máy photocopy)"}, {"type": "vocab", "title": "Chọn tiếng Nhật đúng", "subtitle": "Từ vựng Bài 14", "content": "đóng (cửa)", "options": ["あけます", "しめます", "つけます", "けします"], "correct": 1, "vi_hint": "しめます (Đóng)"}, {"type": "vocab", "title": "Chọn tiếng Nhật đúng", "subtitle": "Từ vựng Bài 14", "content": "bật (điện)", "options": ["つけます", "けします", "あけます", "しめます"], "correct": 0, "vi_hint": "つけます (Bật)"}, {"type": "vocab", "title": "Chọn tiếng Nhật đúng", "subtitle": "Từ vựng Bài 14", "content": "giám đốc", "options": ["ぶちょう", "かちょう", "しゃちょう", "てんちょう"], "correct": 2, "vi_hint": "しゃちょう (Giám đốc)"}, {"type": "vocab", "title": "Chọn tiếng Nhật đúng", "subtitle": "Từ vựng Bài 14", "content": "nhân viên", "options": ["しゃちょう", "しゃいん", "かいしゃ", "せんせい"], "correct": 1, "vi_hint": "しゃいん (Nhân viên)"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 14", "content": "自分", "options": ["Gia đình", "Bản thân", "Bạn bè", "Người yêu"], "correct": 1, "vi_hint": "Bản thân / Tự mình"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 14", "content": "電話", "options": ["Điện báo", "Điện nước", "Điện thoại", "Máy tính"], "correct": 2, "vi_hint": "Điện thoại"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 14", "content": "電気", "options": ["Nước", "Gas", "Điện / Đèn điện", "Internet"], "correct": 2, "vi_hint": "Điện / Đèn điện"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 14", "content": "車", "options": ["Xe hơi", "Xe đạp", "Tàu điện", "Máy bay"], "correct": 0, "vi_hint": "Xe hơi"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 14", "content": "送ります", "options": ["Gửi / Tiễn", "Nhận", "Mượn", "Cho mượn"], "correct": 0, "vi_hint": "Gửi / Tiễn"}, {"type": "vocab", "title": "Chọn nghĩa đúng", "subtitle": "Từ vựng Bài 14", "content": "使います", "options": ["Bỏ đi", "Sử dụng", "Tìm kiếm", "Sửa chữa"], "correct": 1, "vi_hint": "Sử dụng"}, {"type": "grammar", "title": "Chọn từ thích hợp", "subtitle": "Ngữ pháp Bài 14", "content": "日本に（___）、３年になります。", "options": ["きます", "くる", "きて", "こない"], "correct": 2, "explanation": "Cấu trúc Vてから, hoặc Vて...なります: Từ khi đến Nhật đã được 3 năm. きます chia thể te thành きて.", "vi_hint": "Từ khi (đến) Nhật đã được 3 năm."}, {"type": "grammar", "title": "Chọn từ thích hợp", "subtitle": "Ngữ pháp Bài 14", "content": "かんじを（___）て、６か月になります。", "options": ["べんきょうし", "べんきょうして", "べんきょうす", "べんきょうする"], "correct": 0, "explanation": "Đã có chữ 'て' ở sau, nên べんきょうします chỉ cần bỏ ます thành べんきょうし.", "vi_hint": "(Học) Hán tự được 6 tháng."}, {"type": "grammar", "title": "Chọn từ thích hợp", "subtitle": "Ngữ pháp Bài 14", "content": "この本を（___）でもいいですか。", "options": ["よみます", "よむ", "よん", "よんで"], "correct": 2, "explanation": "Cấu trúc Vても/Vでもいいですか (Làm việc gì đó có được không?). よみます chia thành よんで. Ở đây đã có 'でも' nên chọn 'よん'.", "vi_hint": "(Đọc) sách này có được không?"}, {"type": "grammar", "title": "Chọn từ thích hợp", "subtitle": "Ngữ pháp Bài 14", "content": "ここで（___）てもいいですか。", "options": ["すわります", "すわる", "すわっ", "すわって"], "correct": 2, "explanation": "Cấu trúc Vてもいいですか. すわります chia thành すわって. Ở đây đã có 'ても' nên chọn 'すわっ'.", "vi_hint": "(Ngồi) ở đây có được không?"}];
+    const ttsMap = {"あいさつ": "tts_1.mp3", "オフィス": "tts_2.mp3", "がいこくじん": "tts_3.mp3", "くうこう": "tts_4.mp3", "シャワー": "tts_5.mp3", "たんとう": "tts_6.mp3", "でんき": "tts_7.mp3", "でんわ": "tts_8.mp3", "でんしゃ": "tts_9.mp3", "でんち": "tts_10.mp3", "きっぷ": "tts_11.mp3", "にもつ": "tts_12.mp3", "さいふ": "tts_13.mp3", "かばん": "tts_14.mp3", "あつい": "tts_15.mp3", "つめたい": "tts_16.mp3", "さめます": "tts_17.mp3", "あたたかい": "tts_18.mp3", "おかね": "tts_19.mp3", "ねだん": "tts_20.mp3", "きゅうりょう": "tts_21.mp3", "りょうきん": "tts_22.mp3", "びん": "tts_23.mp3", "パスポート": "tts_24.mp3", "ビザ": "tts_25.mp3", "おくります": "tts_26.mp3", "むかえます": "tts_27.mp3", "まちます": "tts_28.mp3", "よびます": "tts_29.mp3", "会社": "tts_30.mp3", "本社": "tts_31.mp3", "午前": "tts_32.mp3", "出張": "tts_33.mp3", "空港": "tts_34.mp3", "到着": "tts_35.mp3", "わたしは日本に（___）ことがあります。": "tts_36.mp3", "行きます": "tts_37.mp3", "行く": "tts_38.mp3", "行った": "tts_39.mp3", "行かない": "tts_40.mp3", "このコーヒーは（___）すぎます。": "tts_41.mp3", "にが": "tts_42.mp3", "にがい": "tts_43.mp3", "にがく": "tts_44.mp3", "にがくて": "tts_45.mp3", "このへやは（___）すぎてちょっとこわいです。": "tts_46.mp3", "しずか": "tts_47.mp3", "しずかな": "tts_48.mp3", "しずかで": "tts_49.mp3", "しずかに": "tts_50.mp3", "エアコンがあります（___）こわれています。": "tts_51.mp3", "が": "tts_52.mp3", "で": "tts_53.mp3", "と": "tts_54.mp3", "に": "tts_55.mp3", "かります": "tts_56.mp3", "けします": "tts_57.mp3", "じょうず": "tts_58.mp3", "はじめます": "tts_59.mp3", "ずっと": "tts_60.mp3", "パソコン": "tts_61.mp3", "うけつけ": "tts_62.mp3", "かいぎしつ": "tts_63.mp3", "しょくどう": "tts_64.mp3", "じむしょ": "tts_65.mp3", "ファクス": "tts_66.mp3", "コピーき": "tts_67.mp3", "エアコン": "tts_68.mp3", "あけます": "tts_69.mp3", "しめます": "tts_70.mp3", "つけます": "tts_71.mp3", "ぶちょう": "tts_72.mp3", "かちょう": "tts_73.mp3", "しゃちょう": "tts_74.mp3", "てんちょう": "tts_75.mp3", "しゃいん": "tts_76.mp3", "かいしゃ": "tts_77.mp3", "せんせい": "tts_78.mp3", "自分": "tts_79.mp3", "電話": "tts_80.mp3", "電気": "tts_81.mp3", "車": "tts_82.mp3", "送ります": "tts_83.mp3", "使います": "tts_84.mp3", "日本に（___）、３年になります。": "tts_85.mp3", "きます": "tts_86.mp3", "くる": "tts_87.mp3", "きて": "tts_88.mp3", "こない": "tts_89.mp3", "かんじを（___）て、６か月になります。": "tts_90.mp3", "べんきょうし": "tts_91.mp3", "べんきょうして": "tts_92.mp3", "べんきょうす": "tts_93.mp3", "べんきょうする": "tts_94.mp3", "この本を（___）でもいいですか。": "tts_95.mp3", "よみます": "tts_96.mp3", "よむ": "tts_97.mp3", "よん": "tts_98.mp3", "よんで": "tts_99.mp3", "ここで（___）てもいいですか。": "tts_100.mp3", "すわります": "tts_101.mp3", "すわる": "tts_102.mp3", "すわっ": "tts_103.mp3", "すわって": "tts_104.mp3"};
 
+    let historyState = [];
     let currentQuestionIndex = 0;
     let selectedOption = null;
     let isChecked = false;
+    let displayMode = 'normal'; // 'normal' or 'listen'
     
     const ui = {
         title: document.getElementById('q-title'),
-        subtitle: document.getElementById('q-subtitle'),
         content: document.getElementById('q-content'),
+        qCard: document.getElementById('q-card'),
+        listenCard: document.getElementById('listen-card'),
         optionsContainer: document.getElementById('options-container'),
         btnCheck: document.getElementById('btn-check'),
         bottomBar: document.getElementById('bottom-bar'),
@@ -323,186 +250,11 @@
         header: document.getElementById('header')
     };
 
-    const ttsMap = {"あいさつ": "tts_1.mp3", "オフィス": "tts_2.mp3", "がいこくじん": "tts_3.mp3", "くうこう": "tts_4.mp3", "シャワー": "tts_5.mp3", "たんとう": "tts_6.mp3", "でんき": "tts_7.mp3", "でんわ": "tts_8.mp3", "でんしゃ": "tts_9.mp3", "でんち": "tts_10.mp3", "きっぷ": "tts_11.mp3", "にもつ": "tts_12.mp3", "さいふ": "tts_13.mp3", "かばん": "tts_14.mp3", "あつい": "tts_15.mp3", "つめたい": "tts_16.mp3", "さめます": "tts_17.mp3", "あたたかい": "tts_18.mp3", "おかね": "tts_19.mp3", "ねだん": "tts_20.mp3", "きゅうりょう": "tts_21.mp3", "りょうきん": "tts_22.mp3", "びん": "tts_23.mp3", "パスポート": "tts_24.mp3", "ビザ": "tts_25.mp3", "おくります": "tts_26.mp3", "むかえます": "tts_27.mp3", "まちます": "tts_28.mp3", "よびます": "tts_29.mp3", "会社": "tts_30.mp3", "本社": "tts_31.mp3", "午前": "tts_32.mp3", "出張": "tts_33.mp3", "空港": "tts_34.mp3", "到着": "tts_35.mp3", "わたしは日本に（___）ことがあります。": "tts_36.mp3", "行きます": "tts_37.mp3", "行く": "tts_38.mp3", "行った": "tts_39.mp3", "行かない": "tts_40.mp3", "このコーヒーは（___）すぎます。": "tts_41.mp3", "にが": "tts_42.mp3", "にがい": "tts_43.mp3", "にがく": "tts_44.mp3", "にがくて": "tts_45.mp3", "このへやは（___）すぎてちょっとこわいです。": "tts_46.mp3", "しずか": "tts_47.mp3", "しずかな": "tts_48.mp3", "しずかで": "tts_49.mp3", "しずかに": "tts_50.mp3", "エアコンがあります（___）こわれています。": "tts_51.mp3", "が": "tts_52.mp3", "で": "tts_53.mp3", "と": "tts_54.mp3", "に": "tts_55.mp3", "かります": "tts_56.mp3", "けします": "tts_57.mp3", "じょうず": "tts_58.mp3", "はじめます": "tts_59.mp3", "ずっと": "tts_60.mp3", "パソコン": "tts_61.mp3", "うけつけ": "tts_62.mp3", "かいぎしつ": "tts_63.mp3", "しょくどう": "tts_64.mp3", "じむしょ": "tts_65.mp3", "ファクス": "tts_66.mp3", "コピーき": "tts_67.mp3", "エアコン": "tts_68.mp3", "あけます": "tts_69.mp3", "しめます": "tts_70.mp3", "つけます": "tts_71.mp3", "ぶちょう": "tts_72.mp3", "かちょう": "tts_73.mp3", "しゃちょう": "tts_74.mp3", "てんちょう": "tts_75.mp3", "しゃいん": "tts_76.mp3", "かいしゃ": "tts_77.mp3", "せんせい": "tts_78.mp3", "自分": "tts_79.mp3", "電話": "tts_80.mp3", "電気": "tts_81.mp3", "車": "tts_82.mp3", "送ります": "tts_83.mp3", "使います": "tts_84.mp3", "日本に（___）、３年になります。": "tts_85.mp3", "きます": "tts_86.mp3", "くる": "tts_87.mp3", "きて": "tts_88.mp3", "こない": "tts_89.mp3", "かんじを（___）て、６か月になります。": "tts_90.mp3", "べんきょうし": "tts_91.mp3", "べんきょうして": "tts_92.mp3", "べんきょうす": "tts_93.mp3", "べんきょうする": "tts_94.mp3", "この本を（___）でもいいですか。": "tts_95.mp3", "よみます": "tts_96.mp3", "よむ": "tts_97.mp3", "よん": "tts_98.mp3", "よんで": "tts_99.mp3", "ここで（___）てもいいですか。": "tts_100.mp3", "すわります": "tts_101.mp3", "すわる": "tts_102.mp3", "すわっ": "tts_103.mp3", "すわって": "tts_104.mp3"};
-
-    function speakJP(text) {
-        if (ttsMap[text]) {
-            const a = new Audio(ttsMap[text]);
-            a.play().catch(e=>console.log(e));
-        }
-    }
-
-
-    function replayQuestionAudio() {
-        speakJP(questions[currentQuestionIndex].content);
-    }
-
-    function toggleHint() {
-        const hint = document.getElementById('q-hint');
-        const btn = document.getElementById('btn-toggle-hint');
-        if (hint.style.display === 'none') {
-            hint.style.display = 'block';
-            btn.innerText = 'Ẩn tiếng Việt';
-        } else {
-            hint.style.display = 'none';
-            btn.innerText = 'Dịch tiếng Việt';
-        }
-    }
-
-    function toggleAnswers() {
-        const container = document.getElementById('options-container');
-        const btn = document.getElementById('btn-toggle-options');
-        if (container.style.display === 'none') {
-            container.style.display = 'grid';
-            btn.innerText = 'Ẩn đáp án';
-        } else {
-            container.style.display = 'none';
-            btn.innerText = 'Hiện đáp án';
-        }
-    }
-
-    function loadQuestion() {
-        if (currentQuestionIndex >= questions.length) {
-            ui.quizScreen.style.display = 'none';
-            ui.header.style.display = 'none';
-            ui.bottomBar.style.display = 'none';
-            ui.endScreen.style.display = 'flex';
-            return;
-        }
-
-        const q = questions[currentQuestionIndex];
-        ui.title.innerText = q.title;
-        ui.subtitle.innerText = q.subtitle;
-        ui.content.innerText = q.content;
-        
-        document.getElementById('q-hint').innerText = q.vi_hint || '';
-        document.getElementById('q-hint').style.display = 'none';
-        
-        const btnHint = document.getElementById('btn-toggle-hint');
-        btnHint.innerText = 'Dịch tiếng Việt';
-        if (q.vi_hint) {
-            btnHint.style.display = 'block';
-        } else {
-            btnHint.style.display = 'none';
-        }
-        
-        if (ttsMap[q.content]) {
-            ui.content.style.cursor = 'pointer';
-        } else {
-            ui.content.style.cursor = 'default';
-        }
-        
-        // Auto-play question if it's Japanese
-        setTimeout(() => speakJP(q.content), 300);
-
-        ui.optionsContainer.innerHTML = '';
-        ui.optionsContainer.style.display = 'none';
-        document.getElementById('btn-toggle-options').style.display = 'block';
-        document.getElementById('btn-toggle-options').innerText = 'Hiện đáp án';
-        selectedOption = null;
-        isChecked = false;
-        
-        q.options.forEach((opt, index) => {
-            const div = document.createElement('div');
-            div.className = 'option';
-            div.innerText = opt;
-            div.onclick = () => {
-                selectOption(div, index);
-                speakJP(opt);
-            };
-            ui.optionsContainer.appendChild(div);
-        });
-
-        // Reset bottom bar
-        ui.bottomBar.className = 'bottom-bar';
-        ui.feedbackContainer.style.display = 'none';
-        ui.btnCheck.className = 'btn-check';
-        ui.btnCheck.innerText = 'Kiểm tra';
-        
-        // Update progress bar
-        const progress = (currentQuestionIndex / questions.length) * 100;
-        ui.progressBar.style.width = progress + '%';
-    }
-
-    function selectOption(el, index) {
-        if (isChecked) return;
-        
-        document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
-        el.classList.add('selected');
-        selectedOption = index;
-        
-        ui.btnCheck.classList.add('active');
-    }
-
     const audioCorrect = new Audio('duolingo-correct.mp3');
     const audioWrong = new Audio('duolingo-wrong.mp3');
 
-    function playCorrectSound() {
-        audioCorrect.currentTime = 0;
-        audioCorrect.play().catch(e => console.log(e));
-    }
-
-    function playIncorrectSound() {
-        audioWrong.currentTime = 0;
-        audioWrong.play().catch(e => console.log(e));
-    }
-
-    function onCheckClick() {
-        if (selectedOption === null) return;
-
-        if (!isChecked) {
-            // Check answer
-            isChecked = true;
-            const q = questions[currentQuestionIndex];
-            const isCorrect = selectedOption === q.correct;
-            
-            ui.btnCheck.innerText = 'Tiếp tục';
-            ui.feedbackContainer.style.display = 'block';
-            ui.feedbackExplanation.innerText = q.explanation || "";
-
-            // Disable all options
-            document.querySelectorAll('.option').forEach(opt => opt.classList.add('disabled'));
-            // Hide toggle buttons
-            document.getElementById('btn-toggle-options').style.display = 'none';
-            document.getElementById('btn-toggle-hint').style.display = 'none';
-
-            if (isCorrect) {
-                ui.bottomBar.className = 'bottom-bar correct';
-                ui.feedbackTitle.innerText = 'Chính xác! Làm tốt lắm!';
-                playCorrectSound();
-            } else {
-                ui.bottomBar.className = 'bottom-bar incorrect';
-                ui.feedbackTitle.innerText = 'Chưa đúng rồi!';
-                playIncorrectSound();
-                // Also highlight correct answer
-                document.querySelectorAll('.option')[q.correct].style.borderColor = '#58cc02';
-                document.querySelectorAll('.option')[q.correct].style.color = '#58cc02';
-            }
-        } else {
-            // Save history BEFORE moving to next question
-            historyState.push({
-                index: currentQuestionIndex,
-                qs: JSON.parse(JSON.stringify(questions))
-            });
-
-            // Move to next question
-            const q = questions[currentQuestionIndex];
-            if (selectedOption === q.correct) {
-                currentQuestionIndex++;
-            } else {
-                // Duolingo logic: push failed question to the end of the array
-                questions.push(questions.splice(currentQuestionIndex, 1)[0]);
-                // do not increase currentQuestionIndex
-            }
-            saveState(); // Save progress
-            loadQuestion();
-        }
-    }
-
-    let historyState = [];
-
     function saveState() {
-        localStorage.setItem('jap183_saved', JSON.stringify({
+        localStorage.setItem('jap_state', JSON.stringify({
             index: currentQuestionIndex,
             qs: questions,
             hist: historyState
@@ -510,7 +262,7 @@
     }
 
     function loadState() {
-        const saved = localStorage.getItem('jap183_saved');
+        const saved = localStorage.getItem('jap_state');
         if (saved) {
             try {
                 const state = JSON.parse(saved);
@@ -531,8 +283,8 @@
     }
 
     function restartApp() {
-        if(confirm("Bạn có chắc chắn muốn làm lại từ đầu không? Toàn bộ tiến trình sẽ bị xóa.")) {
-            localStorage.removeItem('jap183_saved');
+        if(confirm("Làm lại từ đầu? Mọi tiến trình sẽ bị xoá.")) {
+            localStorage.removeItem('jap_state');
             location.reload();
         }
     }
@@ -545,7 +297,144 @@
             saveState();
             loadQuestion();
         } else {
-            alert("Đây là câu hỏi đầu tiên, không thể quay lại được nữa!");
+            alert("Đây là câu đầu tiên!");
+        }
+    }
+
+    function speakJP(text) {
+        if (ttsMap[text]) {
+            const a = new Audio(ttsMap[text]);
+            a.play().catch(e=>console.log(e));
+        }
+    }
+
+    function replayQuestionAudio() {
+        speakJP(questions[currentQuestionIndex].content);
+    }
+
+    function toggleHint() {
+        const hint = document.getElementById('q-hint');
+        const btn = document.getElementById('btn-toggle-hint');
+        if (hint.style.display === 'none') {
+            hint.style.display = 'block';
+            btn.innerText = 'Ẩn dịch nghĩa';
+        } else {
+            hint.style.display = 'none';
+            btn.innerText = 'Dịch nghĩa';
+        }
+    }
+
+    function loadQuestion() {
+        if (currentQuestionIndex >= questions.length) {
+            ui.quizScreen.style.display = 'none';
+            ui.header.style.display = 'none';
+            ui.bottomBar.style.display = 'none';
+            ui.endScreen.style.display = 'flex';
+            return;
+        }
+
+        const q = questions[currentQuestionIndex];
+        
+        // Randomize mode: 30% chance for Listening if it has audio and is vocab
+        displayMode = 'normal';
+        if (q.type === 'vocab' && ttsMap[q.content] && Math.random() < 0.3) {
+            displayMode = 'listen';
+        }
+
+        if (displayMode === 'listen') {
+            ui.title.innerText = "Lắng nghe và chọn đáp án";
+            ui.qCard.style.display = 'none';
+            ui.listenCard.style.display = 'block';
+            document.getElementById('btn-toggle-hint').style.display = 'none'; // hide hint in listen mode
+        } else {
+            ui.title.innerText = q.title;
+            ui.qCard.style.display = 'flex';
+            ui.listenCard.style.display = 'none';
+            ui.content.innerText = q.content;
+            
+            document.getElementById('q-hint').innerText = q.vi_hint || '';
+            document.getElementById('q-hint').style.display = 'none';
+            
+            const btnHint = document.getElementById('btn-toggle-hint');
+            btnHint.innerText = 'Dịch nghĩa';
+            btnHint.style.display = q.vi_hint ? 'inline-block' : 'none';
+        }
+        
+        // Auto-play
+        setTimeout(() => speakJP(q.content), 300);
+
+        ui.optionsContainer.innerHTML = '';
+        selectedOption = null;
+        isChecked = false;
+        
+        q.options.forEach((opt, index) => {
+            const div = document.createElement('div');
+            div.className = 'option';
+            div.innerText = opt;
+            div.onclick = () => {
+                if (isChecked) return;
+                document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                div.classList.add('selected');
+                selectedOption = index;
+                ui.btnCheck.classList.add('active');
+                speakJP(opt);
+            };
+            ui.optionsContainer.appendChild(div);
+        });
+
+        // Reset bottom bar
+        ui.bottomBar.className = 'bottom-bar';
+        ui.feedbackContainer.style.display = 'none';
+        ui.btnCheck.className = 'btn-check';
+        ui.btnCheck.innerText = 'KIỂM TRA';
+        
+        const progress = (currentQuestionIndex / questions.length) * 100;
+        ui.progressBar.style.width = progress + '%';
+    }
+
+    function onCheckClick() {
+        if (selectedOption === null) return;
+        const q = questions[currentQuestionIndex];
+
+        if (!isChecked) {
+            isChecked = true;
+            const isCorrect = selectedOption === q.correct;
+            
+            ui.btnCheck.innerText = 'TIẾP TỤC';
+            ui.feedbackContainer.style.display = 'block';
+            ui.feedbackExplanation.innerText = q.explanation || "";
+
+            document.querySelectorAll('.option').forEach(opt => opt.classList.add('disabled'));
+            document.getElementById('btn-toggle-hint').style.display = 'none';
+
+            if (isCorrect) {
+                ui.bottomBar.className = 'bottom-bar correct';
+                ui.feedbackTitle.innerText = 'Chính xác! Làm tốt lắm!';
+                audioCorrect.currentTime = 0;
+                audioCorrect.play().catch(e=>e);
+            } else {
+                ui.bottomBar.className = 'bottom-bar incorrect';
+                ui.feedbackTitle.innerText = 'Chưa đúng rồi!';
+                audioWrong.currentTime = 0;
+                audioWrong.play().catch(e=>e);
+                
+                const correctOpt = document.querySelectorAll('.option')[q.correct];
+                correctOpt.style.borderColor = 'var(--red)';
+                correctOpt.style.color = 'var(--red)';
+            }
+        } else {
+            historyState.push({
+                index: currentQuestionIndex,
+                qs: JSON.parse(JSON.stringify(questions))
+            });
+
+            if (selectedOption === q.correct) {
+                currentQuestionIndex++;
+            } else {
+                questions.push(questions.splice(currentQuestionIndex, 1)[0]);
+            }
+            saveState();
+            loadQuestion();
         }
     }
 </script>
