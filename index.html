@@ -193,6 +193,7 @@
     
     <div id="listen-card" style="display:none; text-align:center; margin-bottom:40px;">
         <button class="listen-btn" onclick="replayQuestionAudio()">🔊</button>
+        <button onclick="disableListening()" style="margin-top:20px; background:none; border:none; color:var(--gray-dark); font-weight:700; font-size:16px; cursor:pointer; text-decoration:underline;">Không thể nghe lúc này</button>
     </div>
     
     
@@ -229,7 +230,8 @@
     let currentQuestionIndex = 0;
     let selectedOption = null;
     let isChecked = false;
-    let displayMode = 'normal'; // 'normal' or 'listen'
+    let displayMode = 'normal';
+    let canListen = true; // 'normal' or 'listen'
     
     const ui = {
         title: document.getElementById('q-title'),
@@ -306,6 +308,13 @@
         }
     }
 
+    
+    function disableListening() {
+        canListen = false;
+        displayMode = 'normal';
+        renderCurrentMode();
+    }
+
     function replayQuestionAudio() {
         speakJP(questions[currentQuestionIndex].content);
     }
@@ -323,32 +332,28 @@
 
         const q = questions[currentQuestionIndex];
         
-        // Randomize mode: 30% chance for Listening if it has audio and is vocab
         displayMode = 'normal';
-        if (q.type === 'vocab' && ttsMap[q.content] && Math.random() < 0.3) {
+        if (canListen && q.type === 'vocab' && ttsMap[q.content] && Math.random() < 0.3) {
             displayMode = 'listen';
         }
+        
+        renderCurrentMode();
+    }
 
+    function renderCurrentMode() {
+        const q = questions[currentQuestionIndex];
+        
         if (displayMode === 'listen') {
             ui.title.innerText = "Lắng nghe và chọn đáp án";
             ui.qCard.style.display = 'none';
             ui.listenCard.style.display = 'block';
-            
         } else {
             ui.title.innerText = q.title;
             ui.qCard.style.display = 'flex';
             ui.listenCard.style.display = 'none';
             ui.content.innerText = q.content;
-            
-            
-            
-            
-            
-            
-            
         }
         
-        // Auto-play
         setTimeout(() => speakJP(q.content), 300);
 
         ui.optionsContainer.innerHTML = '';
@@ -370,7 +375,6 @@
             ui.optionsContainer.appendChild(div);
         });
 
-        // Reset bottom bar
         ui.bottomBar.className = 'bottom-bar';
         ui.feedbackContainer.style.display = 'none';
         ui.btnCheck.className = 'btn-check';
