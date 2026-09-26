@@ -423,6 +423,12 @@
     function onCheckClick() {
         const q = activeQuestions[currentQuestionIndex];
         if (!ui.btnCheck.classList.contains('active')) return;
+        
+        // Dừng mic nếu người dùng ấn kiểm tra
+        if (isRecording) {
+            isRecording = false;
+            recognition.stop();
+        }
 
         if (!isChecked) {
             isChecked = true;
@@ -568,8 +574,18 @@
             if(!accumulatedSpeech) speechResult.innerText = "Lỗi mic: " + event.error;
         };
         recognition.onend = () => {
-            resetMicBtn();
-            // We do NOT auto submit here anymore. Let the user press Check!
+            if (isRecording) {
+                // Trình duyệt tự tắt do im lặng quá lâu -> Tự động bật lại!
+                try {
+                    recognition.start();
+                    return; // Đừng đổi UI
+                } catch(e) {
+                    resetMicBtn();
+                }
+            } else {
+                resetMicBtn();
+            }
+            
             if (!accumulatedSpeech && !speechResult.innerText.includes('Lỗi')) {
                 speechResult.innerText = "Đã ngắt thu âm. Nhấn KIỂM TRA để nộp hoặc nhấn Mic nói lại.";
             }
@@ -582,7 +598,8 @@
     }
 
     function skipSpeaking() {
-        if(isRecording && recognition) recognition.stop();
+        isRecording = false;
+        if(recognition) recognition.stop();
         accumulatedSpeech = "SKIP_SPEAKING";
         ui.btnCheck.classList.add('active');
         onCheckClick();
