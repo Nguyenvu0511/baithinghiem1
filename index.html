@@ -109,15 +109,25 @@
         .start-tooltip { position: absolute; top: -28px; left: 5px; z-index: 10; background-color: white; border: 2px solid var(--neutral-200); border-radius: 12px; padding: 8px 12px; font-weight: 900; font-size: 15px; color: var(--green-500); animation: bounce 2s infinite; }
         @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-10px); } 60% { transform: translateY(-5px); } }
         
-        @keyframes micPulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 75, 75, 0.4); }
-            70% { box-shadow: 0 0 0 20px rgba(255, 75, 75, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 75, 75, 0); }
+        .listen-btn {
+            background: var(--blue);
+            width: 80px; height: 80px; font-size: 30px; border-radius: 50%;
+            margin: 0 auto; border: none; cursor: pointer; color: white;
+            box-shadow: 0 6px 0 var(--blue-dark); transition: 0.1s;
         }
+        .listen-btn:active {
+            transform: translateY(4px); box-shadow: 0 2px 0 var(--blue-dark);
+        }
+        
+        @keyframes micPulse {
+            0% { box-shadow: 0 6px 0 var(--red-dark), 0 0 0 0 rgba(255, 75, 75, 0.7); }
+            70% { box-shadow: 0 6px 0 var(--red-dark), 0 0 0 25px rgba(255, 75, 75, 0); }
+            100% { box-shadow: 0 6px 0 var(--red-dark), 0 0 0 0 rgba(255, 75, 75, 0); }
+        }
+        
         .mic-recording {
             background: var(--red) !important;
-            box-shadow: 0 6px 0 var(--red-dark) !important;
-            animation: micPulse 1.5s infinite;
+            animation: micPulse 1.5s infinite !important;
         }
     </style>
 </head>
@@ -151,8 +161,8 @@
             <div class="flashcard-reveal" id="fc-reveal" style="display:none;">Tap to reveal</div>
         </div>
         <div id="mic-container" style="margin-top: 20px;">
-            <button id="btn-mic" class="listen-btn" style="background:var(--blue); width:80px; height:80px; font-size:30px; border-radius:50%; margin: 0 auto; box-shadow: 0 6px 0 var(--blue-dark); transition: 0.2s;">🎤</button>
-            <div id="speech-result" style="margin-top: 20px; font-weight: 800; font-size: 18px; color: var(--gray-dark);">Nhấn Mic để đọc câu trên</div>
+            <button id="btn-mic" class="listen-btn">🎤</button>
+            <div id="speech-result" style="margin-top: 20px; font-weight: 800; font-size: 18px; color: var(--gray-dark);">Bấm Mic để nói. Xong thì bấm nút KIỂM TRA.</div>
             <button onclick="skipSpeaking()" style="margin-top:20px; background:none; border:none; color:var(--neutral-400); font-weight:700; font-size:16px; cursor:pointer; text-decoration:underline;">Không thể nói lúc này</button>
         </div>
     </div>
@@ -374,7 +384,7 @@
             document.getElementById('q-title').innerText = "Đọc to câu sau";
             ui.fcText.innerText = isKanaMode ? q.q_kana : q.q_kanji;
             ui.btnCheck.classList.remove('active');
-            if(speechResult) speechResult.innerText = "Nhấn Mic để đọc câu trên";
+            if(speechResult) speechResult.innerText = "Bấm Mic để nói. Xong thì bấm nút KIỂM TRA.";
         } else {
             ui.sortingMode.style.display = 'flex'; ui.sortingMode.style.flexDirection = 'column'; ui.readingMode.style.display = 'none';
             document.getElementById('q-title').innerText = "Nghe và sắp xếp câu trả lời";
@@ -561,7 +571,7 @@
             resetMicBtn();
             // We do NOT auto submit here anymore. Let the user press Check!
             if (!accumulatedSpeech && !speechResult.innerText.includes('Lỗi')) {
-                speechResult.innerText = "Nhấn Mic để đọc lại.";
+                speechResult.innerText = "Đã ngắt thu âm. Nhấn KIỂM TRA để nộp hoặc nhấn Mic nói lại.";
             }
         }
     }
