@@ -123,7 +123,10 @@
 </div>
 
 <header id="header" style="display:none;">
-    <div class="close-btn" onclick="backToMap()">✖</div>
+    <div style="display:flex; gap:15px; align-items:center;">
+        <div class="close-btn" onclick="backToMap()" title="Thoát">✖</div>
+        <div class="back-btn" onclick="goBack()" title="Quay lại" style="cursor:pointer; font-size:28px; color:var(--gray-dark); font-weight:900; transition:0.2s;">❮</div>
+    </div>
     <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
     <button class="toggle-btn" id="btn-toggle" onclick="toggleKana()">あ/漢</button>
 </header>
@@ -184,6 +187,7 @@
     let isKanaMode = false;
     let currentAnswerBlocks = []; 
     let wordBankState = []; 
+    let historyStack = [];
     
     let completedLevels = JSON.parse(localStorage.getItem('jap183_completed') || '[]');
 
@@ -207,17 +211,32 @@
 
     const audioCorrect = new Audio('duolingo-correct.mp3');
     const audioWrong = new Audio('duolingo-wrong.mp3');
+    let currentAudio = null;
+
+    // Session Persistence
+    function saveSession() {
+        const sessionData = {
+            levelIndex: currentLevelIndex,
+            questionIndex: currentQuestionIndex,
+            activeQuestions: activeQuestions,
+            history: historyStack,
+            isKanaMode: isKanaMode
+        };
+        localStorage.setItem('jap183_session', JSON.stringify(sessionData));
+    }
+
+    function clearSession() {
+        localStorage.removeItem('jap183_session');
+    }
     
     function toggleKana() {
         isKanaMode = !isKanaMode;
         ui.btnToggle.className = isKanaMode ? 'toggle-btn active' : 'toggle-btn';
         renderCurrentQuestion();
+        saveSession();
     }
 
-    let currentAudio = null;
-
     function speakJP(text) {
-        // Remove spaces for TTS key matching
         const key = text.replace(/ /g, '');
         if (ttsMap[key]) {
             if (currentAudio) {
@@ -237,7 +256,7 @@
     function renderLevels() {
         const container = document.getElementById('level-container');
         container.innerHTML = '';
-        const numLevels = Math.ceil(questions.length / 5); // 5 questions per level
+        const numLevels = Math.ceil(questions.length / 5);
         
         let activeLevel = 0;
         while(completedLevels.includes(activeLevel) && activeLevel < numLevels) activeLevel++;
@@ -272,18 +291,35 @@
             wrapper.appendChild(btn); container.appendChild(wrapper);
         }
     }
-    renderLevels();
 
     function startLevel(index) {
         currentLevelIndex = index;
         const start = index * 5;
         activeQuestions = JSON.parse(JSON.stringify(questions.slice(start, start + 5)));
+        currentQuestionIndex = 0;
+        historyStack = [];
+        saveSession();
+        
         document.getElementById('start-overlay').style.display = 'none';
         document.getElementById('header').style.display = 'flex';
         ui.quizScreen.style.display = 'flex';
         ui.bottomBar.style.display = 'flex';
-        currentQuestionIndex = 0;
         loadQuestion();
+    }
+
+    function goBack() {
+        if (historyStack.length > 0) {
+            const prevState = historyStack.pop();
+            currentQuestionIndex = prevState.qIndex;
+            activeQuestions = prevState.activeQ;
+            
+            if (recognition && btnMic.style.background === 'var(--red)') {
+                recognition.stop();
+            }
+            
+            saveSession();
+            loadQuestion();
+        }
     }
 
     function loadQuestion() {
@@ -292,6 +328,7 @@
                 completedLevels.push(currentLevelIndex);
                 localStorage.setItem('jap183_completed', JSON.stringify(completedLevels));
             }
+            clearSession();
             ui.quizScreen.style.display = 'none'; document.getElementById('header').style.display = 'none'; ui.bottomBar.style.display = 'none';
             document.getElementById('end-screen').style.display = 'flex'; return;
         }
@@ -303,7 +340,6 @@
         ui.progressBar.style.width = ((currentQuestionIndex / activeQuestions.length) * 100) + '%';
         
         if (q.type === 'sorting') {
-            // Randomize blocks
             const targetArray = isKanaMode ? q.a_kana_chunks : q.a_kanji_chunks;
             let blocks = targetArray.map((text, i) => ({ text, id: i, kanji: q.a_kanji_chunks[i], kana: q.a_kana_chunks[i] }));
             wordBankState = blocks.sort(() => Math.random() - 0.5);
@@ -317,19 +353,19 @@
 
     function renderCurrentQuestion() {
         const q = activeQuestions[currentQuestionIndex];
+        ui.btnToggle.className = isKanaMode ? 'toggle-btn active' : 'toggle-btn';
         
         if (q.type === 'reading') {
             ui.sortingMode.style.display = 'none'; ui.readingMode.style.display = 'block';
             document.getElementById('q-title').innerText = "Đọc to câu sau";
             ui.fcText.innerText = isKanaMode ? q.q_kana : q.q_kanji;
-            ui.btnCheck.classList.remove('active'); // Must speak or skip
+            ui.btnCheck.classList.remove('active');
             if(speechResult) speechResult.innerText = "Nhấn Mic để đọc câu trên";
         } else {
             ui.sortingMode.style.display = 'flex'; ui.sortingMode.style.flexDirection = 'column'; ui.readingMode.style.display = 'none';
             document.getElementById('q-title').innerText = "Nghe và sắp xếp câu trả lời";
             ui.qSpeech.innerText = isKanaMode ? q.q_kana : q.q_kanji;
             
-            // Re-render drop zone
             ui.dropZone.innerHTML = '';
             currentAnswerBlocks.forEach((b, i) => {
                 const d = document.createElement('div'); d.className = 'word-chunk'; 
@@ -338,7 +374,6 @@
                 ui.dropZone.appendChild(d);
             });
 
-            // Re-render word bank
             ui.wordBank.innerHTML = '';
             wordBankState.forEach((b, i) => {
                 const d = document.createElement('div'); d.className = 'word-chunk';
@@ -371,17 +406,14 @@
             ui.feedbackContainer.style.display = 'block';
 
             if (q.type === 'reading') {
-                // Always correct for reading
                 ui.bottomBar.className = 'bottom-bar correct';
                 ui.feedbackTitle.innerText = 'Tốt lắm!';
                 ui.feedbackExplanation.innerHTML = `Hãy chắc chắn bạn đã đọc đúng nhé.<br><br><b>${q.q_kana}</b><br>${q.vi}`;
                 audioCorrect.currentTime = 0; audioCorrect.play().catch(e=>e);
             } else {
-                // Verify sorting
                 const userIds = currentAnswerBlocks.map(b => b.id).join(',');
                 const correctIds = q.a_kanji_chunks.map((_, i) => i).join(',');
                 const isCorrect = userIds === correctIds;
-
                 const fullKana = q.a_kana_chunks.join('');
                 if (isCorrect) {
                     ui.bottomBar.className = 'bottom-bar correct';
@@ -397,6 +429,11 @@
                 }
             }
         } else {
+            historyStack.push({
+                qIndex: currentQuestionIndex,
+                activeQ: JSON.parse(JSON.stringify(activeQuestions))
+            });
+
             if (q.type === 'reading') {
                 currentQuestionIndex++;
             } else {
@@ -405,11 +442,14 @@
                 if (userIds === correctIds) currentQuestionIndex++;
                 else activeQuestions.push(activeQuestions.splice(currentQuestionIndex, 1)[0]);
             }
+            saveSession();
             loadQuestion();
         }
     }
 
     function backToMap() {
+        if(document.getElementById('quiz-screen').style.display !== 'none' && !confirm("Cậu có chắc chắn muốn thoát? Quá trình của ải này sẽ bị hủy bỏ.")) return;
+        clearSession();
         document.getElementById('quiz-screen').style.display = 'none';
         document.getElementById('header').style.display = 'none';
         document.getElementById('bottom-bar').style.display = 'none';
@@ -465,26 +505,20 @@
 
     function checkSpeech(transcript) {
         const q = activeQuestions[currentQuestionIndex];
-        
         const clean = (str) => str.replace(/[。、\s]/g, '');
         const targetKanji = clean(q.q_kanji);
         const targetKana = clean(q.q_kana);
         const spoken = clean(transcript);
         
-        // Fuzzy match: check if they share a good portion of characters
         let matchCount = 0;
         for(let char of spoken) {
-            if (targetKanji.includes(char) || targetKana.includes(char)) {
-                matchCount++;
-            }
+            if (targetKanji.includes(char) || targetKana.includes(char)) matchCount++;
         }
-        
         const similarity = matchCount / Math.max(spoken.length, targetKanji.length);
         
         if (similarity > 0.5 || spoken === targetKanji || spoken === targetKana) {
-            // Correct!
             ui.btnCheck.classList.add('active');
-            onCheckClick(); // Auto verify
+            onCheckClick();
         } else {
             speechResult.innerHTML = `Nghe được: <span style="color:var(--red); font-weight:900; font-size:20px;">${transcript}</span><br>Chưa chuẩn lắm, thử lại nhé!`;
             audioWrong.currentTime = 0; audioWrong.play().catch(e=>e);
@@ -495,7 +529,28 @@
         ui.btnCheck.classList.add('active');
         onCheckClick();
     }
-    // ============================
+
+    // Check existing session on load
+    window.onload = () => {
+        renderLevels();
+        const saved = localStorage.getItem('jap183_session');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                currentLevelIndex = data.levelIndex;
+                currentQuestionIndex = data.questionIndex;
+                activeQuestions = data.activeQuestions;
+                historyStack = data.history || [];
+                isKanaMode = data.isKanaMode || false;
+                
+                document.getElementById('start-overlay').style.display = 'none';
+                document.getElementById('header').style.display = 'flex';
+                ui.quizScreen.style.display = 'flex';
+                ui.bottomBar.style.display = 'flex';
+                loadQuestion();
+            } catch(e) {}
+        }
+    };
 
 </script>
 </body>
