@@ -108,6 +108,17 @@
         
         .start-tooltip { position: absolute; top: -28px; left: 5px; z-index: 10; background-color: white; border: 2px solid var(--neutral-200); border-radius: 12px; padding: 8px 12px; font-weight: 900; font-size: 15px; color: var(--green-500); animation: bounce 2s infinite; }
         @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-10px); } 60% { transform: translateY(-5px); } }
+        
+        @keyframes micPulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 75, 75, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 75, 75, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 75, 75, 0); }
+        }
+        .mic-recording {
+            background: var(--red) !important;
+            box-shadow: 0 6px 0 var(--red-dark) !important;
+            animation: micPulse 1.5s infinite;
+        }
     </style>
 </head>
 <body>
@@ -356,6 +367,9 @@
         ui.btnToggle.className = isKanaMode ? 'toggle-btn active' : 'toggle-btn';
         
         if (q.type === 'reading') {
+            accumulatedSpeech = "";
+            isRecording = false;
+            if(btnMic) btnMic.classList.remove('mic-recording');
             ui.sortingMode.style.display = 'none'; ui.readingMode.style.display = 'block';
             document.getElementById('q-title').innerText = "Đọc to câu sau";
             ui.fcText.innerText = isKanaMode ? q.q_kana : q.q_kanji;
@@ -406,10 +420,35 @@
             ui.feedbackContainer.style.display = 'block';
 
             if (q.type === 'reading') {
-                ui.bottomBar.className = 'bottom-bar correct';
-                ui.feedbackTitle.innerText = 'Tốt lắm!';
-                ui.feedbackExplanation.innerHTML = `Hãy chắc chắn bạn đã đọc đúng nhé.<br><br><b>${q.q_kana}</b><br>${q.vi}`;
-                audioCorrect.currentTime = 0; audioCorrect.play().catch(e=>e);
+                if (accumulatedSpeech === "SKIP_SPEAKING") {
+                    ui.bottomBar.className = 'bottom-bar correct';
+                    ui.feedbackTitle.innerText = 'Đã bỏ qua';
+                    ui.feedbackExplanation.innerHTML = `Hãy luyện đọc lại câu này nhé:<br><br><b>${q.q_kana}</b><br>${q.vi}`;
+                    audioCorrect.currentTime = 0; audioCorrect.play().catch(e=>e);
+                } else {
+                    const clean = (str) => str.replace(/[。、\s]/g, '');
+                    const targetKanji = clean(q.q_kanji);
+                    const targetKana = clean(q.q_kana);
+                    const spoken = clean(accumulatedSpeech);
+                    
+                    let matchCount = 0;
+                    for(let char of spoken) {
+                        if (targetKanji.includes(char) || targetKana.includes(char)) matchCount++;
+                    }
+                    const similarity = matchCount / Math.max(spoken.length, targetKanji.length);
+                    
+                    if (similarity > 0.5 || spoken === targetKanji || spoken === targetKana || targetKanji.includes(spoken) || targetKana.includes(spoken)) {
+                        ui.bottomBar.className = 'bottom-bar correct';
+                        ui.feedbackTitle.innerText = 'Phát âm chuẩn!';
+                        ui.feedbackExplanation.innerHTML = `<b>${q.q_kana}</b><br>${q.vi}`;
+                        audioCorrect.currentTime = 0; audioCorrect.play().catch(e=>e);
+                    } else {
+                        ui.bottomBar.className = 'bottom-bar incorrect';
+                        ui.feedbackTitle.innerText = 'Chưa chính xác!';
+                        ui.feedbackExplanation.innerHTML = `Hệ thống nghe được:<br><span style="color:var(--red-dark); font-weight:bold;">${accumulatedSpeech}</span><br><br>Đáp án đúng:<br><b>${q.q_kana}</b>`;
+                        audioWrong.currentTime = 0; audioWrong.play().catch(e=>e);
+                    }
+                }
             } else {
                 const userIds = currentAnswerBlocks.map(b => b.id).join(',');
                 const correctIds = q.a_kanji_chunks.map((_, i) => i).join(',');
@@ -461,10 +500,14 @@
     // ==== SPEECH RECOGNITION ====
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
+    let isRecording = false;
+    let accumulatedSpeech = "";
+
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
         recognition.lang = 'ja-JP';
-        recognition.interimResults = false;
+        recognition.continuous = true;
+        recognition.interimResults = true;
         recognition.maxAlternatives = 1;
     }
 
@@ -477,59 +520,64 @@
                 alert("Trình duyệt của bạn không hỗ trợ thu âm (Hãy dùng Chrome/Edge)!");
                 return;
             }
-            btnMic.style.background = 'var(--red)';
-            btnMic.style.boxShadow = '0 6px 0 var(--red-dark)';
+            if (isRecording) {
+                recognition.stop();
+                return;
+            }
+            accumulatedSpeech = '';
+            isRecording = true;
+            btnMic.classList.add('mic-recording');
             speechResult.innerText = "Đang nghe...";
+            ui.btnCheck.classList.remove('active');
             recognition.start();
         };
     }
 
     if (recognition) {
         recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            checkSpeech(transcript);
+            let interimTranscript = '';
+            let finalTranscript = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript;
+                } else {
+                    interimTranscript += event.results[i][0].transcript;
+                }
+            }
+            
+            accumulatedSpeech += finalTranscript;
+            const fullTranscript = accumulatedSpeech + interimTranscript;
+            speechResult.innerHTML = `Nghe được: <span style="color:var(--blue); font-weight:900;">${fullTranscript}</span>`;
+            
+            if (fullTranscript.trim().length > 0) {
+                ui.btnCheck.classList.add('active'); // Allow manual check
+            }
         };
         recognition.onerror = (event) => {
-            speechResult.innerText = "Lỗi mic: " + event.error;
             resetMicBtn();
+            if(!accumulatedSpeech) speechResult.innerText = "Lỗi mic: " + event.error;
         };
         recognition.onend = () => {
             resetMicBtn();
+            // We do NOT auto submit here anymore. Let the user press Check!
+            if (!accumulatedSpeech && !speechResult.innerText.includes('Lỗi')) {
+                speechResult.innerText = "Nhấn Mic để đọc lại.";
+            }
         }
     }
 
     function resetMicBtn() {
-        btnMic.style.background = 'var(--blue)';
-        btnMic.style.boxShadow = '0 6px 0 var(--blue-dark)';
-    }
-
-    function checkSpeech(transcript) {
-        const q = activeQuestions[currentQuestionIndex];
-        const clean = (str) => str.replace(/[。、\s]/g, '');
-        const targetKanji = clean(q.q_kanji);
-        const targetKana = clean(q.q_kana);
-        const spoken = clean(transcript);
-        
-        let matchCount = 0;
-        for(let char of spoken) {
-            if (targetKanji.includes(char) || targetKana.includes(char)) matchCount++;
-        }
-        const similarity = matchCount / Math.max(spoken.length, targetKanji.length);
-        
-        if (similarity > 0.5 || spoken === targetKanji || spoken === targetKana) {
-            ui.btnCheck.classList.add('active');
-            onCheckClick();
-        } else {
-            speechResult.innerHTML = `Nghe được: <span style="color:var(--red); font-weight:900; font-size:20px;">${transcript}</span><br>Chưa chuẩn lắm, thử lại nhé!`;
-            audioWrong.currentTime = 0; audioWrong.play().catch(e=>e);
-        }
+        isRecording = false;
+        if(btnMic) btnMic.classList.remove('mic-recording');
     }
 
     function skipSpeaking() {
+        if(isRecording && recognition) recognition.stop();
+        accumulatedSpeech = "SKIP_SPEAKING";
         ui.btnCheck.classList.add('active');
         onCheckClick();
     }
-
+    
     // Check existing session on load
     window.onload = () => {
         renderLevels();
@@ -551,7 +599,6 @@
             } catch(e) {}
         }
     };
-
 </script>
 </body>
 </html>
