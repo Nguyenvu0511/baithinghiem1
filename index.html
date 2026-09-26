@@ -161,7 +161,12 @@
             <div class="flashcard-reveal" id="fc-reveal" style="display:none;">Tap to reveal</div>
         </div>
         <div id="mic-container" style="margin-top: 20px;">
-            <button id="btn-mic" class="listen-btn">🎤</button>
+            
+            <div style="display:flex; justify-content:center; align-items:center; gap: 20px;">
+                <button id="btn-mic" class="listen-btn">🎤</button>
+                <button id="btn-clear-mic" style="background:var(--neutral-200); border:none; width:50px; height:50px; border-radius:50%; font-size:24px; cursor:pointer; box-shadow: 0 4px 0 var(--neutral-400); color:var(--text-main);" onclick="clearSpeech()" title="Làm lại từ đầu">↻</button>
+            </div>
+
             <div id="speech-result" style="margin-top: 20px; font-weight: 800; font-size: 18px; color: var(--gray-dark);">Bấm Mic để nói. Xong thì bấm nút KIỂM TRA.</div>
             <button onclick="skipSpeaking()" style="margin-top:20px; background:none; border:none; color:var(--neutral-400); font-weight:700; font-size:16px; cursor:pointer; text-decoration:underline;">Không thể nói lúc này</button>
         </div>
@@ -541,7 +546,14 @@
                 recognition.stop();
                 return;
             }
-            accumulatedSpeech = '';
+            
+            // If they are retrying after an incorrect guess, clear it automatically
+            if (ui.bottomBar.classList.contains('incorrect')) {
+                accumulatedSpeech = '';
+                ui.bottomBar.className = 'bottom-bar';
+                ui.bottomBar.style.display = 'none';
+            }
+            
             isRecording = true;
             btnMic.classList.add('mic-recording');
             speechResult.innerText = "Đang nghe...";
@@ -574,28 +586,28 @@
             resetMicBtn();
             if(!accumulatedSpeech) speechResult.innerText = "Lỗi mic: " + event.error;
         };
-        recognition.onend = () => {
-            if (isRecording) {
-                // Trình duyệt tự tắt do im lặng quá lâu -> Tự động bật lại!
-                try {
-                    recognition.start();
-                    return; // Đừng đổi UI
-                } catch(e) {
-                    resetMicBtn();
-                }
-            } else {
-                resetMicBtn();
+                recognition.onend = () => {
+            resetMicBtn();
+            if (accumulatedSpeech) {
+                speechResult.innerHTML = `Nghe được: <span style="color:var(--blue); font-weight:900;">${accumulatedSpeech}</span><br><span style="font-size:14px; color:#777;">(Mic đã tạm ngắt. Nhấn Mic để nói tiếp, hoặc nhấn C làm lại)</span>`;
+            } else if (!speechResult.innerText.includes('Lỗi')) {
+                speechResult.innerText = "Đã ngắt thu âm. Nhấn Mic để thử lại.";
             }
-            
-            if (!accumulatedSpeech && !speechResult.innerText.includes('Lỗi')) {
-                speechResult.innerText = "Đã ngắt thu âm. Nhấn KIỂM TRA để nộp hoặc nhấn Mic nói lại.";
-            }
+        }
         }
     }
 
     function resetMicBtn() {
         isRecording = false;
         if(btnMic) btnMic.classList.remove('mic-recording');
+    }
+
+    
+    function clearSpeech() {
+        if(isRecording && recognition) recognition.stop();
+        accumulatedSpeech = '';
+        speechResult.innerText = "Đã xoá. Nhấn Mic để đọc lại từ đầu.";
+        ui.btnCheck.classList.remove('active');
     }
 
     function skipSpeaking() {
