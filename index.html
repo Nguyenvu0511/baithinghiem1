@@ -131,10 +131,15 @@
 <main id="quiz-screen" style="display:none;">
     <h1 class="title" id="q-title">Phát âm câu sau</h1>
     
-    <div id="reading-mode" style="display:none; width: 100%;">
+    <div id="reading-mode" style="display:none; width: 100%; text-align: center;">
         <div class="flashcard" id="flashcard" onclick="flipCard()">
             <div id="fc-text">Kanji text</div>
             <div class="flashcard-reveal" id="fc-reveal" style="display:none;">Tap to reveal</div>
+        </div>
+        <div id="mic-container" style="margin-top: 20px;">
+            <button id="btn-mic" class="listen-btn" style="background:var(--blue); width:80px; height:80px; font-size:30px; border-radius:50%; margin: 0 auto; box-shadow: 0 6px 0 var(--blue-dark); transition: 0.2s;">🎤</button>
+            <div id="speech-result" style="margin-top: 20px; font-weight: 800; font-size: 18px; color: var(--gray-dark);">Nhấn Mic để đọc câu trên</div>
+            <button onclick="skipSpeaking()" style="margin-top:20px; background:none; border:none; color:var(--neutral-400); font-weight:700; font-size:16px; cursor:pointer; text-decoration:underline;">Không thể nói lúc này</button>
         </div>
     </div>
 
@@ -317,7 +322,8 @@
             ui.sortingMode.style.display = 'none'; ui.readingMode.style.display = 'block';
             document.getElementById('q-title').innerText = "Đọc to câu sau";
             ui.fcText.innerText = isKanaMode ? q.q_kana : q.q_kanji;
-            ui.btnCheck.classList.add('active'); // Always clickable in reading mode
+            ui.btnCheck.classList.remove('active'); // Must speak or skip
+            if(speechResult) speechResult.innerText = "Nhấn Mic để đọc câu trên";
         } else {
             ui.sortingMode.style.display = 'flex'; ui.sortingMode.style.flexDirection = 'column'; ui.readingMode.style.display = 'none';
             document.getElementById('q-title').innerText = "Nghe và sắp xếp câu trả lời";
@@ -411,6 +417,86 @@
         document.getElementById('start-overlay').style.display = 'flex';
         renderLevels();
     }
+
+    // ==== SPEECH RECOGNITION ====
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'ja-JP';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+    }
+
+    const btnMic = document.getElementById('btn-mic');
+    const speechResult = document.getElementById('speech-result');
+
+    if (btnMic) {
+        btnMic.onclick = () => {
+            if (!recognition) {
+                alert("Trình duyệt của bạn không hỗ trợ thu âm (Hãy dùng Chrome/Edge)!");
+                return;
+            }
+            btnMic.style.background = 'var(--red)';
+            btnMic.style.boxShadow = '0 6px 0 var(--red-dark)';
+            speechResult.innerText = "Đang nghe...";
+            recognition.start();
+        };
+    }
+
+    if (recognition) {
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            checkSpeech(transcript);
+        };
+        recognition.onerror = (event) => {
+            speechResult.innerText = "Lỗi mic: " + event.error;
+            resetMicBtn();
+        };
+        recognition.onend = () => {
+            resetMicBtn();
+        }
+    }
+
+    function resetMicBtn() {
+        btnMic.style.background = 'var(--blue)';
+        btnMic.style.boxShadow = '0 6px 0 var(--blue-dark)';
+    }
+
+    function checkSpeech(transcript) {
+        const q = activeQuestions[currentQuestionIndex];
+        
+        const clean = (str) => str.replace(/[。、\s]/g, '');
+        const targetKanji = clean(q.q_kanji);
+        const targetKana = clean(q.q_kana);
+        const spoken = clean(transcript);
+        
+        // Fuzzy match: check if they share a good portion of characters
+        let matchCount = 0;
+        for(let char of spoken) {
+            if (targetKanji.includes(char) || targetKana.includes(char)) {
+                matchCount++;
+            }
+        }
+        
+        const similarity = matchCount / Math.max(spoken.length, targetKanji.length);
+        
+        if (similarity > 0.5 || spoken === targetKanji || spoken === targetKana) {
+            // Correct!
+            ui.btnCheck.classList.add('active');
+            onCheckClick(); // Auto verify
+        } else {
+            speechResult.innerHTML = `Nghe được: <span style="color:var(--red); font-weight:900; font-size:20px;">${transcript}</span><br>Chưa chuẩn lắm, thử lại nhé!`;
+            audioWrong.currentTime = 0; audioWrong.play().catch(e=>e);
+        }
+    }
+
+    function skipSpeaking() {
+        ui.btnCheck.classList.add('active');
+        onCheckClick();
+    }
+    // ============================
+
 </script>
 </body>
 </html>
