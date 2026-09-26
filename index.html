@@ -209,11 +209,18 @@
         renderCurrentQuestion();
     }
 
+    let currentAudio = null;
+
     function speakJP(text) {
         // Remove spaces for TTS key matching
         const key = text.replace(/ /g, '');
         if (ttsMap[key]) {
-            new Audio(ttsMap[key]).play().catch(e=>e);
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+            currentAudio = new Audio(ttsMap[key]);
+            currentAudio.play().catch(e=>console.log(e));
         }
     }
 
