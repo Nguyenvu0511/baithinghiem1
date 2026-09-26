@@ -109,6 +109,7 @@
         .start-tooltip { position: absolute; top: -28px; left: 5px; z-index: 10; background-color: white; border: 2px solid var(--neutral-200); border-radius: 12px; padding: 8px 12px; font-weight: 900; font-size: 15px; color: var(--green-500); animation: bounce 2s infinite; }
         @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-10px); } 60% { transform: translateY(-5px); } }
         
+        /* FIX MIC CSS */
         .listen-btn {
             background: var(--blue);
             width: 80px; height: 80px; font-size: 30px; border-radius: 50%;
@@ -118,13 +119,11 @@
         .listen-btn:active {
             transform: translateY(4px); box-shadow: 0 2px 0 var(--blue-dark);
         }
-        
         @keyframes micPulse {
             0% { box-shadow: 0 6px 0 var(--red-dark), 0 0 0 0 rgba(255, 75, 75, 0.7); }
             70% { box-shadow: 0 6px 0 var(--red-dark), 0 0 0 25px rgba(255, 75, 75, 0); }
             100% { box-shadow: 0 6px 0 var(--red-dark), 0 0 0 0 rgba(255, 75, 75, 0); }
         }
-        
         .mic-recording {
             background: var(--red) !important;
             animation: micPulse 1.5s infinite !important;
@@ -166,7 +165,7 @@
                 <button id="btn-mic" class="listen-btn">🎤</button>
                 <button id="btn-clear-mic" style="background:var(--neutral-200); border:none; width:50px; height:50px; border-radius:50%; font-size:24px; cursor:pointer; box-shadow: 0 4px 0 var(--neutral-400); color:var(--text-main);" onclick="clearSpeech()" title="Làm lại từ đầu">↻</button>
             </div>
-
+            
             <div id="speech-result" style="margin-top: 20px; font-weight: 800; font-size: 18px; color: var(--gray-dark);">Bấm Mic để nói. Xong thì bấm nút KIỂM TRA.</div>
             <button onclick="skipSpeaking()" style="margin-top:20px; background:none; border:none; color:var(--neutral-400); font-weight:700; font-size:16px; cursor:pointer; text-decoration:underline;">Không thể nói lúc này</button>
         </div>
@@ -239,7 +238,6 @@
     const audioWrong = new Audio('duolingo-wrong.mp3');
     let currentAudio = null;
 
-    // Session Persistence
     function saveSession() {
         const sessionData = {
             levelIndex: currentLevelIndex,
@@ -429,7 +427,7 @@
         const q = activeQuestions[currentQuestionIndex];
         if (!ui.btnCheck.classList.contains('active')) return;
         
-        // Dừng mic nếu người dùng ấn kiểm tra
+        // Stop recording immediately if Check is clicked
         if (isRecording) {
             isRecording = false;
             recognition.stop();
@@ -582,19 +580,20 @@
                 ui.btnCheck.classList.add('active'); // Allow manual check
             }
         };
+        
         recognition.onerror = (event) => {
             resetMicBtn();
             if(!accumulatedSpeech) speechResult.innerText = "Lỗi mic: " + event.error;
         };
-                recognition.onend = () => {
+        
+        recognition.onend = () => {
             resetMicBtn();
             if (accumulatedSpeech) {
-                speechResult.innerHTML = `Nghe được: <span style="color:var(--blue); font-weight:900;">${accumulatedSpeech}</span><br><span style="font-size:14px; color:#777;">(Mic đã tạm ngắt. Nhấn Mic để nói tiếp, hoặc nhấn C làm lại)</span>`;
+                speechResult.innerHTML = `Nghe được: <span style="color:var(--blue); font-weight:900;">${accumulatedSpeech}</span><br><span style="font-size:14px; color:#777;">(Mic tạm ngắt. Nhấn Mic đọc tiếp hoặc nhấn ↻ làm lại)</span>`;
             } else if (!speechResult.innerText.includes('Lỗi')) {
                 speechResult.innerText = "Đã ngắt thu âm. Nhấn Mic để thử lại.";
             }
-        }
-        }
+        };
     }
 
     function resetMicBtn() {
@@ -602,12 +601,15 @@
         if(btnMic) btnMic.classList.remove('mic-recording');
     }
 
-    
     function clearSpeech() {
         if(isRecording && recognition) recognition.stop();
         accumulatedSpeech = '';
         speechResult.innerText = "Đã xoá. Nhấn Mic để đọc lại từ đầu.";
         ui.btnCheck.classList.remove('active');
+        if (ui.bottomBar.classList.contains('incorrect')) {
+            ui.bottomBar.className = 'bottom-bar';
+            ui.bottomBar.style.display = 'none';
+        }
     }
 
     function skipSpeaking() {
