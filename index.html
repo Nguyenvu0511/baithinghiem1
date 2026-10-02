@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Duolingo Clone - JAP 183 Kaiwa Test</title>
+    <title>Duolingo Clone - JAP 183 Vocab</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -18,22 +18,11 @@
         * { box-sizing: border-box; user-select: none; font-family: 'Nunito', sans-serif; }
         body { margin: 0; background: var(--bg); color: var(--text-main); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        /* HEADER */
         header { display: flex; align-items: center; justify-content: space-between; padding: 20px; max-width: 800px; margin: 0 auto; width: 100%; }
         .close-btn { cursor: pointer; font-size: 28px; color: var(--gray-dark); font-weight: 900; width: 40px; text-align: center; transition: 0.2s; }
         .progress-bar-bg { flex-grow: 1; background: var(--gray); height: 16px; border-radius: 8px; margin: 0 15px; position: relative; overflow: hidden; }
         .progress-bar-fill { background: var(--green-500); height: 100%; width: 0%; border-radius: 8px; transition: width 0.3s ease-out; position: relative; }
         
-        /* TOGGLE BUTTON */
-        .toggle-btn {
-            background: #fff; border: 2px solid var(--gray); border-bottom: 4px solid var(--gray);
-            border-radius: 10px; padding: 5px 10px; font-weight: 900; color: var(--gray-dark);
-            cursor: pointer; font-size: 14px;
-        }
-        .toggle-btn.active { border-color: var(--blue); color: var(--blue); background: #ddf4ff; }
-        .toggle-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
-
-        /* MAIN */
         main { flex-grow: 1; display: flex; flex-direction: column; max-width: 600px; margin: 0 auto; width: 100%; padding: 0 20px; overflow-y: auto; padding-bottom: 150px; }
         h1.title { font-size: 24px; font-weight: 800; margin-bottom: 20px; color: var(--text-main); }
         
@@ -49,39 +38,25 @@
         .audio-btn { background: var(--blue); color: #fff; border: none; border-radius: 12px; padding: 10px; font-size: 20px; cursor: pointer; box-shadow: 0 4px 0 var(--blue-dark); margin-right: 15px; }
         .audio-btn:active { transform: translateY(4px); box-shadow: none; }
 
-        /* READING MODE */
-        .flashcard {
-            border: 2px solid var(--gray); border-radius: 15px; padding: 40px 20px; text-align: center;
-            font-size: 28px; font-weight: 900; margin-bottom: 30px; cursor: pointer; border-bottom: 6px solid var(--gray);
-            background: #fff; transition: 0.1s;
-        }
-        .flashcard:active { transform: translateY(4px); border-bottom-width: 2px; }
-        .flashcard-reveal { font-size: 18px; color: var(--blue); font-weight: 700; margin-top: 15px; }
-
-        /* SORTING MODE */
-        .drop-zone {
-            display: flex; flex-wrap: wrap; gap: 10px; min-height: 60px; padding: 10px 0;
-            border-bottom: 2px solid var(--gray); margin-bottom: 20px;
-        }
-        .word-bank { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-        .word-chunk {
+        /* MCQ MODE */
+        .mcq-option {
             background: #fff; border: 2px solid var(--gray); border-bottom: 4px solid var(--gray);
-            border-radius: 12px; padding: 10px 15px; font-size: 20px; font-weight: 700;
-            cursor: pointer; transition: 0.1s; display: inline-block;
+            border-radius: 15px; padding: 20px 15px; font-size: 18px; font-weight: 700; color: var(--text-main);
+            cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center; text-align: center;
         }
-        .word-chunk:active { transform: translateY(2px); border-bottom-width: 2px; }
-        .word-chunk.placeholder { background: var(--gray); border-color: var(--gray); color: transparent; pointer-events: none; }
+        .mcq-option:active { transform: translateY(2px); border-bottom-width: 2px; }
+        .mcq-option.selected { border-color: var(--blue); background: #ddf4ff; color: var(--blue); }
 
         /* BOTTOM BAR */
         .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px; border-top: 2px solid var(--gray); background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99999; }
         .bottom-bar.correct { background: #d7ffb8; border-color: #d7ffb8; }
         .bottom-bar.incorrect { background: #ffdfe0; border-color: #ffdfe0; }
-        .bottom-content { max-width: 800px; width: 100%; display: flex; align-items: center; justify-content: space-between; }
+        .bottom-content { max-width: 800px; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 15px; }
         .feedback { display: none; flex-grow: 1; padding-right: 15px; }
         .feedback h2 { margin: 0 0 5px 0; font-size: 24px; font-weight: 900; }
         .bottom-bar.correct .feedback h2 { color: var(--green-600); }
         .bottom-bar.incorrect .feedback h2 { color: var(--red-dark); }
-        .feedback .explanation { font-size: 16px; font-weight: 700; color: #777; }
+        .feedback .explanation { font-size: 16px; font-weight: 700; color: #555; line-height: 1.4; }
         .btn-check {
             background: var(--neutral-200); color: var(--neutral-400); border: none; border-radius: 15px; padding: 15px 30px; font-size: 18px; font-weight: 800;
             text-transform: uppercase; letter-spacing: 1px; cursor: default; transition: 0.1s; min-width: 150px; border-bottom: 4px solid var(--neutral-200);
@@ -92,7 +67,7 @@
 
         /* START OVERLAY */
         #start-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: #fff; z-index:9999; display:flex; flex-direction:column; align-items:center; overflow-y: auto; padding: 20px; }
-        .unit-banner { background-color: var(--green-500); color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 550px; }
+        .unit-banner { background-color: var(--green-500); color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 550px; box-shadow: 0 4px 0 var(--green-600); }
         .path-container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 550px; padding-bottom: 50px; }
         
         .lesson-node-wrapper { position: relative; height: 102px; width: 102px; margin-top: 24px; display: flex; align-items: center; justify-content: center; }
@@ -108,26 +83,6 @@
         
         .start-tooltip { position: absolute; top: -28px; left: 5px; z-index: 10; background-color: white; border: 2px solid var(--neutral-200); border-radius: 12px; padding: 8px 12px; font-weight: 900; font-size: 15px; color: var(--green-500); animation: bounce 2s infinite; }
         @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-10px); } 60% { transform: translateY(-5px); } }
-        
-        /* FIX MIC CSS */
-        .listen-btn {
-            background: var(--blue);
-            width: 80px; height: 80px; font-size: 30px; border-radius: 50%;
-            margin: 0 auto; border: none; cursor: pointer; color: white;
-            box-shadow: 0 6px 0 var(--blue-dark); transition: 0.1s;
-        }
-        .listen-btn:active {
-            transform: translateY(4px); box-shadow: 0 2px 0 var(--blue-dark);
-        }
-        @keyframes micPulse {
-            0% { box-shadow: 0 6px 0 var(--red-dark), 0 0 0 0 rgba(255, 75, 75, 0.7); }
-            70% { box-shadow: 0 6px 0 var(--red-dark), 0 0 0 25px rgba(255, 75, 75, 0); }
-            100% { box-shadow: 0 6px 0 var(--red-dark), 0 0 0 0 rgba(255, 75, 75, 0); }
-        }
-        .mic-recording {
-            background: var(--red) !important;
-            animation: micPulse 1.5s infinite !important;
-        }
     </style>
 </head>
 <body>
@@ -135,8 +90,8 @@
 <div id="start-overlay">
     <div class="unit-banner">
         <div>
-            <h2 style="margin: 0; font-size: 22px; font-weight: 900;">JAP 183 Kaiwa</h2>
-            <p style="margin: 5px 0 0 0; font-size: 17px; font-weight: 700; opacity: 0.9;">Bài thi giữa kỳ (20 câu)</p>
+            <h2 style="margin: 0; font-size: 22px; font-weight: 900;">Từ Vựng Tiếng Nhật</h2>
+            <p style="margin: 5px 0 0 0; font-size: 17px; font-weight: 700; opacity: 0.9;">Học tốc tốc mai thi! (77 từ)</p>
         </div>
     </div>
     <div class="path-container" id="level-container"></div>
@@ -148,39 +103,19 @@
         <div class="back-btn" onclick="goBack()" title="Quay lại" style="cursor:pointer; font-size:28px; color:var(--gray-dark); font-weight:900; transition:0.2s;">❮</div>
     </div>
     <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-bar"></div></div>
-    <button class="toggle-btn" id="btn-toggle" onclick="toggleKana()">あ/漢</button>
 </header>
 
 <main id="quiz-screen" style="display:none;">
-    <h1 class="title" id="q-title">Phát âm câu sau</h1>
+    <h1 class="title" id="q-title">Chọn nghĩa tiếng Việt đúng</h1>
     
-    <div id="reading-mode" style="display:none; width: 100%; text-align: center;">
-        <div class="flashcard" id="flashcard" onclick="flipCard()">
-            <div id="fc-text">Kanji text</div>
-            <div class="flashcard-reveal" id="fc-reveal" style="display:none;">Tap to reveal</div>
+    <div id="mcq-mode" style="display:none; width: 100%; text-align: center;">
+        <div style="display:flex; align-items:center; justify-content:center; gap: 15px; margin-bottom:10px;">
+            <button class="audio-btn" onclick="playQuestionAudio()" style="margin:0; width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center;">🔊</button>
+            <div style="font-size: 60px; font-weight: 900; color: var(--text-main);" id="mcq-kanji">漢</div>
         </div>
-        <div id="mic-container" style="margin-top: 20px;">
-            
-            <div style="display:flex; justify-content:center; align-items:center; gap: 20px;">
-                <button id="btn-mic" class="listen-btn">🎤</button>
-                <button id="btn-clear-mic" style="background:var(--neutral-200); border:none; width:50px; height:50px; border-radius:50%; font-size:24px; cursor:pointer; box-shadow: 0 4px 0 var(--neutral-400); color:var(--text-main);" onclick="clearSpeech()" title="Làm lại từ đầu">↻</button>
-            </div>
-            
-            <div id="speech-result" style="margin-top: 20px; font-weight: 800; font-size: 18px; color: var(--gray-dark);">Bấm Mic để nói. Xong thì bấm nút KIỂM TRA.</div>
-            <button onclick="skipSpeaking()" style="margin-top:20px; background:none; border:none; color:var(--neutral-400); font-weight:700; font-size:16px; cursor:pointer; text-decoration:underline;">Không thể nói lúc này</button>
+        <div style="font-size: 24px; color: var(--blue); margin-bottom: 30px; font-weight: 800;" id="mcq-kana">かんじ</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;" id="mcq-options">
         </div>
-    </div>
-
-    <div id="sorting-mode" style="display:none; width: 100%;">
-        <div class="mascot-area">
-            <div class="mascot"></div>
-            <div class="speech-bubble">
-                <button class="audio-btn" onclick="playQuestionAudio()">🔊</button>
-                <span id="q-speech">Question</span>
-            </div>
-        </div>
-        <div class="drop-zone" id="drop-zone"></div>
-        <div class="word-bank" id="word-bank"></div>
     </div>
 </main>
 
@@ -201,37 +136,31 @@
 </div>
 
 <script>
-    const questions = [{"id": 1, "type": "reading", "q_kanji": "たなかさんに 東京で 会ったことがあります。", "q_kana": "たなかさんに とうきょうで あったことがあります。", "vi": "Tôi đã từng gặp anh Tanaka ở Tokyo."}, {"id": 2, "type": "reading", "q_kanji": "このコピーき を 使ってもいいですか。", "q_kana": "このコピーきを つかってもいいですか。", "vi": "Tôi có thể sử dụng máy photocopy này được không?"}, {"id": 3, "type": "reading", "q_kanji": "食事のとき、おはしとフォークと どちらがいいですか。", "q_kana": "しょくじのとき、おはしとフォークと どちらがいいですか。", "vi": "Khi ăn, đũa và dĩa cái nào tốt hơn?"}, {"id": 4, "type": "reading", "q_kanji": "私はコンピューターの 会社で はたらいています。", "q_kana": "わたしはコンピューターの かいしゃで はたらいています。", "vi": "Tôi đang làm việc tại một công ty máy tính."}, {"id": 5, "type": "reading", "q_kanji": "私は毎日、うちから 駅まで 30分ぐらい 歩きます。", "q_kana": "わたしはまいにち、うちから えきまで 30ぷんぐらい あるきます。", "vi": "Hàng ngày tôi đi bộ từ nhà đến ga khoảng 30 phút."}, {"id": 6, "type": "sorting", "q_kanji": "いま 何を いちばんしたいですか。", "q_kana": "いま なにを いちばんしたいですか。", "a_kanji_chunks": ["いま、", "日本へ", "行きたい", "です。"], "a_kana_chunks": ["いま、", "にほんへ", "いきたい", "です。"], "vi": "Bây giờ bạn muốn làm gì nhất? -> Bây giờ, tôi muốn đi Nhật."}, {"id": 7, "type": "sorting", "q_kanji": "どんな 味の食べ物が 好きですか。", "q_kana": "どんな あじのたべものが すきですか。", "a_kanji_chunks": ["甘い", "食べ物が", "好き", "です。"], "a_kana_chunks": ["あまい", "たべものが", "すき", "です。"], "vi": "Bạn thích đồ ăn vị gì? -> Tôi thích đồ ăn ngọt."}, {"id": 8, "type": "sorting", "q_kanji": "ピクニックのとき 何をもっていきますか。", "q_kana": "ピクニックのとき なにをもっていきますか。", "a_kanji_chunks": ["お弁当と", "お茶を", "もって", "いきます。"], "a_kana_chunks": ["おべんとうと", "おちゃを", "もって", "いきます。"], "vi": "Khi đi dã ngoại bạn mang theo gì? -> Tôi mang theo cơm hộp và trà."}, {"id": 9, "type": "sorting", "q_kanji": "ペン・けいたいでんわを 借りてもいいですか。", "q_kana": "ペン・けいたいでんわを かりてもいいですか。", "a_kanji_chunks": ["はい、", "どうぞ。"], "a_kana_chunks": ["はい、", "どうぞ。"], "vi": "Tôi có thể mượn bút / điện thoại được không? -> Vâng, xin mời."}, {"id": 10, "type": "sorting", "q_kanji": "日本料理を 食べたことが ありますか。", "q_kana": "にほんりょうりを たべたことが ありますか。", "a_kanji_chunks": ["はい、", "あります。", "すしを", "食べました。"], "a_kana_chunks": ["はい、", "あります。", "すしを", "たべました。"], "vi": "Bạn đã từng ăn món ăn Nhật chưa? -> Vâng, có. Tôi đã ăn sushi."}, {"id": 11, "type": "sorting", "q_kanji": "趣味は なんですか。週に何回 していますか。", "q_kana": "しゅみは なんですか。しゅうになんかい していますか。", "a_kanji_chunks": ["私の", "趣味は", "スポーツです。", "1週間に", "2回ぐらい", "しています。"], "a_kana_chunks": ["わたしの", "しゅみは", "スポーツです。", "いっしゅうかんに", "にかいぐらい", "しています。"], "vi": "Sở thích của bạn là gì? Mỗi tuần bạn làm mấy lần? -> Sở thích của tôi là thể thao. 1 tuần tôi tập khoảng 2 lần."}, {"id": 12, "type": "sorting", "q_kanji": "どんな国に きょうみが ありますか。", "q_kana": "どんなくにに きょうみが ありますか。", "a_kanji_chunks": ["日本に", "きょうみが", "あります。", "日本の", "食べ物に", "きょうみが", "あります。"], "a_kana_chunks": ["にほんに", "きょうみが", "あります。", "にほんの", "たべものに", "きょうみが", "あります。"], "vi": "Bạn hứng thú với đất nước nào? -> Tôi hứng thú với Nhật Bản. Tôi hứng thú với đồ ăn Nhật."}, {"id": 13, "type": "sorting", "q_kanji": "お茶と ジュースと どちらがいいですか。", "q_kana": "おちゃと ジュースと どちらがいいですか。", "a_kanji_chunks": ["お茶の", "ほうが", "いいです。"], "a_kana_chunks": ["おちゃの", "ほうが", "いいです。"], "vi": "Trà và nước hoa quả, cái nào tốt hơn? -> Trà tốt hơn."}, {"id": 14, "type": "sorting", "q_kanji": "寝る前に、何をしますか。", "q_kana": "ねるまえに、なにをしますか。", "a_kanji_chunks": ["寝る", "前に、", "本を", "読みます。"], "a_kana_chunks": ["ねる", "まえに、", "ほんを", "よみます。"], "vi": "Trước khi ngủ bạn làm gì? -> Trước khi ngủ tôi đọc sách."}, {"id": 15, "type": "sorting", "q_kanji": "ジョギングを する前に、何をしますか。", "q_kana": "ジョギングを するまえに、なにをしますか。", "a_kanji_chunks": ["ジョギングを", "するまえに、", "準備運動を", "します。"], "a_kana_chunks": ["ジョギングを", "するまえに、", "じゅんびうんどうを", "します。"], "vi": "Trước khi chạy bộ bạn làm gì? -> Trước khi chạy bộ tôi khởi động."}, {"id": 16, "type": "sorting", "q_kanji": "寝る前に、お風呂に入りますか。", "q_kana": "ねるまえに、おふろにはいりますか。", "a_kanji_chunks": ["寝る", "まえに、", "お風呂に", "入ります。"], "a_kana_chunks": ["ねる", "まえに、", "おふろに", "はいります。"], "vi": "Trước khi ngủ bạn có tắm bồn không? -> Trước khi ngủ tôi tắm bồn."}, {"id": 17, "type": "sorting", "q_kanji": "ごはんを 食べる前に、何をしますか。", "q_kana": "ごはんを たべるまえに、なにをしますか。", "a_kanji_chunks": ["ごはんを", "食べる", "まえに、", "手を", "洗います。"], "a_kana_chunks": ["ごはんを", "たべる", "まえに、", "てを", "あらいます。"], "vi": "Trước khi ăn cơm bạn làm gì? -> Trước khi ăn cơm tôi rửa tay."}, {"id": 18, "type": "sorting", "q_kanji": "泳ぐ前に、何をしますか。", "q_kana": "およぐまえに、なにをしますか。", "a_kanji_chunks": ["泳ぐ", "まえに、", "たいそうを", "します。"], "a_kana_chunks": ["およぐ", "まえに、", "たいそうを", "します。"], "vi": "Trước khi bơi bạn làm gì? -> Trước khi bơi tôi tập thể dục."}, {"id": 19, "type": "sorting", "q_kanji": "友だちは さいきん あまり寝られません。アドバイスをしてください。", "q_kana": "ともだちは さいきん あまりねられません。アドバイスをしてください。", "a_kanji_chunks": ["寝る", "前に、", "温かい", "牛乳を", "飲んだ", "ほうがいいです。"], "a_kana_chunks": ["ねる", "まえに、", "あたたかい", "ぎゅうにゅうを", "のんだ", "ほうがいいです。"], "vi": "Bạn tôi gần đây không ngủ được. Xin hãy cho lời khuyên. -> Trước khi ngủ nên uống sữa ấm."}, {"id": 20, "type": "sorting", "q_kanji": "けんこうのために 何か していますか。", "q_kana": "けんこうのために なにか していますか。", "a_kanji_chunks": ["けんこうの", "ために、", "野菜を", "食べたり、", "運動を", "したり", "しています。"], "a_kana_chunks": ["けんこうの", "ために、", "やさいを", "たべたり、", "うんどうを", "したり", "しています。"], "vi": "Bạn có đang làm gì vì sức khỏe không? -> Vì sức khỏe, tôi ăn rau, tập thể dục..."}];
-    const ttsMap = {"たなかさんにとうきょうであったことがあります。": "tts_1.mp3", "このコピーきをつかってもいいですか。": "tts_2.mp3", "しょくじのとき、おはしとフォークとどちらがいいですか。": "tts_3.mp3", "わたしはコンピューターのかいしゃではたらいています。": "tts_4.mp3", "わたしはまいにち、うちからえきまで30ぷんぐらいあるきます。": "tts_5.mp3", "いまなにをいちばんしたいですか。": "tts_6.mp3", "いま、にほんへいきたいです。": "tts_7.mp3", "いま、": "tts_8.mp3", "日本へ": "tts_9.mp3", "行きたい": "tts_10.mp3", "です。": "tts_11.mp3", "にほんへ": "tts_12.mp3", "いきたい": "tts_13.mp3", "どんなあじのたべものがすきですか。": "tts_14.mp3", "あまいたべものがすきです。": "tts_15.mp3", "甘い": "tts_16.mp3", "食べ物が": "tts_17.mp3", "好き": "tts_18.mp3", "あまい": "tts_19.mp3", "たべものが": "tts_20.mp3", "すき": "tts_21.mp3", "ピクニックのときなにをもっていきますか。": "tts_22.mp3", "おべんとうとおちゃをもっていきます。": "tts_23.mp3", "お弁当と": "tts_24.mp3", "お茶を": "tts_25.mp3", "もって": "tts_26.mp3", "いきます。": "tts_27.mp3", "おべんとうと": "tts_28.mp3", "おちゃを": "tts_29.mp3", "ペン・けいたいでんわをかりてもいいですか。": "tts_30.mp3", "はい、どうぞ。": "tts_31.mp3", "はい、": "tts_32.mp3", "どうぞ。": "tts_33.mp3", "にほんりょうりをたべたことがありますか。": "tts_34.mp3", "はい、あります。すしをたべました。": "tts_35.mp3", "あります。": "tts_36.mp3", "すしを": "tts_37.mp3", "食べました。": "tts_38.mp3", "たべました。": "tts_39.mp3", "しゅみはなんですか。しゅうになんかいしていますか。": "tts_40.mp3", "わたしのしゅみはスポーツです。いっしゅうかんににかいぐらいしています。": "tts_41.mp3", "私の": "tts_42.mp3", "趣味は": "tts_43.mp3", "スポーツです。": "tts_44.mp3", "1週間に": "tts_45.mp3", "2回ぐらい": "tts_46.mp3", "しています。": "tts_47.mp3", "わたしの": "tts_48.mp3", "しゅみは": "tts_49.mp3", "いっしゅうかんに": "tts_50.mp3", "にかいぐらい": "tts_51.mp3", "どんなくににきょうみがありますか。": "tts_52.mp3", "にほんにきょうみがあります。にほんのたべものにきょうみがあります。": "tts_53.mp3", "日本に": "tts_54.mp3", "きょうみが": "tts_55.mp3", "日本の": "tts_56.mp3", "食べ物に": "tts_57.mp3", "にほんに": "tts_58.mp3", "にほんの": "tts_59.mp3", "たべものに": "tts_60.mp3", "おちゃとジュースとどちらがいいですか。": "tts_61.mp3", "おちゃのほうがいいです。": "tts_62.mp3", "お茶の": "tts_63.mp3", "ほうが": "tts_64.mp3", "いいです。": "tts_65.mp3", "おちゃの": "tts_66.mp3", "ねるまえに、なにをしますか。": "tts_67.mp3", "ねるまえに、ほんをよみます。": "tts_68.mp3", "寝る": "tts_69.mp3", "前に、": "tts_70.mp3", "本を": "tts_71.mp3", "読みます。": "tts_72.mp3", "ねる": "tts_73.mp3", "まえに、": "tts_74.mp3", "ほんを": "tts_75.mp3", "よみます。": "tts_76.mp3", "ジョギングをするまえに、なにをしますか。": "tts_77.mp3", "ジョギングをするまえに、じゅんびうんどうをします。": "tts_78.mp3", "ジョギングを": "tts_79.mp3", "するまえに、": "tts_80.mp3", "準備運動を": "tts_81.mp3", "します。": "tts_82.mp3", "じゅんびうんどうを": "tts_83.mp3", "ねるまえに、おふろにはいりますか。": "tts_84.mp3", "ねるまえに、おふろにはいります。": "tts_85.mp3", "お風呂に": "tts_86.mp3", "入ります。": "tts_87.mp3", "おふろに": "tts_88.mp3", "はいります。": "tts_89.mp3", "ごはんをたべるまえに、なにをしますか。": "tts_90.mp3", "ごはんをたべるまえに、てをあらいます。": "tts_91.mp3", "ごはんを": "tts_92.mp3", "食べる": "tts_93.mp3", "手を": "tts_94.mp3", "洗います。": "tts_95.mp3", "たべる": "tts_96.mp3", "てを": "tts_97.mp3", "あらいます。": "tts_98.mp3", "およぐまえに、なにをしますか。": "tts_99.mp3", "およぐまえに、たいそうをします。": "tts_100.mp3", "泳ぐ": "tts_101.mp3", "たいそうを": "tts_102.mp3", "およぐ": "tts_103.mp3", "ともだちはさいきんあまりねられません。アドバイスをしてください。": "tts_104.mp3", "ねるまえに、あたたかいぎゅうにゅうをのんだほうがいいです。": "tts_105.mp3", "温かい": "tts_106.mp3", "牛乳を": "tts_107.mp3", "飲んだ": "tts_108.mp3", "ほうがいいです。": "tts_109.mp3", "あたたかい": "tts_110.mp3", "ぎゅうにゅうを": "tts_111.mp3", "のんだ": "tts_112.mp3", "けんこうのためになにかしていますか。": "tts_113.mp3", "けんこうのために、やさいをたべたり、うんどうをしたりしています。": "tts_114.mp3", "けんこうの": "tts_115.mp3", "ために、": "tts_116.mp3", "野菜を": "tts_117.mp3", "食べたり、": "tts_118.mp3", "運動を": "tts_119.mp3", "したり": "tts_120.mp3", "やさいを": "tts_121.mp3", "たべたり、": "tts_122.mp3", "うんどうを": "tts_123.mp3"};
+    const questions = [{"type": "mcq", "kanji": "止まります", "kana": "とまります", "options": ["Tuần", "Mượn", "Bức ảnh", "Dừng lại"], "correct_index": 3, "mnemonic": "止 (Chỉ): Hình ảnh dấu chân bị vạch ngang chặn lại -> Dừng lại."}, {"type": "mcq", "kanji": "食事", "kana": "しょくじ", "options": ["Chiều (PM)", "Bữa ăn / Dùng bữa", "Kết hôn", "Trong"], "correct_index": 1, "mnemonic": "食 (Thực - ăn), 事 (Sự - việc) -> Việc ăn uống."}, {"type": "mcq", "kanji": "仕事", "kana": "しごと", "options": ["Món ăn, nấu ăn", "Công việc", "Ô tô", "Tàu điện"], "correct_index": 1, "mnemonic": "仕 (Sĩ - làm việc), 事 (Sự - việc) -> Công việc."}, {"type": "mcq", "kanji": "前", "kana": "まえ", "options": ["Trước", "Rau", "Năm ngoái", "Cơ thể"], "correct_index": 0, "mnemonic": "前 (Tiền): Hình ảnh con dao (刂) cắt mặt trăng (月) đem lên phía trước."}, {"type": "mcq", "kanji": "後", "kana": "あと", "options": ["Trong", "Sau", "Năm ngoái", "Đồng hồ"], "correct_index": 1, "mnemonic": "後 (Hậu): Chân bước đi (彳) nhịp nhàng lùi về phía sau."}, {"type": "mcq", "kanji": "朝", "kana": "あさ", "options": ["Năm sau", "Bức ảnh", "Buổi sáng", "Du học"], "correct_index": 2, "mnemonic": "朝 (Triêu): Thập (十) Nhật (日) Thập (十) Nguyệt (月) -> Mặt trời lên, mặt trăng lặn -> Buổi sáng."}, {"type": "mcq", "kanji": "昼", "kana": "ひる", "options": ["Buổi sáng", "Âm nhạc", "Buổi trưa", "Đồ uống"], "correct_index": 2, "mnemonic": "昼 (Trú): Tay cầm thước (尺) đo bóng mặt trời (日) -> Buổi trưa."}, {"type": "mcq", "kanji": "夜", "kana": "よる", "options": ["Buổi tối / Đêm", "Đồ ăn", "Khỏe mạnh", "Văn hóa"], "correct_index": 0, "mnemonic": "夜 (Dạ): Người (亻) đi dưới màn đêm (夕) có mái che (亠) -> Buổi tối."}, {"type": "mcq", "kanji": "乗ります", "kana": "のります", "options": ["Đi công tác", "Trường trung học phổ thông", "Màu sắc", "Lên (xe, tàu)"], "correct_index": 3, "mnemonic": "乗 (Thừa): Hình ảnh người trèo lên cây/xe -> Lên (xe, tàu)."}, {"type": "mcq", "kanji": "学校", "kana": "がっこう", "options": ["Trường học", "Đến nơi", "Mang đi", "Điện thoại"], "correct_index": 0, "mnemonic": "学 (Học: Trẻ em học dưới mái trường), 校 (Hiệu: Cây gỗ làm trường) -> Trường học."}, {"type": "mcq", "kanji": "小学校", "kana": "しょうがっこう", "options": ["Sáng (AM)", "Trường tiểu học", "Mỗi ~", "Dừng lại"], "correct_index": 1, "mnemonic": "Hãy đọc nhẩm '小学校' vài lần cùng nghĩa 'Trường tiểu học' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "中学校", "kana": "ちゅうがっこう", "options": ["Trường trung học cơ sở", "Thức dậy", "Đồng hồ", "Đại học"], "correct_index": 0, "mnemonic": "Hãy đọc nhẩm '中学校' vài lần cùng nghĩa 'Trường trung học cơ sở' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "高校", "kana": "こうこう", "options": ["Học tập", "Đi bộ", "Màu sắc", "Trường trung học phổ thông"], "correct_index": 3, "mnemonic": "Hãy đọc nhẩm '高校' vài lần cùng nghĩa 'Trường trung học phổ thông' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "大学", "kana": "だいがく", "options": ["~ Trước", "Vị", "Đại học", "Đang có bên trong / Chứa"], "correct_index": 2, "mnemonic": "Hãy đọc nhẩm '大学' vài lần cùng nghĩa 'Đại học' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "先生", "kana": "せんせい", "options": ["Chiều (PM)", "Món ăn, nấu ăn", "Âm nhạc", "Giáo viên"], "correct_index": 3, "mnemonic": "先 (Tiên: Đi trước), 生 (Sinh: Sinh ra) -> Người sinh ra trước là Giáo viên."}, {"type": "mcq", "kanji": "学生", "kana": "がくせい", "options": ["Đồng hồ", "Bản thân", "Học sinh, sinh viên", "~ Trước"], "correct_index": 2, "mnemonic": "学 (Học), 生 (Sinh) -> Học sinh, sinh viên."}, {"type": "mcq", "kanji": "～年生", "kana": "～ねんせい", "options": ["~ Lần", "Học sinh năm thứ ~", "Tranh", "Bức ảnh"], "correct_index": 1, "mnemonic": "Hãy đọc nhẩm '～年生' vài lần cùng nghĩa 'Học sinh năm thứ ~' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "勉強", "kana": "べんきょう", "options": ["Học tập", "Thức dậy", "Buổi sáng", "Tàu điện"], "correct_index": 0, "mnemonic": "勉 (Miễn: Nỗ lực), 強 (Cường: Mạnh mẽ) -> Học tập cần nỗ lực mạnh mẽ."}, {"type": "mcq", "kanji": "文化", "kana": "ぶんか", "options": ["Tay", "Văn hóa", "Tai", "Trường trung học phổ thông"], "correct_index": 1, "mnemonic": "文 (Văn), 化 (Hóa) -> Văn hóa."}, {"type": "mcq", "kanji": "音楽", "kana": "おんがく", "options": ["Trường trung học cơ sở", "Bơi", "Chân", "Âm nhạc"], "correct_index": 3, "mnemonic": "音 (Âm: Âm thanh), 楽 (Lạc: Vui vẻ) -> Âm thanh mang lại niềm vui -> Âm nhạc."}, {"type": "mcq", "kanji": "旅行", "kana": "りょこう", "options": ["Chạy", "Du lịch", "Xuất phát", "Giáo viên"], "correct_index": 1, "mnemonic": "旅 (Lữ: Cờ hiệu vẫy gọi), 行 (Hành: Đi) -> Du lịch."}, {"type": "mcq", "kanji": "留学", "kana": "りゅうがく", "options": ["Du học", "Đại học", "Nhà", "Học sinh, sinh viên"], "correct_index": 0, "mnemonic": "Hãy đọc nhẩm '留学' vài lần cùng nghĩa 'Du học' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "友だち", "kana": "ともだち", "options": ["Học tập", "Bạn bè", "Ô tô", "Du lịch"], "correct_index": 1, "mnemonic": "友 (Hữu): Hai bàn tay đan vào nhau -> Bạn bè."}, {"type": "mcq", "kanji": "楽しい", "kana": "たのしい", "options": ["Bơi", "Đầu", "Vui vẻ", "Khỏe mạnh"], "correct_index": 2, "mnemonic": "楽 (Lạc): Nhạc cụ đánh trên cây gỗ đem lại tiếng cười -> Vui vẻ."}, {"type": "mcq", "kanji": "週", "kana": "しゅう", "options": ["Đang có bên trong / Chứa", "Vị", "Tuần", "Điện, đèn điện"], "correct_index": 2, "mnemonic": "週 (Chu): Bộ Xước (辶 - đi) + Cát (吉 - tốt) -> Một tuần trôi qua điềm lành."}, {"type": "mcq", "kanji": "～回", "kana": "～かい", "options": ["~ Này", "Nhà", "~ Lần", "Bạn bè"], "correct_index": 2, "mnemonic": "Hãy đọc nhẩm '～回' vài lần cùng nghĩa '~ Lần' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "食べ物", "kana": "たべもの", "options": ["~ Trước", "Cơ thể", "Sinh nhật", "Đồ ăn"], "correct_index": 3, "mnemonic": "食 (Thực: Ăn) + 物 (Vật: Đồ vật) -> Đồ ăn."}, {"type": "mcq", "kanji": "飲み物", "kana": "のみもの", "options": ["Mượn", "Đồ uống", "~ Trước", "Trường học"], "correct_index": 1, "mnemonic": "飲 (Ẩm: Uống) + 物 (Vật) -> Đồ uống."}, {"type": "mcq", "kanji": "お茶", "kana": "おちゃ", "options": ["Chạy", "Mỗi ~", "Tháng này", "Trà"], "correct_index": 3, "mnemonic": "茶 (Trà): Bộ Thảo (艹 - cây cỏ) trên mái nhà -> Cây trà."}, {"type": "mcq", "kanji": "お酒", "kana": "おさけ", "options": ["Đồ ăn", "Rượu", "Chúc mừng / Quà chúc mừng", "Cơ thể"], "correct_index": 1, "mnemonic": "酒 (Tửu): Nước (氵) đựng trong bình (酉) -> Rượu."}, {"type": "mcq", "kanji": "作ります", "kana": "つくります", "options": ["Làm, chế tạo, nấu", "Học tập", "Văn hóa", "Tuần trước"], "correct_index": 0, "mnemonic": "作 (Tác): Người (亻) đẽo gọt cành cây -> Làm, chế tạo."}, {"type": "mcq", "kanji": "持っていきます", "kana": "もっていきます", "options": ["Mang đi", "Chiều (PM)", "Bản thân", "Bạn bè"], "correct_index": 0, "mnemonic": "持 (Trì): Tay (扌) cầm đồ dâng lên chùa (寺) -> Mang đi."}, {"type": "mcq", "kanji": "お願いします", "kana": "おねがいします", "options": ["Văn hóa", "Mượn", "Làm ơn, nhờ vả", "Vị"], "correct_index": 2, "mnemonic": "Hãy đọc nhẩm 'お願いします' vài lần cùng nghĩa 'Làm ơn, nhờ vả' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "料理", "kana": "りょうり", "options": ["Món ăn, nấu ăn", "Chúc mừng / Quà chúc mừng", "Tàu điện", "Bơi"], "correct_index": 0, "mnemonic": "料 (Liệu: Đong gạo), 理 (Lý: Chế biến) -> Nấu ăn."}, {"type": "mcq", "kanji": "味", "kana": "あじ", "options": ["Vị", "Bức ảnh", "Sử dụng", "Chiều (PM)"], "correct_index": 0, "mnemonic": "Hãy đọc nhẩm '味' vài lần cùng nghĩa 'Vị' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "色", "kana": "いろ", "options": ["Tuần trước", "Buổi tối / Đêm", "Thức dậy", "Màu sắc"], "correct_index": 3, "mnemonic": "Hãy đọc nhẩm '色' vài lần cùng nghĩa 'Màu sắc' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "野菜", "kana": "やさい", "options": ["Rau", "Món ăn, nấu ăn", "Cơ thể", "Buổi tối / Đêm"], "correct_index": 0, "mnemonic": "野 (Dã: Cánh đồng), 菜 (Thái: Rau) -> Rau củ."}, {"type": "mcq", "kanji": "少し", "kana": "すこし", "options": ["Tuần", "Món ăn, nấu ăn", "Học tập", "Một chút"], "correct_index": 3, "mnemonic": "少 (Thiểu): Bốn hạt cát chẻ nhỏ thêm -> Một chút."}, {"type": "mcq", "kanji": "中", "kana": "なか", "options": ["Trong", "Trên", "Khỏe mạnh", "Đồ ăn"], "correct_index": 0, "mnemonic": "Hãy đọc nhẩm '中' vài lần cùng nghĩa 'Trong' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "入っています", "kana": "はいっています", "options": ["Điện thoại", "Đang có bên trong / Chứa", "Trong", "Tàu điện"], "correct_index": 1, "mnemonic": "Hãy đọc nhẩm '入っています' vài lần cùng nghĩa 'Đang có bên trong / Chứa' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "会社", "kana": "かいしゃ", "options": ["Thức dậy", "Một chút", "Năm sau", "Công ty"], "correct_index": 3, "mnemonic": "会 (Hội: Gặp gỡ), 社 (Xã: Thổ địa) -> Nơi mọi người tụ tập -> Công ty."}, {"type": "mcq", "kanji": "本社", "kana": "ほんしゃ", "options": ["Buổi tối / Đêm", "Trụ sở chính", "~ Lần", "Dừng lại"], "correct_index": 1, "mnemonic": "Hãy đọc nhẩm '本社' vài lần cùng nghĩa 'Trụ sở chính' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "支社", "kana": "ししゃ", "options": ["Năm nay", "Nhà", "Tháng này", "Chi nhánh"], "correct_index": 3, "mnemonic": "Hãy đọc nhẩm '支社' vài lần cùng nghĩa 'Chi nhánh' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "出張", "kana": "しゅっちょう", "options": ["Đi công tác", "Đồng hồ", "Bạn bè", "Mặc (áo)"], "correct_index": 0, "mnemonic": "出 (Xuất: Ra ngoài), 張 (Trương: Kéo dài) -> Đi công tác xa."}, {"type": "mcq", "kanji": "空港", "kana": "くうこう", "options": ["Rượu", "Đại học", "Sân bay", "Tháng này"], "correct_index": 2, "mnemonic": "空 (Không: Bầu trời), 港 (Cảng: Bến) -> Bến cảng trên trời -> Sân bay."}, {"type": "mcq", "kanji": "出発", "kana": "しゅっぱつ", "options": ["Mắt", "Xuất phát", "Mặc (áo)", "Trường học"], "correct_index": 1, "mnemonic": "Hãy đọc nhẩm '出発' vài lần cùng nghĩa 'Xuất phát' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "到着", "kana": "とうちゃく", "options": ["Đến nơi", "~ Trước", "Học sinh năm thứ ~", "Trên"], "correct_index": 0, "mnemonic": "Hãy đọc nhẩm '到着' vài lần cùng nghĩa 'Đến nơi' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "午前", "kana": "ごぜん", "options": ["Tay", "Sáng (AM)", "Chiều (PM)", "Khỏe mạnh"], "correct_index": 1, "mnemonic": "午 (Ngọ: Buổi trưa), 前 (Tiền: Trước) -> Trước buổi trưa (Sáng)."}, {"type": "mcq", "kanji": "午後", "kana": "ごご", "options": ["Mỗi sáng", "Làm ơn, nhờ vả", "Chiều (PM)", "Giáo viên"], "correct_index": 2, "mnemonic": "午 (Ngọ: Buổi trưa), 後 (Hậu: Sau) -> Sau buổi trưa (Chiều)."}, {"type": "mcq", "kanji": "自分", "kana": "じぶん", "options": ["Đồ ăn", "Bản thân", "Trường trung học phổ thông", "Điện thoại"], "correct_index": 1, "mnemonic": "Hãy đọc nhẩm '自分' vài lần cùng nghĩa 'Bản thân' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "電話", "kana": "でんわ", "options": ["Dừng lại", "Chi nhánh", "Điện thoại", "~ Lần"], "correct_index": 2, "mnemonic": "電 (Điện: Tia chớp), 話 (Thoại: Lời nói) -> Nói chuyện bằng điện -> Điện thoại."}, {"type": "mcq", "kanji": "電気", "kana": "でんき", "options": ["Mỗi ngày", "Điện, đèn điện", "Sinh nhật", "Dừng lại"], "correct_index": 1, "mnemonic": "Hãy đọc nhẩm '電気' vài lần cùng nghĩa 'Điện, đèn điện' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "電車", "kana": "でんしゃ", "options": ["Màu sắc", "Điện, đèn điện", "Tàu điện", "Tháng này"], "correct_index": 2, "mnemonic": "電 (Điện), 車 (Xa: Xe có bánh) -> Tàu điện."}, {"type": "mcq", "kanji": "車", "kana": "くるま", "options": ["Ô tô", "Năm nay", "Sân bay", "Sử dụng"], "correct_index": 0, "mnemonic": "車 (Xa): Hình ảnh chiếc xe đẩy có bánh và trục -> Ô tô."}, {"type": "mcq", "kanji": "送ります", "kana": "おくります", "options": ["Chi nhánh", "Buổi sáng", "Gửi, tiễn", "Chạy"], "correct_index": 2, "mnemonic": "送 (Tống): Đi (辶) cầm bó đuốc (丷) -> Tiễn, gửi đi."}, {"type": "mcq", "kanji": "使います", "kana": "つかいます", "options": ["Chi nhánh", "Văn hóa", "Sử dụng", "Tay"], "correct_index": 2, "mnemonic": "使 (Sử/Sứ): Người (亻) nhận lệnh làm quan sứ -> Sử dụng."}, {"type": "mcq", "kanji": "借ります", "kana": "かります", "options": ["Mượn", "Điện, đèn điện", "Buổi sáng", "Mang đi"], "correct_index": 0, "mnemonic": "借 (Tá): Người (亻) đi vay tiền ngày xưa -> Mượn."}, {"type": "mcq", "kanji": "体", "kana": "からだ", "options": ["Cơ thể", "Sử dụng", "Làm ơn, nhờ vả", "Sân bay"], "correct_index": 0, "mnemonic": "体 (Thể): Người (亻) là gốc (本) -> Cơ thể con người."}, {"type": "mcq", "kanji": "頭", "kana": "あたま", "options": ["Trường học", "Năm nay", "Đầu", "Đại học"], "correct_index": 2, "mnemonic": "頭 (Đầu): Bộ Hiệt (頁) chỉ cái đầu -> Đầu."}, {"type": "mcq", "kanji": "目", "kana": "め", "options": ["Bên ngoài", "Đang có bên trong / Chứa", "Mắt", "~ Tới / Sau"], "correct_index": 2, "mnemonic": "目 (Mục): Hình ảnh con mắt dựng dọc -> Mắt."}, {"type": "mcq", "kanji": "口", "kana": "くち", "options": ["Đầu", "Gửi, tiễn", "Mỗi ~", "Miệng"], "correct_index": 3, "mnemonic": "口 (Khẩu): Hình ảnh cái miệng mở vuông -> Miệng."}, {"type": "mcq", "kanji": "耳", "kana": "みみ", "options": ["Trường trung học cơ sở", "Tai", "Mặc (áo)", "Học sinh năm thứ ~"], "correct_index": 1, "mnemonic": "耳 (Nhĩ): Hình dáng cái tai người -> Tai."}, {"type": "mcq", "kanji": "手", "kana": "て", "options": ["Lên (xe, tàu)", "Sinh nhật", "Mắt", "Tay"], "correct_index": 3, "mnemonic": "手 (Thủ): Hình ảnh bàn tay xòe 5 ngón -> Tay."}, {"type": "mcq", "kanji": "足", "kana": "あし", "options": ["Rau", "Chân", "Trường trung học cơ sở", "Đi công tác"], "correct_index": 1, "mnemonic": "足 (Túc): Hình dáng cái chân và đầu gối -> Chân."}, {"type": "mcq", "kanji": "上", "kana": "うえ", "options": ["Trên", "Khỏe mạnh", "Một chút", "Màu sắc"], "correct_index": 0, "mnemonic": "上 (Thượng): Nét chỉ vị trí bên trên vạch ngang -> Trên."}, {"type": "mcq", "kanji": "下", "kana": "した", "options": ["~ Tới / Sau", "Dưới", "~ Trước", "Trước"], "correct_index": 1, "mnemonic": "下 (Hạ): Nét chỉ vị trí bên dưới vạch ngang -> Dưới."}, {"type": "mcq", "kanji": "毎～", "kana": "まい～", "options": ["Điện, đèn điện", "Khỏe mạnh", "Điện thoại", "Mỗi ~"], "correct_index": 3, "mnemonic": "Hãy đọc nhẩm '毎～' vài lần cùng nghĩa 'Mỗi ~' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "毎朝", "kana": "まいあさ", "options": ["Dừng lại", "Mỗi sáng", "Sân bay", "Mang đi"], "correct_index": 1, "mnemonic": "毎 (Mỗi: Người mẹ nuôi con mỗi ngày), 朝 (Sáng) -> Mỗi sáng."}, {"type": "mcq", "kanji": "毎日", "kana": "まいにち", "options": ["Điện, đèn điện", "Mỗi ngày", "Mỗi ~", "Tháng này"], "correct_index": 1, "mnemonic": "毎 (Mỗi), 日 (Ngày) -> Mỗi ngày."}, {"type": "mcq", "kanji": "週末", "kana": "しゅうまつ", "options": ["Trong", "Du lịch", "Năm ngoái", "Cuối tuần"], "correct_index": 3, "mnemonic": "週 (Tuần), 末 (Mạt: Ngọn cây nhỏ xíu) -> Cuối tuần."}, {"type": "mcq", "kanji": "元気", "kana": "げんき", "options": ["Khỏe mạnh", "Xuất phát", "Tàu điện", "Du học"], "correct_index": 0, "mnemonic": "元 (Nguyên), 気 (Khí) -> Khí huyết gốc rễ dồi dào -> Khỏe mạnh."}, {"type": "mcq", "kanji": "外", "kana": "そと", "options": ["Bên ngoài", "Sân bay", "Chúc mừng / Quà chúc mừng", "Trong"], "correct_index": 0, "mnemonic": "外 (Ngoại): Xem bói (卜) vào buổi tối (夕) ở ngoài trời -> Bên ngoài."}, {"type": "mcq", "kanji": "起きます", "kana": "おきます", "options": ["Gửi, tiễn", "Du lịch", "Bức ảnh", "Thức dậy"], "correct_index": 3, "mnemonic": "起 (Khởi): Chạy (走) đi ra khỏi nhà (己) -> Thức dậy."}, {"type": "mcq", "kanji": "歩きます", "kana": "あるきます", "options": ["Cơ thể", "Ô tô", "Mượn", "Đi bộ"], "correct_index": 3, "mnemonic": "歩 (Bộ): Dừng lại (止) rồi đi tiếp (少) -> Đi bộ."}, {"type": "mcq", "kanji": "走ります", "kana": "はしります", "options": ["Chạy", "Đi bộ", "Miệng", "Xuất phát"], "correct_index": 0, "mnemonic": "走 (Tẩu): Hình ảnh người dang tay chạy vội -> Chạy."}, {"type": "mcq", "kanji": "泳ぎます", "kana": "およぎます", "options": ["Giáo viên", "~ Tới / Sau", "Chi nhánh", "Bơi"], "correct_index": 3, "mnemonic": "泳 (Vịnh): Nước (氵) để bơi lội mãi mãi (永) -> Bơi."}, {"type": "mcq", "kanji": "お祝い", "kana": "おいわい", "options": ["Vui vẻ", "Vị", "Chúc mừng / Quà chúc mừng", "Tay"], "correct_index": 2, "mnemonic": "Hãy đọc nhẩm 'お祝い' vài lần cùng nghĩa 'Chúc mừng / Quà chúc mừng' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "誕生日", "kana": "たんじょうび", "options": ["~ Tới / Sau", "Buổi sáng", "Sinh nhật", "Trà"], "correct_index": 2, "mnemonic": "誕 (Đản: Ra đời), 生 (Sinh), 日 (Ngày) -> Ngày sinh nhật."}, {"type": "mcq", "kanji": "結婚", "kana": "けっこん", "options": ["Kết hôn", "Màu sắc", "Công ty", "~ Trước"], "correct_index": 0, "mnemonic": "結 (Kết: Buộc lại bằng sợi tơ), 婚 (Hôn: Người phụ nữ lấy chồng) -> Kết hôn."}, {"type": "mcq", "kanji": "絵", "kana": "え", "options": ["Tai", "Trụ sở chính", "Tranh", "Sử dụng"], "correct_index": 2, "mnemonic": "絵 (Hội): Vẽ tranh phải dùng sợi tơ (糸) và hội họp (会) -> Tranh."}, {"type": "mcq", "kanji": "写真", "kana": "しゃしん", "options": ["Bức ảnh", "Bên ngoài", "Ô tô", "Cuối tuần"], "correct_index": 0, "mnemonic": "写 (Tả: Chép lại), 真 (Chân: Sự thật) -> Bức ảnh."}, {"type": "mcq", "kanji": "時計", "kana": "とけい", "options": ["Chân", "Năm ngoái", "Đồng hồ", "Vị"], "correct_index": 2, "mnemonic": "時 (Thời: Thời gian), 計 (Kế: Đo lường) -> Đồng hồ."}, {"type": "mcq", "kanji": "着ます", "kana": "きます", "options": ["Mỗi ngày", "Khỏe mạnh", "Mặc (áo)", "Bên ngoài"], "correct_index": 2, "mnemonic": "着 (Trước): Con cừu (羊) che con mắt (目) -> Mặc áo/Trang phục."}, {"type": "mcq", "kanji": "先～", "kana": "せん～", "options": ["Xuất phát", "Mỗi ngày", "Miệng", "~ Trước"], "correct_index": 3, "mnemonic": "Hãy đọc nhẩm '先～' vài lần cùng nghĩa '~ Trước' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "先週", "kana": "せんしゅう", "options": ["Rượu", "Tuần trước", "Năm sau", "Du lịch"], "correct_index": 1, "mnemonic": "Hãy đọc nhẩm '先週' vài lần cùng nghĩa 'Tuần trước' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "今～", "kana": "こん～", "options": ["Chiều (PM)", "~ Này", "Giáo viên", "Xuất phát"], "correct_index": 1, "mnemonic": "Hãy đọc nhẩm '今～' vài lần cùng nghĩa '~ Này' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "今月", "kana": "こんげつ", "options": ["Tháng này", "Đầu", "Dừng lại", "Văn hóa"], "correct_index": 0, "mnemonic": "Hãy đọc nhẩm '今月' vài lần cùng nghĩa 'Tháng này' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "来～", "kana": "らい～", "options": ["Đến nơi", "Chúc mừng / Quà chúc mừng", "~ Tới / Sau", "Màu sắc"], "correct_index": 2, "mnemonic": "Hãy đọc nhẩm '来～' vài lần cùng nghĩa '~ Tới / Sau' nhé. Có công mài sắt có ngày nên kim!"}, {"type": "mcq", "kanji": "来年", "kana": "らいねん", "options": ["Điện, đèn điện", "Dừng lại", "Điện thoại", "Năm sau"], "correct_index": 3, "mnemonic": "来 (Lai: Cây lúa mọc lên), 年 (Niên: Năm) -> Năm sau."}, {"type": "mcq", "kanji": "今年", "kana": "ことし", "options": ["Năm nay", "Du học", "Âm nhạc", "Mang đi"], "correct_index": 0, "mnemonic": "今 (Kim: Cái miệng ngậm lại -> Hiện tại), 年 (Niên) -> Năm nay."}, {"type": "mcq", "kanji": "去年", "kana": "きょねん", "options": ["Khỏe mạnh", "Âm nhạc", "Lên (xe, tàu)", "Năm ngoái"], "correct_index": 3, "mnemonic": "去 (Khứ: Qua đi), 年 (Niên) -> Năm ngoái."}, {"type": "mcq", "kanji": "家", "kana": "いえ", "options": ["Nhà", "~ Trước", "Bơi", "Bạn bè"], "correct_index": 0, "mnemonic": "家 (Gia): Con lợn (豕) nuôi dưới mái nhà (宀) -> Nhà."}, {"type": "mcq", "kanji": "思います", "kana": "おもいます", "options": ["Trường trung học phổ thông", "Nhà", "Nghĩ (rằng)", "Rau"], "correct_index": 2, "mnemonic": "思 (Tư): Dùng tâm (心) để ngẫm nghĩ về mảnh ruộng (田) -> Nghĩ rằng."}];
+    const ttsMap = {"とまります": "tts_0.mp3", "しょくじ": "tts_1.mp3", "しごと": "tts_2.mp3", "まえ": "tts_3.mp3", "あと": "tts_4.mp3", "あさ": "tts_5.mp3", "ひる": "tts_6.mp3", "よる": "tts_7.mp3", "のります": "tts_8.mp3", "がっこう": "tts_9.mp3", "しょうがっこう": "tts_10.mp3", "ちゅうがっこう": "tts_11.mp3", "こうこう": "tts_12.mp3", "だいがく": "tts_13.mp3", "せんせい": "tts_14.mp3", "がくせい": "tts_15.mp3", "～ねんせい": "tts_16.mp3", "べんきょう": "tts_17.mp3", "ぶんか": "tts_18.mp3", "おんがく": "tts_19.mp3", "りょこう": "tts_20.mp3", "りゅうがく": "tts_21.mp3", "ともだち": "tts_22.mp3", "たのしい": "tts_23.mp3", "しゅう": "tts_24.mp3", "～かい": "tts_25.mp3", "たべもの": "tts_26.mp3", "のみもの": "tts_27.mp3", "おちゃ": "tts_28.mp3", "おさけ": "tts_29.mp3", "つくります": "tts_30.mp3", "もっていきます": "tts_31.mp3", "おねがいします": "tts_32.mp3", "りょうり": "tts_33.mp3", "あじ": "tts_34.mp3", "いろ": "tts_35.mp3", "やさい": "tts_36.mp3", "すこし": "tts_37.mp3", "なか": "tts_38.mp3", "はいっています": "tts_39.mp3", "かいしゃ": "tts_40.mp3", "ほんしゃ": "tts_41.mp3", "ししゃ": "tts_42.mp3", "しゅっちょう": "tts_43.mp3", "くうこう": "tts_44.mp3", "しゅっぱつ": "tts_45.mp3", "とうちゃく": "tts_46.mp3", "ごぜん": "tts_47.mp3", "ごご": "tts_48.mp3", "じぶん": "tts_49.mp3", "でんわ": "tts_50.mp3", "でんき": "tts_51.mp3", "でんしゃ": "tts_52.mp3", "くるま": "tts_53.mp3", "おくります": "tts_54.mp3", "つかいます": "tts_55.mp3", "かります": "tts_56.mp3", "からだ": "tts_57.mp3", "あたま": "tts_58.mp3", "め": "tts_59.mp3", "くち": "tts_60.mp3", "みみ": "tts_61.mp3", "て": "tts_62.mp3", "あし": "tts_63.mp3", "うえ": "tts_64.mp3", "した": "tts_65.mp3", "まい～": "tts_66.mp3", "まいあさ": "tts_67.mp3", "まいにち": "tts_68.mp3", "しゅうまつ": "tts_69.mp3", "げんき": "tts_70.mp3", "そと": "tts_71.mp3", "おきます": "tts_72.mp3", "あるきます": "tts_73.mp3", "はしります": "tts_74.mp3", "およぎます": "tts_75.mp3", "おいわい": "tts_76.mp3", "たんじょうび": "tts_77.mp3", "けっこん": "tts_78.mp3", "え": "tts_79.mp3", "しゃしん": "tts_80.mp3", "とけい": "tts_81.mp3", "きます": "tts_82.mp3", "せん～": "tts_83.mp3", "せんしゅう": "tts_84.mp3", "こん～": "tts_85.mp3", "こんげつ": "tts_86.mp3", "らい～": "tts_87.mp3", "らいねん": "tts_88.mp3", "ことし": "tts_89.mp3", "きょねん": "tts_90.mp3", "いえ": "tts_91.mp3", "おもいます": "tts_92.mp3"};
 
     let activeQuestions = [];
     let currentLevelIndex = 0;
     let currentQuestionIndex = 0;
     
     let isChecked = false;
-    let isKanaMode = false;
-    let currentAnswerBlocks = []; 
-    let wordBankState = []; 
+    let selectedOptionIndex = -1;
     let historyStack = [];
     
-    let completedLevels = JSON.parse(localStorage.getItem('jap183_completed') || '[]');
+    let completedLevels = JSON.parse(localStorage.getItem('vocab_completed') || '[]');
 
     const ui = {
         quizScreen: document.getElementById('quiz-screen'),
-        readingMode: document.getElementById('reading-mode'),
-        sortingMode: document.getElementById('sorting-mode'),
-        fcText: document.getElementById('fc-text'),
-        fcReveal: document.getElementById('fc-reveal'),
-        qSpeech: document.getElementById('q-speech'),
-        dropZone: document.getElementById('drop-zone'),
-        wordBank: document.getElementById('word-bank'),
+        mcqMode: document.getElementById('mcq-mode'),
+        mcqKanji: document.getElementById('mcq-kanji'),
+        mcqKana: document.getElementById('mcq-kana'),
+        mcqOptions: document.getElementById('mcq-options'),
         btnCheck: document.getElementById('btn-check'),
         bottomBar: document.getElementById('bottom-bar'),
         feedbackContainer: document.getElementById('feedback-container'),
         feedbackExplanation: document.getElementById('feedback-explanation'),
         feedbackTitle: document.getElementById('feedback-title'),
-        progressBar: document.getElementById('progress-bar'),
-        btnToggle: document.getElementById('btn-toggle')
+        progressBar: document.getElementById('progress-bar')
     };
 
     const audioCorrect = new Audio('duolingo-correct.mp3');
@@ -243,21 +172,13 @@
             levelIndex: currentLevelIndex,
             questionIndex: currentQuestionIndex,
             activeQuestions: activeQuestions,
-            history: historyStack,
-            isKanaMode: isKanaMode
+            history: historyStack
         };
-        localStorage.setItem('jap183_session', JSON.stringify(sessionData));
+        localStorage.setItem('vocab_session', JSON.stringify(sessionData));
     }
 
     function clearSession() {
-        localStorage.removeItem('jap183_session');
-    }
-    
-    function toggleKana() {
-        isKanaMode = !isKanaMode;
-        ui.btnToggle.className = isKanaMode ? 'toggle-btn active' : 'toggle-btn';
-        renderCurrentQuestion();
-        saveSession();
+        localStorage.removeItem('vocab_session');
     }
 
     function speakJP(text) {
@@ -274,7 +195,7 @@
 
     function playQuestionAudio() {
         const q = activeQuestions[currentQuestionIndex];
-        speakJP(q.q_kana);
+        speakJP(q.kana);
     }
 
     function renderLevels() {
@@ -336,11 +257,6 @@
             const prevState = historyStack.pop();
             currentQuestionIndex = prevState.qIndex;
             activeQuestions = prevState.activeQ;
-            
-            if (recognition && btnMic.style.background === 'var(--red)') {
-                recognition.stop();
-            }
-            
             saveSession();
             loadQuestion();
         }
@@ -350,7 +266,7 @@
         if (currentQuestionIndex >= activeQuestions.length) {
             if(!completedLevels.includes(currentLevelIndex)) {
                 completedLevels.push(currentLevelIndex);
-                localStorage.setItem('jap183_completed', JSON.stringify(completedLevels));
+                localStorage.setItem('vocab_completed', JSON.stringify(completedLevels));
             }
             clearSession();
             ui.quizScreen.style.display = 'none'; document.getElementById('header').style.display = 'none'; ui.bottomBar.style.display = 'none';
@@ -359,132 +275,63 @@
         
         const q = activeQuestions[currentQuestionIndex];
         isChecked = false;
+        selectedOptionIndex = -1;
         ui.bottomBar.className = 'bottom-bar'; ui.feedbackContainer.style.display = 'none';
         ui.btnCheck.className = 'btn-check'; ui.btnCheck.innerText = 'KIỂM TRA';
         ui.progressBar.style.width = ((currentQuestionIndex / activeQuestions.length) * 100) + '%';
         
-        if (q.type === 'sorting') {
-            const targetArray = isKanaMode ? q.a_kana_chunks : q.a_kanji_chunks;
-            let blocks = targetArray.map((text, i) => ({ text, id: i, kanji: q.a_kanji_chunks[i], kana: q.a_kana_chunks[i] }));
-            wordBankState = blocks.sort(() => Math.random() - 0.5);
-            currentAnswerBlocks = [];
-        } else {
-            ui.fcReveal.style.display = 'none';
-            ui.fcReveal.innerHTML = `${q.q_kana}<br><br><span style="color:#777; font-size:16px;">${q.vi}</span>`;
-        }
         renderCurrentQuestion();
+        playQuestionAudio(); // Auto play audio on load
     }
 
     function renderCurrentQuestion() {
         const q = activeQuestions[currentQuestionIndex];
-        ui.btnToggle.className = isKanaMode ? 'toggle-btn active' : 'toggle-btn';
         
-        if (q.type === 'reading') {
-            accumulatedSpeech = "";
-            isRecording = false;
-            if(btnMic) btnMic.classList.remove('mic-recording');
-            ui.sortingMode.style.display = 'none'; ui.readingMode.style.display = 'block';
-            document.getElementById('q-title').innerText = "Đọc to câu sau";
-            ui.fcText.innerText = isKanaMode ? q.q_kana : q.q_kanji;
-            ui.btnCheck.classList.remove('active');
-            if(speechResult) speechResult.innerText = "Bấm Mic để nói. Xong thì bấm nút KIỂM TRA.";
+        ui.mcqMode.style.display = 'block';
+        ui.mcqKanji.innerText = q.kanji;
+        ui.mcqKana.innerText = q.kana;
+        ui.mcqOptions.innerHTML = '';
+        
+        q.options.forEach((opt, idx) => {
+            const btn = document.createElement('div');
+            btn.className = 'mcq-option';
+            if (idx === selectedOptionIndex) btn.classList.add('selected');
+            btn.innerText = opt;
+            btn.onclick = () => {
+                if (isChecked) return;
+                selectedOptionIndex = idx;
+                renderCurrentQuestion();
+            };
+            ui.mcqOptions.appendChild(btn);
+        });
+        
+        if (selectedOptionIndex !== -1) {
+            ui.btnCheck.classList.add('active');
         } else {
-            ui.sortingMode.style.display = 'flex'; ui.sortingMode.style.flexDirection = 'column'; ui.readingMode.style.display = 'none';
-            document.getElementById('q-title').innerText = "Nghe và sắp xếp câu trả lời";
-            ui.qSpeech.innerText = isKanaMode ? q.q_kana : q.q_kanji;
-            
-            ui.dropZone.innerHTML = '';
-            currentAnswerBlocks.forEach((b, i) => {
-                const d = document.createElement('div'); d.className = 'word-chunk'; 
-                d.innerText = isKanaMode ? b.kana : b.kanji;
-                d.onclick = () => { if(!isChecked) { wordBankState.push(b); currentAnswerBlocks.splice(i, 1); renderCurrentQuestion(); } };
-                ui.dropZone.appendChild(d);
-            });
-
-            ui.wordBank.innerHTML = '';
-            wordBankState.forEach((b, i) => {
-                const d = document.createElement('div'); d.className = 'word-chunk';
-                d.innerText = isKanaMode ? b.kana : b.kanji;
-                d.onclick = () => { if(!isChecked) { currentAnswerBlocks.push(b); wordBankState.splice(i, 1); speakJP(d.innerText); renderCurrentQuestion(); } };
-                ui.wordBank.appendChild(d);
-            });
-            
-            if (currentAnswerBlocks.length > 0 && wordBankState.length === 0) {
-                ui.btnCheck.classList.add('active');
-            } else {
-                ui.btnCheck.classList.remove('active');
-            }
+            ui.btnCheck.classList.remove('active');
         }
-    }
-
-    function flipCard() {
-        const q = activeQuestions[currentQuestionIndex];
-        ui.fcReveal.style.display = 'block';
-        speakJP(q.q_kana);
     }
 
     function onCheckClick() {
         const q = activeQuestions[currentQuestionIndex];
         if (!ui.btnCheck.classList.contains('active')) return;
-        
-        // Stop recording immediately if Check is clicked
-        if (isRecording) {
-            isRecording = false;
-            recognition.stop();
-        }
 
         if (!isChecked) {
             isChecked = true;
             ui.btnCheck.innerText = 'TIẾP TỤC';
             ui.feedbackContainer.style.display = 'block';
 
-            if (q.type === 'reading') {
-                if (accumulatedSpeech === "SKIP_SPEAKING") {
-                    ui.bottomBar.className = 'bottom-bar correct';
-                    ui.feedbackTitle.innerText = 'Đã bỏ qua';
-                    ui.feedbackExplanation.innerHTML = `Hãy luyện đọc lại câu này nhé:<br><br><b>${q.q_kana}</b><br>${q.vi}`;
-                    audioCorrect.currentTime = 0; audioCorrect.play().catch(e=>e);
-                } else {
-                    const clean = (str) => str.replace(/[。、\s]/g, '');
-                    const targetKanji = clean(q.q_kanji);
-                    const targetKana = clean(q.q_kana);
-                    const spoken = clean(accumulatedSpeech);
-                    
-                    let matchCount = 0;
-                    for(let char of spoken) {
-                        if (targetKanji.includes(char) || targetKana.includes(char)) matchCount++;
-                    }
-                    const similarity = matchCount / Math.max(spoken.length, targetKanji.length);
-                    
-                    if (similarity > 0.5 || spoken === targetKanji || spoken === targetKana || targetKanji.includes(spoken) || targetKana.includes(spoken)) {
-                        ui.bottomBar.className = 'bottom-bar correct';
-                        ui.feedbackTitle.innerText = 'Phát âm chuẩn!';
-                        ui.feedbackExplanation.innerHTML = `<b>${q.q_kana}</b><br>${q.vi}`;
-                        audioCorrect.currentTime = 0; audioCorrect.play().catch(e=>e);
-                    } else {
-                        ui.bottomBar.className = 'bottom-bar incorrect';
-                        ui.feedbackTitle.innerText = 'Chưa chính xác!';
-                        ui.feedbackExplanation.innerHTML = `Hệ thống nghe được:<br><span style="color:var(--red-dark); font-weight:bold;">${accumulatedSpeech}</span><br><br>Đáp án đúng:<br><b>${q.q_kana}</b>`;
-                        audioWrong.currentTime = 0; audioWrong.play().catch(e=>e);
-                    }
-                }
+            const isCorrect = (selectedOptionIndex === q.correct_index);
+            if (isCorrect) {
+                ui.bottomBar.className = 'bottom-bar correct';
+                ui.feedbackTitle.innerText = 'Tuyệt vời!';
+                ui.feedbackExplanation.innerHTML = `<b>Mẹo nhớ:</b> ${q.mnemonic}`;
+                audioCorrect.currentTime = 0; audioCorrect.play().catch(e=>e);
             } else {
-                const userIds = currentAnswerBlocks.map(b => b.id).join(',');
-                const correctIds = q.a_kanji_chunks.map((_, i) => i).join(',');
-                const isCorrect = userIds === correctIds;
-                const fullKana = q.a_kana_chunks.join('');
-                if (isCorrect) {
-                    ui.bottomBar.className = 'bottom-bar correct';
-                    ui.feedbackTitle.innerText = 'Chính xác!';
-                    ui.feedbackExplanation.innerHTML = `<b>${fullKana}</b><br>${q.vi}`;
-                    audioCorrect.currentTime = 0; audioCorrect.play().catch(e=>e);
-                    speakJP(fullKana);
-                } else {
-                    ui.bottomBar.className = 'bottom-bar incorrect';
-                    ui.feedbackTitle.innerText = 'Chưa đúng rồi!';
-                    ui.feedbackExplanation.innerHTML = `Đáp án đúng:<br><b>${isKanaMode ? fullKana : q.a_kanji_chunks.join('')}</b><br>${q.vi}`;
-                    audioWrong.currentTime = 0; audioWrong.play().catch(e=>e);
-                }
+                ui.bottomBar.className = 'bottom-bar incorrect';
+                ui.feedbackTitle.innerText = 'Sai rồi!';
+                ui.feedbackExplanation.innerHTML = `<b>Đáp án đúng:</b> ${q.options[q.correct_index]}<br><br><b>Mẹo nhớ:</b> ${q.mnemonic}`;
+                audioWrong.currentTime = 0; audioWrong.play().catch(e=>e);
             }
         } else {
             historyStack.push({
@@ -492,14 +339,10 @@
                 activeQ: JSON.parse(JSON.stringify(activeQuestions))
             });
 
-            if (q.type === 'reading') {
-                currentQuestionIndex++;
-            } else {
-                const userIds = currentAnswerBlocks.map(b => b.id).join(',');
-                const correctIds = q.a_kanji_chunks.map((_, i) => i).join(',');
-                if (userIds === correctIds) currentQuestionIndex++;
-                else activeQuestions.push(activeQuestions.splice(currentQuestionIndex, 1)[0]);
-            }
+            const isCorrect = (selectedOptionIndex === q.correct_index);
+            if (isCorrect) currentQuestionIndex++;
+            else activeQuestions.push(activeQuestions.splice(currentQuestionIndex, 1)[0]);
+            
             saveSession();
             loadQuestion();
         }
@@ -516,114 +359,9 @@
         renderLevels();
     }
 
-    // ==== SPEECH RECOGNITION ====
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition = null;
-    let isRecording = false;
-    let accumulatedSpeech = "";
-
-    if (SpeechRecognition) {
-        recognition = new SpeechRecognition();
-        recognition.lang = 'ja-JP';
-        recognition.continuous = true;
-        recognition.interimResults = true;
-        recognition.maxAlternatives = 1;
-    }
-
-    const btnMic = document.getElementById('btn-mic');
-    const speechResult = document.getElementById('speech-result');
-
-    if (btnMic) {
-        btnMic.onclick = () => {
-            if (!recognition) {
-                alert("Trình duyệt của bạn không hỗ trợ thu âm (Hãy dùng Chrome/Edge)!");
-                return;
-            }
-            if (isRecording) {
-                isRecording = false;
-                recognition.stop();
-                return;
-            }
-            
-            // If they are retrying after an incorrect guess, clear it automatically
-            if (ui.bottomBar.classList.contains('incorrect')) {
-                accumulatedSpeech = '';
-                ui.bottomBar.className = 'bottom-bar';
-                ui.bottomBar.style.display = 'none';
-            }
-            
-            isRecording = true;
-            btnMic.classList.add('mic-recording');
-            speechResult.innerText = "Đang nghe...";
-            ui.btnCheck.classList.remove('active');
-            recognition.start();
-        };
-    }
-
-    if (recognition) {
-        recognition.onresult = (event) => {
-            let interimTranscript = '';
-            let finalTranscript = '';
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
-                if (event.results[i].isFinal) {
-                    finalTranscript += event.results[i][0].transcript;
-                } else {
-                    interimTranscript += event.results[i][0].transcript;
-                }
-            }
-            
-            accumulatedSpeech += finalTranscript;
-            const fullTranscript = accumulatedSpeech + interimTranscript;
-            speechResult.innerHTML = `Nghe được: <span style="color:var(--blue); font-weight:900;">${fullTranscript}</span>`;
-            
-            if (fullTranscript.trim().length > 0) {
-                ui.btnCheck.classList.add('active'); // Allow manual check
-            }
-        };
-        
-        recognition.onerror = (event) => {
-            resetMicBtn();
-            if(!accumulatedSpeech) speechResult.innerText = "Lỗi mic: " + event.error;
-        };
-        
-        recognition.onend = () => {
-            resetMicBtn();
-            if (accumulatedSpeech) {
-                speechResult.innerHTML = `Nghe được: <span style="color:var(--blue); font-weight:900;">${accumulatedSpeech}</span><br><span style="font-size:14px; color:#777;">(Mic tạm ngắt. Nhấn Mic đọc tiếp hoặc nhấn ↻ làm lại)</span>`;
-            } else if (!speechResult.innerText.includes('Lỗi')) {
-                speechResult.innerText = "Đã ngắt thu âm. Nhấn Mic để thử lại.";
-            }
-        };
-    }
-
-    function resetMicBtn() {
-        isRecording = false;
-        if(btnMic) btnMic.classList.remove('mic-recording');
-    }
-
-    function clearSpeech() {
-        if(isRecording && recognition) recognition.stop();
-        accumulatedSpeech = '';
-        speechResult.innerText = "Đã xoá. Nhấn Mic để đọc lại từ đầu.";
-        ui.btnCheck.classList.remove('active');
-        if (ui.bottomBar.classList.contains('incorrect')) {
-            ui.bottomBar.className = 'bottom-bar';
-            ui.bottomBar.style.display = 'none';
-        }
-    }
-
-    function skipSpeaking() {
-        isRecording = false;
-        if(recognition) recognition.stop();
-        accumulatedSpeech = "SKIP_SPEAKING";
-        ui.btnCheck.classList.add('active');
-        onCheckClick();
-    }
-    
-    // Check existing session on load
     window.onload = () => {
         renderLevels();
-        const saved = localStorage.getItem('jap183_session');
+        const saved = localStorage.getItem('vocab_session');
         if (saved) {
             try {
                 const data = JSON.parse(saved);
@@ -631,7 +369,6 @@
                 currentQuestionIndex = data.questionIndex;
                 activeQuestions = data.activeQuestions;
                 historyStack = data.history || [];
-                isKanaMode = data.isKanaMode || false;
                 
                 document.getElementById('start-overlay').style.display = 'none';
                 document.getElementById('header').style.display = 'flex';
