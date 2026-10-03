@@ -86,6 +86,27 @@
     </style>
 </head>
 <body>
+<div id="sync-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:10000; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:#fff; border-radius:20px; padding:20px; width:100%; max-width:400px; display:flex; flex-direction:column; gap:15px; position:relative;">
+        <button onclick="closeSyncModal()" style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:24px; color:var(--gray-dark); cursor:pointer;">✖</button>
+        <h2 style="margin:0; font-weight:900; color:var(--text-main); font-size:20px;">Đồng bộ dữ liệu</h2>
+        
+        <div>
+            <label style="font-weight:800; font-size:14px; color:var(--gray-dark);">Mã xuất (Copy để gửi sang máy khác):</label>
+            <textarea id="sync-export" readonly style="width:100%; height:60px; border:2px solid var(--gray); border-radius:10px; padding:10px; font-family:monospace; margin-top:5px; resize:none;"></textarea>
+            <button onclick="copySyncCode()" style="margin-top:10px; width:100%; padding:10px; background:var(--blue); color:white; border:none; border-radius:10px; font-weight:800; font-size:16px; cursor:pointer;">SAO CHÉP MÃ</button>
+        </div>
+        
+        <div style="height:2px; background:var(--gray); margin:10px 0;"></div>
+        
+        <div>
+            <label style="font-weight:800; font-size:14px; color:var(--gray-dark);">Mã nhập (Dán mã từ máy khác vào đây):</label>
+            <textarea id="sync-import" style="width:100%; height:60px; border:2px solid var(--gray); border-radius:10px; padding:10px; font-family:monospace; margin-top:5px; resize:none;"></textarea>
+            <button onclick="importSyncCode()" style="margin-top:10px; width:100%; padding:10px; background:var(--green-500); color:white; border:none; border-radius:10px; font-weight:800; font-size:16px; cursor:pointer;">ĐỒNG BỘ NGAY</button>
+        </div>
+    </div>
+</div>
+
 
 <div id="start-overlay">
     <div class="unit-banner">
@@ -93,6 +114,7 @@
             <h2 style="margin: 0; font-size: 22px; font-weight: 900;">Từ Vựng Tiếng Nhật</h2>
             <p style="margin: 5px 0 0 0; font-size: 17px; font-weight: 700; opacity: 0.9;">Học tốc tốc mai thi! (77 từ)</p>
         </div>
+        <button onclick="openSyncModal()" style="background:rgba(255,255,255,0.2); border:none; border-radius:50%; width:40px; height:40px; font-size:20px; cursor:pointer; color:white; display:flex; align-items:center; justify-content:center;" title="Đồng bộ">⚙️</button>
     </div>
     <div class="path-container" id="level-container"></div>
 </div>
@@ -235,6 +257,70 @@
             if(!isLocked) btn.onclick = () => startLevel(i);
             wrapper.appendChild(btn); container.appendChild(wrapper);
         }
+
+        const finalWrapper = document.createElement('div');
+        finalWrapper.className = 'lesson-node-wrapper';
+        finalWrapper.style.right = '0px';
+        const finalBtn = document.createElement('button');
+        finalBtn.className = 'lesson-button active-node';
+        finalBtn.style.backgroundColor = 'var(--gold)';
+        finalBtn.style.borderBottomColor = '#d4a000';
+        finalBtn.innerHTML = '<span style="font-size:32px;">👑</span>';
+        finalBtn.onclick = () => startFinalReview();
+        const finalRing = document.createElement('div');
+        finalRing.innerHTML = `<svg width="102" height="102" viewBox="0 0 102 102" class="progress-ring"><circle cx="51" cy="51" r="46" stroke="var(--neutral-200)" stroke-width="8" fill="none" /><circle cx="51" cy="51" r="46" stroke="var(--gold)" stroke-width="8" fill="none" stroke-dasharray="289" stroke-dashoffset="0" stroke-linecap="round" /></svg>`;
+        finalWrapper.appendChild(finalRing.firstElementChild);
+        const finalTooltip = document.createElement('div'); finalTooltip.className = 'start-tooltip'; finalTooltip.innerText = 'ÔN TỔNG HỢP'; finalTooltip.style.color = 'var(--gold)'; finalTooltip.style.width = '135px'; finalTooltip.style.left = '-15px'; finalTooltip.style.borderColor = 'var(--gold)'; finalWrapper.appendChild(finalTooltip);
+        finalWrapper.appendChild(finalBtn); container.appendChild(finalWrapper);
+
+    }
+
+    
+    function openSyncModal() {
+        document.getElementById('sync-modal').style.display = 'flex';
+        const data = {
+            vocab_completed: localStorage.getItem('vocab_completed') || '[]',
+            vocab_session: localStorage.getItem('vocab_session') || ''
+        };
+        document.getElementById('sync-export').value = btoa(encodeURIComponent(JSON.stringify(data)));
+    }
+    function closeSyncModal() {
+        document.getElementById('sync-modal').style.display = 'none';
+    }
+    function copySyncCode() {
+        const copyText = document.getElementById('sync-export');
+        copyText.select();
+        document.execCommand('copy');
+        alert('Đã sao chép mã đồng bộ!');
+    }
+    function importSyncCode() {
+        const code = document.getElementById('sync-import').value.trim();
+        if (!code) return;
+        try {
+            const data = JSON.parse(decodeURIComponent(atob(code)));
+            if (data.vocab_completed) localStorage.setItem('vocab_completed', data.vocab_completed);
+            if (data.vocab_session) localStorage.setItem('vocab_session', data.vocab_session);
+            alert('Đồng bộ thành công! Trang sẽ tải lại.');
+            location.reload();
+        } catch(e) {
+            alert('Mã đồng bộ không hợp lệ!');
+        }
+    }
+
+    function startFinalReview() {
+        currentLevelIndex = 'FINAL';
+        let allQ = JSON.parse(JSON.stringify(questions));
+        allQ.sort(() => Math.random() - 0.5);
+        activeQuestions = allQ; // Test on all 77 questions!
+        currentQuestionIndex = 0;
+        historyStack = [];
+        saveSession();
+        
+        document.getElementById('start-overlay').style.display = 'none';
+        document.getElementById('header').style.display = 'flex';
+        ui.quizScreen.style.display = 'flex';
+        ui.bottomBar.style.display = 'flex';
+        loadQuestion();
     }
 
     function startLevel(index) {
@@ -264,7 +350,7 @@
 
     function loadQuestion() {
         if (currentQuestionIndex >= activeQuestions.length) {
-            if(!completedLevels.includes(currentLevelIndex)) {
+            if(currentLevelIndex !== 'FINAL' && !completedLevels.includes(currentLevelIndex)) {
                 completedLevels.push(currentLevelIndex);
                 localStorage.setItem('vocab_completed', JSON.stringify(completedLevels));
             }
