@@ -113,8 +113,7 @@
             <button class="audio-btn" onclick="playQuestionAudio()" style="margin:0; width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center;">🔊</button>
             <div style="font-size: 60px; font-weight: 900; color: var(--text-main);" id="mcq-kanji">漢</div>
         </div>
-        <div style="font-size: 18px; color: var(--gold); margin-bottom: 5px; font-weight: 900; text-transform: uppercase;" id="mcq-hanviet"></div>
-        <div style="font-size: 24px; color: var(--blue); margin-bottom: 30px; font-weight: 800;" id="mcq-kana">かんじ</div>
+                <div style="font-size: 24px; color: var(--blue); margin-bottom: 30px; font-weight: 800;" id="mcq-kana">かんじ</div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;" id="mcq-options">
         </div>
     </div>
@@ -154,7 +153,6 @@
         quizScreen: document.getElementById('quiz-screen'),
         mcqMode: document.getElementById('mcq-mode'),
         mcqKanji: document.getElementById('mcq-kanji'),
-        mcqHanViet: document.getElementById('mcq-hanviet'),
         mcqKana: document.getElementById('mcq-kana'),
         mcqOptions: document.getElementById('mcq-options'),
         btnCheck: document.getElementById('btn-check'),
@@ -291,7 +289,6 @@
         
         ui.mcqMode.style.display = 'block';
         ui.mcqKanji.innerText = q.kanji;
-        ui.mcqHanViet.innerText = q.han_viet || '';
         ui.mcqKana.innerText = q.kana;
         ui.mcqOptions.innerHTML = '';
         
@@ -328,12 +325,12 @@
             if (isCorrect) {
                 ui.bottomBar.className = 'bottom-bar correct';
                 ui.feedbackTitle.innerText = 'Tuyệt vời!';
-                ui.feedbackExplanation.innerHTML = `<b>Mẹo nhớ:</b> ${q.mnemonic}`;
+                ui.feedbackExplanation.innerHTML = `<b>Âm Hán Việt:</b> <span style="color:var(--gold); font-weight:900;">${q.han_viet}</span><br><br><b>Mẹo nhớ:</b> ${q.mnemonic}`;
                 audioCorrect.currentTime = 0; audioCorrect.play().catch(e=>e);
             } else {
                 ui.bottomBar.className = 'bottom-bar incorrect';
                 ui.feedbackTitle.innerText = 'Sai rồi!';
-                ui.feedbackExplanation.innerHTML = `<b>Đáp án đúng:</b> ${q.options[q.correct_index]}<br><br><b>Mẹo nhớ:</b> ${q.mnemonic}`;
+                ui.feedbackExplanation.innerHTML = `<b>Đáp án đúng:</b> ${q.options[q.correct_index]}<br><br><b>Âm Hán Việt:</b> <span style="color:var(--gold); font-weight:900;">${q.han_viet}</span><br><br><b>Mẹo nhớ:</b> ${q.mnemonic}`;
                 audioWrong.currentTime = 0; audioWrong.play().catch(e=>e);
             }
         } else {
