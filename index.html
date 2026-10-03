@@ -83,6 +83,14 @@
         
         .start-tooltip { position: absolute; top: -28px; left: 5px; z-index: 10; background-color: white; border: 2px solid var(--neutral-200); border-radius: 12px; padding: 8px 12px; font-weight: 900; font-size: 15px; color: var(--green-500); animation: bounce 2s infinite; }
         @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0); } 40% { transform: translateY(-10px); } 60% { transform: translateY(-5px); } }
+    
+        .btn-reveal {
+            background: var(--neutral-200); color: var(--neutral-400);
+            border: 2px dashed var(--neutral-400); border-radius: 15px;
+            padding: 20px; font-size: 18px; font-weight: 800;
+            width: 100%; cursor: pointer; transition: 0.2s;
+        }
+        .btn-reveal:active { background: var(--gray); }
     </style>
 </head>
 <body>
@@ -136,7 +144,8 @@
             <div style="font-size: 60px; font-weight: 900; color: var(--text-main);" id="mcq-kanji">漢</div>
         </div>
                 <div style="font-size: 24px; color: var(--blue); margin-bottom: 30px; font-weight: 800;" id="mcq-kana">かんじ</div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;" id="mcq-options">
+        <button id="btn-reveal-options" class="btn-reveal" onclick="revealOptions()">👁 Bấm để hiện các đáp án</button>
+        <div style="display: none; grid-template-columns: 1fr 1fr; gap: 15px;" id="mcq-options">
         </div>
     </div>
 </main>
@@ -370,10 +379,21 @@
         playQuestionAudio(); // Auto play audio on load
     }
 
+    
+    function revealOptions() {
+        document.getElementById('btn-reveal-options').style.display = 'none';
+        document.getElementById('mcq-options').style.display = 'grid';
+    }
+
     function renderCurrentQuestion() {
         const q = activeQuestions[currentQuestionIndex];
         
+        
+        document.getElementById('btn-reveal-options').style.display = 'block';
+        ui.mcqOptions.style.display = 'none';
+        
         ui.mcqMode.style.display = 'block';
+
         ui.mcqKanji.innerText = q.kanji;
         ui.mcqKana.innerText = q.kana;
         ui.mcqOptions.innerHTML = '';
